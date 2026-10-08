@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFind | Lost & Found</title>
+
+```
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+        background: #f5f7fb;
+        color: #1f2937;
+    }
+
+    /* =========================
+       NAVBAR
+    ========================= */
+
+    nav {
+        background: #ffffff;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 7%;
+        border-bottom: 1px solid #e5e7eb;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 23px;
+        font-weight: bold;
+        color: #2563eb;
+    }
+
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        background: #2563eb;
+        color: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+    .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .welcome-text {
+        color: #4b5563;
+        font-size: 14px;
+    }
+
+    .nav-btn {
+        border: none;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .login-btn {
+        background: #2563eb;
+        color: white;
+    }
+
+    .login-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .logout-btn {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .logout-btn:hover {
+        background: #fecaca;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero {
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        color: white;
+        padding: 70px 7%;
+    }
+
+    .hero-content {
+        max-width: 850px;
+        margin: auto;
+        text-align: center;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 18px;
+        line-height: 1.6;
+        opacity: 0.95;
+    }
+
+    .hero-buttons {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .hero-btn {
+        padding: 13px 25px;
+        border-radius: 9px;
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .lost-btn {
+        background: white;
+        color: #2563eb;
+    }
+
+    .found-btn {
+        background: #16a34a;
+        color: white;
+    }
+
+    .hero-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* =========================
+       STATISTICS
+    ========================= */
+
+    .stats {
+        max-width: 1100px;
+        margin: -30px auto 30px;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        position: relative;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 22px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-card h2 {
+        font-size: 30px;
+        color: #2563eb;
+        margin-bottom: 5px;
+    }
+
+    .stat-card p {
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    /* =========================
+       MAIN CONTAINER
+    ========================= */
+
+    .container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .section-title {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+        color: #6b7280;
+        margin-bottom: 25px;
+    }
+
+    /* =========================
+       SEARCH / FILTER
+    ========================= */
+
+    .search-box {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        margin-bottom: 30px;
+    }
+
+    .search-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 12px;
+    }
+
+    .search-input,
+    .filter-select {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        outline: none;
+        font-size: 14px;
+    }
+
+    .search-input:focus,
+    .filter-select:focus {
+        border-color: #2563eb;
+    }
+
+    /* =========================
+       ITEM GRID
+    ========================= */
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+    }
+
+    .item-card {
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, 0.07);
+        transition: 0.2s;
+    }
+
+    .item-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.10);
+    }
+
+    .item-image-container {
+        width: 100%;
+        height: 190px;
+        background: #eef2ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .uploaded-item-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .item-icon {
+        font-size: 55px;
+    }
+
+    .item-content {
+        padding: 18px;
+    }
+
+    .item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .item-title {
+        font-size: 19px;
+        font-weight: bold;
+        color: #111827;
+    }
+
+    .status-badge {
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .status-lost {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .status-found {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .item-info {
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 12px;
+    }
+
+    .item-description {
+        color: #374151;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+
+    .contact-btn {
+        width: 100%;
+        padding: 11px;
+        border: none;
+        background: #2563eb;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .contact-btn:hover {
+        background: #1d4ed8;
+    }
+
+    /* =========================
+       DELETE BUTTON
+    ========================= */
+
+    .delete-btn {
+        width: 100%;
+        margin-top: 10px;
+        padding: 11px;
+        border: none;
+        background: #ef4444;
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .delete-btn:hover {
+        background: #dc2626;
+    }
+
+    /* =========================
+       EMPTY STATE
+    ========================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        background: white;
+        border-radius: 12px;
+        color: #6b7280;
+    }
+
+    .empty-state-icon {
+        font-size: 50px;
+        margin-bottom: 15px;
+    }
+
+    /* =========================
+       MODAL
+    ========================= */
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal {
+        background: white;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 15px;
+        padding: 28px;
+        position: relative;
+    }
+
+    .modal h2 {
+        margin-bottom: 20px;
+        color: #111827;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 18px;
+        border: none;
+        background: transparent;
+        font-size: 25px;
+        cursor: pointer;
+        color: #6b7280;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #374151;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        outline: none;
+        font-size: 14px;
+    }
+
+    .form-textarea {
+        min-height: 90px;
+        resize: vertical;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        border-color: #2563eb;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* =========================
+       AUTH MODAL
+    ========================= */
+
+    .auth-switch {
+        text-align: center;
+        margin-top: 15px;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+    .auth-switch span {
+        color: #2563eb;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* =========================
+       LOADING
+    ========================= */
+
+    .loading {
+        text-align: center;
+        padding: 40px;
+        color: #6b7280;
+        grid-column: 1 / -1;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+        margin-top: 60px;
+        background: #111827;
+        color: white;
+        text-align: center;
+        padding: 25px;
+    }
+
+    footer p {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 850px) {
+        .items-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .search-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 600px) {
+        nav {
+            padding: 0 4%;
+        }
+
+        .welcome-text {
+            display: none;
+        }
+
+        .hero {
+            padding: 50px 5%;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+        }
+
+        .stats {
+            grid-template-columns: 1fr;
+            margin-top: 20px;
+        }
+
+        .items-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .container {
+            padding: 0 15px;
+        }
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<nav>
+
+    <div class="logo">
+        <div class="logo-icon">
+            CF
+        </div>
+
+        <span>CampusFind</span>
+    </div>
+
+    <div class="nav-right">
+
+        <span
+            id="welcomeText"
+            class="welcome-text"
+            style="display:none;"
+        ></span>
+
+        <button
+            id="loginButton"
+            class="nav-btn login-btn"
+            onclick="openAuth('login')"
+        >
+            Login
+        </button>
+
+        <button
+            id="logoutButton"
+            class="nav-btn logout-btn"
+            onclick="logout()"
+            style="display:none;"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</nav>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Campus Lost & Found
+        </h1>
+
+        <p>
+            Lost something on campus?
+            Found something that belongs to someone?
+            CampusFind helps students report,
+            search and recover lost belongings easily.
+        </p>
+
+        <div class="hero-buttons">
+
+            <button
+                class="hero-btn lost-btn"
+                onclick="openReport('Lost')"
+            >
+                🔎 Report Lost Item
+            </button>
+
+            <button
+                class="hero-btn found-btn"
+                onclick="openReport('Found')"
+            >
+                📦 Report Found Item
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     STATISTICS
+========================= -->
+
+<div class="stats">
+
+    <div class="stat-card">
+        <h2 id="totalItems">0</h2>
+        <p>Total Reports</p>
+    </div>
+
+    <div class="stat-card">
+        <h2 id="lostItems">0</h2>
+        <p>Lost Items</p>
+    </div>
+
+    <div class="stat-card">
+        <h2 id="foundItems">0</h2>
+        <p>Found Items</p>
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="container">
+
+    <h2 class="section-title">
+        Browse Reports
+    </h2>
+
+    <p class="section-subtitle">
+        Search through recently reported lost and found items.
+    </p>
+
+
+    <!-- SEARCH -->
+
+    <div class="search-box">
+
+        <div class="search-row">
+
+            <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search item, location, description..."
+                oninput="filterItems()"
+            >
+
+            <select
+                id="statusFilter"
+                class="filter-select"
+                onchange="filterItems()"
+            >
+                <option value="All">All</option>
+                <option value="Lost">Lost</option>
+                <option value="Found">Found</option>
+            </select>
+
+            <select
+                id="categoryFilter"
+                class="filter-select"
+                onchange="filterItems()"
+            >
+                <option value="All">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Documents">Documents</option>
+                <option value="Books">Books</option>
+                <option value="Wallet">Wallet</option>
+                <option value="Keys">Keys</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Other">Other</option>
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <!-- ITEMS -->
+
+    <div
+        id="itemsContainer"
+        class="items-grid"
+    >
+        <div class="loading">
+            Loading reports...
+        </div>
+    </div>
+
+</div>
+
+
+<!-- =========================
+     AUTH MODAL
+========================= -->
+
+<div
+    id="authModal"
+    class="modal-overlay"
+>
+
+    <div class="modal">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('authModal')"
+        >
+            ×
+        </button>
+
+        <h2 id="authTitle">
+            Login
+        </h2>
+
+        <!-- REGISTER NAME -->
+
+        <div
+            id="nameGroup"
+            class="form-group"
+            style="display:none;"
+        >
+            <label>Full Name</label>
+
+            <input
+                type="text"
+                id="authName"
+                class="form-input"
+                placeholder="Enter your name"
+            >
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                id="authEmail"
+                class="form-input"
+                placeholder="Enter your email"
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label>Password</label>
+
+            <input
+                type="password"
+                id="authPassword"
+                class="form-input"
+                placeholder="Enter password"
+            >
+
+        </div>
+
+
+        <button
+            id="authSubmitButton"
+            class="submit-btn"
+            onclick="submitAuth()"
+        >
+            Login
+        </button>
+
+
+        <div class="auth-switch">
+
+            <span id="authSwitchText">
+                Don't have an account?
+            </span>
+
+            <span
+                onclick="switchAuthMode()"
+                id="authSwitchButton"
+            >
+                Register
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     REPORT MODAL
+========================= -->
+
+<div
+    id="reportModal"
+    class="modal-overlay"
+>
+
+    <div class="modal">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('reportModal')"
+        >
+            ×
+        </button>
+
+        <h2 id="reportTitle">
+            Report Item
+        </h2>
+
+
+        <form
+            id="reportForm"
+            onsubmit="submitReport(event)"
+        >
+
+            <!-- ITEM NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Item Name *
+                </label>
+
+                <input
+                    type="text"
+                    id="itemName"
+                    class="form-input"
+                    placeholder="Example: Black Wallet"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="form-group">
+
+                <label>
+                    Category *
+                </label>
+
+                <select
+                    id="category"
+                    class="form-select"
+                    required
+                >
+                    <option value="">
+                        Select Category
+                    </option>
+
+                    <option value="Electronics">
+                        Electronics
+                    </option>
+
+                    <option value="Documents">
+                        Documents
+                    </option>
+
+                    <option value="Books">
+                        Books
+                    </option>
+
+                    <option value="Wallet">
+                        Wallet
+                    </option>
+
+                    <option value="Keys">
+                        Keys
+                    </option>
+
+                    <option value="Clothing">
+                        Clothing
+                    </option>
+
+                    <option value="Accessories">
+                        Accessories
+                    </option>
+
+                    <option value="Other">
+                        Other
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="form-group">
+
+                <label>
+                    Description *
+                </label>
+
+                <textarea
+                    id="description"
+                    class="form-textarea"
+                    placeholder="Describe the item..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- LOCATION -->
+
+            <div class="form-group">
+
+                <label>
+                    Location *
+                </label>
+
+                <input
+                    type="text"
+                    id="location"
+                    class="form-input"
+                    placeholder="Example: Library, Block A"
+                    required
+                >
+
+            </div>
+
+
+            <!-- DATE -->
+
+            <div class="form-group">
+
+                <label>
+                    Date *
+                </label>
+
+                <input
+                    type="date"
+                    id="date"
+                    class="form-input"
+                    required
+                >
+
+            </div>
+
+
+            <!-- IMAGE -->
+
+            <div class="form-group">
+
+                <label>
+                    Item Photo
+                </label>
+
+                <input
+                    type="file"
+                    id="image"
+                    class="form-input"
+                    accept="image/*"
+                >
+
+            </div>
+
+
+            <!-- STUDENT NAME -->
+
+            <div class="form-group">
+
+                <label>
+                    Your Name *
+                </label>
+
+                <input
+                    type="text"
+                    id="studentName"
+                    class="form-input"
+                    required
+                >
+
+            </div>
+
+
+            <!-- CONTACT -->
+
+            <div class="form-group">
+
+                <label>
+                    Contact Number / Email *
+                </label>
+
+                <input
+                    type="text"
+                    id="studentContact"
+                    class="form-input"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                id="reportSubmitButton"
+                class="submit-btn"
+            >
+                Submit Report
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+    <p>
+        © 2026 CampusFind | College Lost & Found
+    </p>
+
+    <p style="margin-top:8px;">
+        Poornima University
+    </p>
+
+</footer>
+```
+
+<script>
+
+/* =========================================================
+   API CONFIGURATION
+========================================================= */
+
+/*
+   IMPORTANT:
+
+   Your frontend is running on:
+   http://127.0.0.1:5501
+
+   Your backend is running on:
+   http://127.0.0.1:5000
+
+   Therefore ALL API requests must go to port 5000.
+*/
+
+const API_BASE = "http://127.0.0.1:5000";
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let currentReportType = "Lost";
+let authMode = "login";
+let allItems = [];
+
+
+/* =========================================================
+   AUTH HELPERS
+========================================================= */
+
+function isLoggedIn() {
+
+    const token = localStorage.getItem("campusToken");
+    const user = localStorage.getItem("campusUser");
+
+    return !!(token && user);
+}
+
+
+function getCurrentUser() {
+
+    try {
+
+        const user = localStorage.getItem("campusUser");
+
+        if (!user) {
+            return null;
+        }
+
+        return JSON.parse(user);
+
+    } catch (error) {
+
+        console.error("GET USER ERROR:", error);
+
+        return null;
+    }
+}
+
+
+/* =========================================================
+   LOGIN UI
+========================================================= */
+
+function updateLoginUI() {
+
+    const loginButton =
+        document.getElementById("loginButton");
+
+    const logoutButton =
+        document.getElementById("logoutButton");
+
+    const welcomeText =
+        document.getElementById("welcomeText");
+
+
+    if (isLoggedIn()) {
+
+        const user = getCurrentUser();
+
+        loginButton.style.display = "none";
+
+        logoutButton.style.display = "block";
+
+        welcomeText.style.display = "block";
+
+        welcomeText.textContent =
+            "Welcome, " +
+            (user?.name || "Student");
+
+    } else {
+
+        loginButton.style.display = "block";
+
+        logoutButton.style.display = "none";
+
+        welcomeText.style.display = "none";
+    }
+}
+
+
+/* =========================================================
+   AUTH MODAL
+========================================================= */
+
+function openAuth(mode) {
+
+    authMode = mode;
+
+    const modal =
+        document.getElementById("authModal");
+
+    const title =
+        document.getElementById("authTitle");
+
+    const nameGroup =
+        document.getElementById("nameGroup");
+
+    const submitButton =
+        document.getElementById("authSubmitButton");
+
+    const switchText =
+        document.getElementById("authSwitchText");
+
+    const switchButton =
+        document.getElementById("authSwitchButton");
+
+
+    if (mode === "login") {
+
+        title.textContent = "Login";
+
+        nameGroup.style.display = "none";
+
+        submitButton.textContent = "Login";
+
+        switchText.textContent =
+            "Don't have an account?";
+
+        switchButton.textContent = "Register";
+
+    } else {
+
+        title.textContent = "Create Account";
+
+        nameGroup.style.display = "block";
+
+        submitButton.textContent = "Register";
+
+        switchText.textContent =
+            "Already have an account?";
+
+        switchButton.textContent = "Login";
+    }
+
+
+    modal.classList.add("active");
+}
+
+
+function switchAuthMode() {
+
+    if (authMode === "login") {
+
+        openAuth("register");
+
+    } else {
+
+        openAuth("login");
+    }
+}
+
+
+/* =========================================================
+   SAFE JSON RESPONSE HELPER
+========================================================= */
+
+async function getResponseData(response) {
+
+    const contentType =
+        response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+
+        return await response.json();
+    }
+
+    const text = await response.text();
+
+    throw new Error(
+        `Server returned ${response.status} instead of JSON.`
+    );
+}
+
+
+/* =========================================================
+   SUBMIT LOGIN / REGISTER
+========================================================= */
+
+async function submitAuth() {
+
+    const name =
+        document.getElementById("authName").value.trim();
+
+    const email =
+        document.getElementById("authEmail").value.trim();
+
+    const password =
+        document.getElementById("authPassword").value;
+
+
+    if (!email || !password) {
+
+        alert("Please enter email and password.");
+
+        return;
+    }
+
+
+    if (authMode === "register" && !name) {
+
+        alert("Please enter your name.");
+
+        return;
+    }
+
+
+    try {
+
+        const endpoint =
+            authMode === "login"
+                ? "/api/auth/login"
+                : "/api/auth/register";
+
+
+        const body =
+            authMode === "login"
+                ? {
+                    email: email,
+                    password: password
+                }
+                : {
+                    name: name,
+                    email: email,
+                    password: password
+                };
+
+
+        const response =
+            await fetch(
+                API_BASE + endpoint,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(body)
+                }
+            );
+
+
+        const data =
+            await getResponseData(response);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Authentication failed"
+            );
+        }
+
+
+        /* REGISTER SUCCESS */
+
+        if (authMode === "register") {
+
+            alert(
+                "Registration successful! Please login."
+            );
+
+
+            document.getElementById("authName").value = "";
+
+            document.getElementById("authEmail").value = "";
+
+            document.getElementById("authPassword").value = "";
+
+
+            openAuth("login");
+
+            return;
+        }
+
+
+        /* LOGIN SUCCESS */
+
+        localStorage.setItem(
+            "campusToken",
+            data.token
+        );
+
+
+        localStorage.setItem(
+            "campusUser",
+            JSON.stringify(data.user)
+        );
+
+
+        alert("Login successful!");
+
+
+        closeModal("authModal");
+
+        updateLoginUI();
+
+        await loadItemsFromDatabase();
+
+
+    } catch (error) {
+
+        console.error("AUTH ERROR:", error);
+
+        alert(
+            error.message ||
+            "Unable to connect to the backend server."
+        );
+    }
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+function logout() {
+
+    localStorage.removeItem("campusToken");
+
+    localStorage.removeItem("campusUser");
+
+    updateLoginUI();
+
+    loadItemsFromDatabase();
+
+    alert("You have been logged out.");
+}
+
+
+/* =========================================================
+   REPORT MODAL
+========================================================= */
+
+function openReport(type) {
+
+    if (!isLoggedIn()) {
+
+        alert(
+            "Please login first to report an item."
+        );
+
+        openAuth("login");
+
+        return;
+    }
+
+
+    currentReportType = type;
+
+
+    const modal =
+        document.getElementById("reportModal");
+
+    const title =
+        document.getElementById("reportTitle");
+
+
+    title.textContent =
+        type === "Lost"
+            ? "Report Lost Item"
+            : "Report Found Item";
+
+
+    const user = getCurrentUser();
+
+
+    if (user) {
+
+        document.getElementById("studentName").value =
+            user.name || "";
+
+        document.getElementById("studentContact").value =
+            user.email || "";
+    }
+
+
+    modal.classList.add("active");
+}
+
+
+/* =========================================================
+   SUBMIT REPORT
+========================================================= */
+
+async function submitReport(event) {
+
+    event.preventDefault();
+
+
+    if (!isLoggedIn()) {
+
+        alert("Please login first.");
+
+        closeModal("reportModal");
+
+        openAuth("login");
+
+        return;
+    }
+
+
+    const token =
+        localStorage.getItem("campusToken");
+
+
+    const itemName =
+        document.getElementById("itemName")
+            .value
+            .trim();
+
+
+    const category =
+        document.getElementById("category")
+            .value;
+
+
+    const description =
+        document.getElementById("description")
+            .value
+            .trim();
+
+
+    const location =
+        document.getElementById("location")
+            .value
+            .trim();
+
+
+    const date =
+        document.getElementById("date")
+            .value;
+
+
+    const studentName =
+        document.getElementById("studentName")
+            .value
+            .trim();
+
+
+    const studentContact =
+        document.getElementById("studentContact")
+            .value
+            .trim();
+
+
+    const imageInput =
+        document.getElementById("image");
+
+
+    let imageBase64 = "";
+
+
+    /* IMAGE TO BASE64 */
+
+    if (
+        imageInput.files &&
+        imageInput.files.length > 0
+    ) {
+
+        imageBase64 =
+            await convertImageToBase64(
+                imageInput.files[0]
+            );
+    }
+
+
+    const submitButton =
+        document.getElementById(
+            "reportSubmitButton"
+        );
+
+
+    submitButton.disabled = true;
+
+    submitButton.textContent = "Submitting...";
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_BASE + "/api/items",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer " + token
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            itemName:
+                                itemName,
+
+                            category:
+                                category,
+
+                            type:
+                                currentReportType,
+
+                            description:
+                                description,
+
+                            location:
+                                location,
+
+                            date:
+                                date,
+
+                            image:
+                                imageBase64,
+
+                            studentName:
+                                studentName,
+
+                            studentContact:
+                                studentContact
+                        })
+                }
+            );
+
+
+        const data =
+            await getResponseData(response);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to create report"
+            );
+        }
+
+
+        alert(
+            "Your " +
+            currentReportType.toLowerCase() +
+            " item has been reported successfully!"
+        );
+
+
+        document.getElementById(
+            "reportForm"
+        ).reset();
+
+
+        closeModal("reportModal");
+
+
+        await loadItemsFromDatabase();
+
+
+    } catch (error) {
+
+        console.error(
+            "CREATE REPORT ERROR:",
+            error
+        );
+
+
+        alert(
+            "Could not submit report.\n\n" +
+            error.message
+        );
+
+    } finally {
+
+        submitButton.disabled = false;
+
+        submitButton.textContent =
+            "Submit Report";
+    }
+}
+
+
+/* =========================================================
+   IMAGE CONVERSION
+========================================================= */
+
+function convertImageToBase64(file) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload = () => {
+
+                resolve(
+                    reader.result
+                );
+            };
+
+
+            reader.onerror = () => {
+
+                reject(
+                    new Error(
+                        "Could not read image"
+                    )
+                );
+            };
+
+
+            reader.readAsDataURL(file);
+        }
+    );
+}
+
+
+/* =========================================================
+   LOAD ITEMS FROM DATABASE
+========================================================= */
+
+async function loadItemsFromDatabase() {
+
+    const container =
+        document.getElementById(
+            "itemsContainer"
+        );
+
+
+    container.innerHTML = `
+        <div class="loading">
+            Loading reports...
+        </div>
+    `;
+
+
+    try {
+
+        console.log(
+            "Loading items from:",
+            API_BASE + "/api/items"
+        );
+
+
+        const response =
+            await fetch(
+                API_BASE + "/api/items"
+            );
+
+
+        const data =
+            await getResponseData(response);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load items"
+            );
+        }
+
+
+        allItems =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        console.log(
+            "Items loaded successfully:",
+            allItems
+        );
+
+
+        renderItems(allItems);
+
+        updateStatistics();
+
+
+    } catch (error) {
+
+        console.error(
+            "LOAD ITEMS ERROR:",
+            error
+        );
+
+
+        container.innerHTML = `
+            <div
+                class="empty-state"
+                style="grid-column:1/-1;"
+            >
+
+                <div class="empty-state-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Unable to load reports
+                </h3>
+
+                <p style="margin-top:10px;">
+                    ${escapeHTML(error.message)}
+                </p>
+
+                <p
+                    style="
+                        margin-top:10px;
+                        font-size:13px;
+                        color:#9ca3af;
+                    "
+                >
+                    Backend:
+                    ${escapeHTML(API_BASE)}
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+
+/* =========================================================
+   RENDER ITEMS
+========================================================= */
+
+function renderItems(items) {
+
+    const container =
+        document.getElementById(
+            "itemsContainer"
+        );
+
+
+    if (!items.length) {
+
+        container.innerHTML = `
+            <div
+                class="empty-state"
+                style="grid-column:1/-1;"
+            >
+
+                <div class="empty-state-icon">
+                    🔍
+                </div>
+
+                <h3>
+                    No reports found
+                </h3>
+
+                <p style="margin-top:10px;">
+                    No lost or found items have been reported yet.
+                </p>
+
+            </div>
+        `;
+
+        return;
+    }
+
+
+    const currentUser =
+        getCurrentUser();
+
+
+    const currentUserId =
+        currentUser
+            ? (
+                currentUser.id ||
+                currentUser._id
+            )
+            : null;
+
+
+    container.innerHTML =
+        items.map(
+            item => {
+
+                /* STATUS */
+
+                const status =
+                    item.type || "Lost";
+
+
+                const statusClass =
+                    status === "Found"
+                        ? "status-found"
+                        : "status-lost";
+
+
+                /* IMAGE */
+
+                const imageHTML =
+                    item.image
+                        ? `
+                            <img
+                                src="${escapeHTML(item.image)}"
+                                class="uploaded-item-image"
+                                alt="${escapeHTML(
+                                    item.itemName || "Item"
+                                )}"
+                            >
+                          `
+                        : `
+                            <div class="item-icon">
+                                ${
+                                    status === "Found"
+                                        ? "📦"
+                                        : "🔎"
+                                }
+                            </div>
+                          `;
+
+
+                /* OWNER ID */
+
+                let ownerId =
+                    item.userId;
+
+
+                /*
+                   Handle cases where Mongoose returns:
+                   { _id: "..." }
+                */
+
+                if (
+                    ownerId &&
+                    typeof ownerId === "object"
+                ) {
+
+                    ownerId =
+                        ownerId._id ||
+                        ownerId.id;
+                }
+
+
+                /* OWNER CHECK */
+
+                const isOwner =
+                    currentUserId &&
+                    ownerId &&
+                    String(currentUserId) ===
+                    String(ownerId);
+
+
+                /* DELETE BUTTON */
+
+                const deleteButton =
+                    isOwner
+                        ? `
+                            <button
+                                class="delete-btn"
+                                onclick="deleteItem('${escapeJS(
+                                    item._id
+                                )}')"
+                            >
+                                🗑️ Delete My Report
+                            </button>
+                          `
+                        : "";
+
+
+                /* CARD */
+
+                return `
+                    <div
+                        class="item-card"
+                        data-status="${escapeHTML(
+                            item.type || ""
+                        )}"
+                        data-category="${escapeHTML(
+                            item.category || ""
+                        )}"
+                        data-search="${escapeHTML(
+                            (
+                                (item.itemName || "") +
+                                " " +
+                                (item.description || "") +
+                                " " +
+                                (item.location || "") +
+                                " " +
+                                (item.category || "") +
+                                " " +
+                                (item.studentName || "")
+                            ).toLowerCase()
+                        )}"
+                    >
+
+                        <div class="item-image-container">
+                            ${imageHTML}
+                        </div>
+
+
+                        <div class="item-content">
+
+                            <div class="item-top">
+
+                                <div class="item-title">
+                                    ${escapeHTML(
+                                        item.itemName ||
+                                        "Unnamed Item"
+                                    )}
+                                </div>
+
+
+                                <span
+                                    class="status-badge ${statusClass}"
+                                >
+                                    ${escapeHTML(status)}
+                                </span>
+
+                            </div>
+
+
+                            <div class="item-info">
+
+                                📂
+                                ${escapeHTML(
+                                    item.category ||
+                                    "Other"
+                                )}
+
+                                <br>
+
+                                📍
+                                ${escapeHTML(
+                                    item.location ||
+                                    "Not specified"
+                                )}
+
+                                <br>
+
+                                📅
+                                ${escapeHTML(
+                                    item.date ||
+                                    "Not specified"
+                                )}
+
+                                <br>
+
+                                👤
+                                ${escapeHTML(
+                                    item.studentName ||
+                                    "Student"
+                                )}
+
+                            </div>
+
+
+                            <div class="item-description">
+
+                                ${escapeHTML(
+                                    item.description ||
+                                    "No description provided."
+                                )}
+
+                            </div>
+
+
+                            <button
+                                class="contact-btn"
+                                onclick="contactUser(
+                                    '${escapeJS(
+                                        item.studentName ||
+                                        "Student"
+                                    )}',
+                                    '${escapeJS(
+                                        item.studentContact ||
+                                        "Not available"
+                                    )}'
+                                )"
+                            >
+                                📞 Contact Student
+                            </button>
+
+
+                            ${deleteButton}
+
+                        </div>
+
+                    </div>
+                `;
+            }
+        ).join("");
+}
+
+
+/* =========================================================
+   DELETE ITEM
+========================================================= */
+
+async function deleteItem(itemId) {
+
+    if (!isLoggedIn()) {
+
+        alert("Please login first.");
+
+        openAuth("login");
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this report?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        const token =
+            localStorage.getItem(
+                "campusToken"
+            );
+
+
+        const response =
+            await fetch(
+                API_BASE +
+                "/api/items/" +
+                encodeURIComponent(itemId),
+                {
+                    method: "DELETE",
+
+                    headers: {
+                        "Authorization":
+                            "Bearer " + token
+                    }
+                }
+            );
+
+
+        const data =
+            await getResponseData(response);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to delete item"
+            );
+        }
+
+
+        alert(
+            "Your report has been deleted successfully."
+        );
+
+
+        await loadItemsFromDatabase();
+
+
+    } catch (error) {
+
+        console.error(
+            "DELETE ITEM ERROR:",
+            error
+        );
+
+
+        alert(
+            "Could not delete the item.\n\n" +
+            error.message
+        );
+    }
+}
+
+
+/* =========================================================
+   SEARCH / FILTER
+========================================================= */
+
+function filterItems() {
+
+    const searchValue =
+        document.getElementById(
+            "searchInput"
+        ).value
+            .trim()
+            .toLowerCase();
+
+
+    const statusValue =
+        document.getElementById(
+            "statusFilter"
+        ).value;
+
+
+    const categoryValue =
+        document.getElementById(
+            "categoryFilter"
+        ).value;
+
+
+    const filtered =
+        allItems.filter(
+            item => {
+
+                const searchableText = (
+
+                    (item.itemName || "") +
+                    " " +
+                    (item.description || "") +
+                    " " +
+                    (item.location || "") +
+                    " " +
+                    (item.category || "") +
+                    " " +
+                    (item.studentName || "")
+
+                ).toLowerCase();
+
+
+                const matchesSearch =
+                    searchableText.includes(
+                        searchValue
+                    );
+
+
+                const matchesStatus =
+                    statusValue === "All" ||
+                    item.type === statusValue;
+
+
+                const matchesCategory =
+                    categoryValue === "All" ||
+                    item.category === categoryValue;
+
+
+                return (
+                    matchesSearch &&
+                    matchesStatus &&
+                    matchesCategory
+                );
+            }
+        );
+
+
+    renderItems(filtered);
+}
+
+
+/* =========================================================
+   STATISTICS
+========================================================= */
+
+function updateStatistics() {
+
+    const total =
+        allItems.length;
+
+
+    const lost =
+        allItems.filter(
+            item =>
+                item.type === "Lost"
+        ).length;
+
+
+    const found =
+        allItems.filter(
+            item =>
+                item.type === "Found"
+        ).length;
+
+
+    document.getElementById(
+        "totalItems"
+    ).textContent =
+        total;
+
+
+    document.getElementById(
+        "lostItems"
+    ).textContent =
+        lost;
+
+
+    document.getElementById(
+        "foundItems"
+    ).textContent =
+        found;
+}
+
+
+/* =========================================================
+   CONTACT STUDENT
+========================================================= */
+
+function contactUser(
+    name,
+    contact
+) {
+
+    alert(
+        "Contact Student\n\n" +
+        "Name: " +
+        name +
+        "\n" +
+        "Contact: " +
+        contact
+    );
+}
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+function closeModal(modalId) {
+
+    const modal =
+        document.getElementById(
+            modalId
+        );
+
+
+    if (modal) {
+
+        modal.classList.remove(
+            "active"
+        );
+    }
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =========================================================
+   ESCAPE JAVASCRIPT STRING
+========================================================= */
+
+function escapeJS(value) {
+
+    return String(value)
+
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
+
+        .replace(
+            /'/g,
+            "\\'"
+        )
+
+        .replace(
+            /"/g,
+            '\\"'
+        )
+
+        .replace(
+            /\n/g,
+            "\\n"
+        )
+
+        .replace(
+            /\r/g,
+            "\\r"
+        );
+}
+
+
+/* =========================================================
+   CLOSE MODAL WHEN CLICKING OUTSIDE
+========================================================= */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.classList.contains(
+                "modal-overlay"
+            )
+        ) {
+
+            event.target.classList.remove(
+                "active"
+            );
+        }
+    }
+);
+
+
+/* =========================================================
+   PAGE START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        updateLoginUI();
+
+        loadItemsFromDatabase();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
