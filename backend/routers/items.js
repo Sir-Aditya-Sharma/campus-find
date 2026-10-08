@@ -1,27 +1,19 @@
+
 const express = require("express");
 const jwt = require("jsonwebtoken");
-
 const router = express.Router();
 const Item = require("../model/Item");
-
 
 // ===============================
 // AUTHENTICATION
 // ===============================
-
 function authenticateUser(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
 
-        if (!authHeader) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
                 message: "Please login first"
-            });
-        }
-
-        if (!authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                message: "Invalid authorization format"
             });
         }
 
@@ -34,32 +26,30 @@ function authenticateUser(req, res, next) {
 
         req.user = decoded;
 
-        next();
+        if (!req.user.id) {
+            return res.status(401).json({
+                message: "Invalid login token. Please login again."
+            });
+        }
 
+        next();
     } catch (error) {
-        console.error("Authentication error:", error);
+        console.error("Authentication error:", error.message);
 
         return res.status(401).json({
-            message: "Invalid or expired login"
+            message: "Invalid or expired login. Please login again."
         });
     }
 }
 
-
 // ===============================
 // GET ALL ITEMS
 // ===============================
-
 router.get("/", async (req, res) => {
     try {
-
-        const items = await Item.find()
-            .sort({ createdAt: -1 });
-
+        const items = await Item.find().sort({ createdAt: -1 });
         res.json(items);
-
     } catch (error) {
-
         console.error("GET ITEMS ERROR:", error);
 
         res.status(500).json({
@@ -68,187 +58,104 @@ router.get("/", async (req, res) => {
     }
 });
 
-
 // ===============================
 // CREATE NEW ITEM
+// Matches the existing index.html form
 // ===============================
+router.post("/", authenticateUser, async (req, res) => {
+    try {
+        const {
+            title,
+            category,
+            status,
+            description,
+            location,
+            date,
+            image
+        } = req.body;
 
-router.post(
-    "/",
-    authenticateUser,
-    async (req, res) => {
-
-        try {
-
-            const {
-                itemName,
-                category,
-                type,
-                description,
-                location,
-                date,
-                image,
-                studentName,
-                studentContact
-            } = req.body;
-
-
-            if (
-                !itemName ||
-                !category ||
-                !type ||
-                !description ||
-                !location ||
-                !date ||
-                !studentName ||
-                !studentContact
-            ) {
-
-                return res.status(400).json({
-                    message: "Please fill all required fields"
-                });
-
-            }
-
-
-            const newItem = new Item({
-
-                itemName: itemName,
-
-                category: category,
-
-                type: type,
-
-                description: description,
-
-                location: location,
-
-                date: date,
-
-                image: image || "",
-
-                studentName: studentName,
-
-                studentContact: studentContact,
-
-                userId: req.user.id
-
+        // Only the fields marked * in the frontend are required.
+        if (
+            typeof title !== "string" || !title.trim() ||
+            typeof category !== "string" || !category.trim() ||
+            !["Lost", "Found"].includes(status) ||
+            typeof location !== "string" || !location.trim() ||
+            !date
+        ) {
+            return res.status(400).json({
+                message: "Please enter Item Name, choose Category and Report Type, and fill Location and Date."
             });
-
-
-            const savedItem = await newItem.save();
-
-
-            console.log(
-                "ITEM CREATED BY USER:",
-                req.user.email
-            );
-
-
-            res.status(201).json({
-
-                message: "Item created successfully",
-
-                item: savedItem
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                "CREATE ITEM ERROR:",
-                error
-            );
-
-            res.status(500).json({
-
-                message: "Failed to create item",
-
-                error: error.message
-
-            });
-
         }
 
-    }
-);
+        const newItem = new Item({
+            title: title.trim(),
+            category: category.trim(),
+            status,
+            description: typeof description === "string"
+                ? description.trim()
+                : "",
+            location: location.trim(),
+            date,
+            image: typeof image === "string" ? image : "",
+            userId: req.user.id
+        });
 
+        const savedItem = await newItem.save();
+
+        console.log("ITEM CREATED BY USER:", req.user.email || req.user.id);
+
+        return res.status(201).json({
+            message: "Item created successfully",
+            item: savedItem
+        });
+    } catch (error) {
+        console.error("CREATE ITEM ERROR:", error);
+
+        return res.status(500).json({
+            message: "Failed to create item",
+            error: error.message
+        });
+    }
+});
 
 // ===============================
 // DELETE ITEM
 // ===============================
+router.delete("/:id", authenticateUser, async (req, res) => {
+    try {
+        const item = await Item.findById(req.params.id);
 
-router.delete(
-    "/:id",
-    authenticateUser,
-    async (req, res) => {
-
-        try {
-
-            const item = await Item.findById(
-                req.params.id
-            );
-
-
-            if (!item) {
-
-                return res.status(404).json({
-                    message: "Item not found"
-                });
-
-            }
-
-
-            // User can delete only their own report
-
-            if (
-                item.userId &&
-                item.userId.toString() !== req.user.id
-            ) {
-
-                return res.status(403).json({
-
-                    message:
-                        "You can only delete your own reports"
-
-                });
-
-            }
-
-
-            await Item.findByIdAndDelete(
-                req.params.id
-            );
-
-
-            res.json({
-
-                message:
-                    "Item deleted successfully"
-
+        if (!item) {
+            return res.status(404).json({
+                message: "Item not found"
             });
-
-
-        } catch (error) {
-
-            console.error(
-                "DELETE ITEM ERROR:",
-                error
-            );
-
-
-            res.status(500).json({
-
-                message:
-                    "Failed to delete item"
-
-            });
-
         }
 
-    }
-);
+        // Do not allow deletion of reports that have no recorded owner.
+        if (!item.userId) {
+            return res.status(403).json({
+                message: "This older report has no recorded owner. An admin must review it."
+            });
+        }
 
+        if (item.userId.toString() !== String(req.user.id)) {
+            return res.status(403).json({
+                message: "You can only delete your own reports"
+            });
+        }
+
+        await Item.findByIdAndDelete(req.params.id);
+
+        return res.json({
+            message: "Item deleted successfully"
+        });
+    } catch (error) {
+        console.error("DELETE ITEM ERROR:", error);
+
+        return res.status(500).json({
+            message: "Failed to delete item"
+        });
+    }
+});
 
 module.exports = router;
