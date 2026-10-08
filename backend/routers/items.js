@@ -1,8 +1,11 @@
-
+```javascript
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+
 const router = express.Router();
 const Item = require("../model/Item");
+const User = require("../model/User");
 
 // ===============================
 // AUTHENTICATION
@@ -24,14 +27,13 @@ function authenticateUser(req, res, next) {
             process.env.JWT_SECRET || "campus-secret-key"
         );
 
-        req.user = decoded;
-
-        if (!req.user.id) {
+        if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
             return res.status(401).json({
                 message: "Invalid login token. Please login again."
             });
         }
 
+        req.user = decoded;
         next();
     } catch (error) {
         console.error("Authentication error:", error.message);
@@ -48,11 +50,11 @@ function authenticateUser(req, res, next) {
 router.get("/", async (req, res) => {
     try {
         const items = await Item.find().sort({ createdAt: -1 });
-        res.json(items);
+        return res.json(items);
     } catch (error) {
         console.error("GET ITEMS ERROR:", error);
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Failed to fetch items"
         });
     }
@@ -60,49 +62,68 @@ router.get("/", async (req, res) => {
 
 // ===============================
 // CREATE NEW ITEM
-// Matches the existing index.html form
 // ===============================
 router.post("/", authenticateUser, async (req, res) => {
     try {
         const {
             title,
+            itemName,
             category,
             status,
+            type,
             description,
             location,
             date,
             image
         } = req.body;
 
-        // Only the fields marked * in the frontend are required.
+        // Support both the current frontend and older field names.
+        const finalName = itemName ?? title;
+        const finalType = type ?? status;
+
         if (
-            typeof title !== "string" || !title.trim() ||
-            typeof category !== "string" || !category.trim() ||
-            !["Lost", "Found"].includes(status) ||
-            typeof location !== "string" || !location.trim() ||
+            typeof finalName !== "string" ||
+            !finalName.trim() ||
+            typeof category !== "string" ||
+            !category.trim() ||
+            !["Lost", "Found"].includes(finalType) ||
+            typeof location !== "string" ||
+            !location.trim() ||
             !date
         ) {
             return res.status(400).json({
-                message: "Please enter Item Name, choose Category and Report Type, and fill Location and Date."
+                message: "Please fill in Item Name, Category, Report Type, Location and Date."
+            });
+        }
+
+        // Get the authenticated user from the database.
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(401).json({
+                message: "User account not found. Please login again."
             });
         }
 
         const newItem = new Item({
-            title: title.trim(),
+            itemName: finalName.trim(),
             category: category.trim(),
-            status,
-            description: typeof description === "string"
-                ? description.trim()
-                : "",
+            type: finalType,
+            description:
+                typeof description === "string"
+                    ? description.trim()
+                    : "",
             location: location.trim(),
-            date,
+            date: String(date),
             image: typeof image === "string" ? image : "",
-            userId: req.user.id
+            studentName: user.name,
+            studentContact: user.email,
+            userId: user._id
         });
 
         const savedItem = await newItem.save();
 
-        console.log("ITEM CREATED BY USER:", req.user.email || req.user.id);
+        console.log("ITEM CREATED BY USER:", user.email);
 
         return res.status(201).json({
             message: "Item created successfully",
@@ -119,10 +140,16 @@ router.post("/", authenticateUser, async (req, res) => {
 });
 
 // ===============================
-// DELETE ITEM
+// DELETE ITEM - OWNER ONLY
 // ===============================
 router.delete("/:id", authenticateUser, async (req, res) => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                message: "Invalid item ID"
+            });
+        }
+
         const item = await Item.findById(req.params.id);
 
         if (!item) {
@@ -131,7 +158,6 @@ router.delete("/:id", authenticateUser, async (req, res) => {
             });
         }
 
-        // Do not allow deletion of reports that have no recorded owner.
         if (!item.userId) {
             return res.status(403).json({
                 message: "This older report has no recorded owner. An admin must review it."
@@ -144,7 +170,7 @@ router.delete("/:id", authenticateUser, async (req, res) => {
             });
         }
 
-        await Item.findByIdAndDelete(req.params.id);
+        await item.deleteOne();
 
         return res.json({
             message: "Item deleted successfully"
@@ -159,3 +185,4 @@ router.delete("/:id", authenticateUser, async (req, res) => {
 });
 
 module.exports = router;
+```
