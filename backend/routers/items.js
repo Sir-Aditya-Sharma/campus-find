@@ -1,15 +1,12 @@
-```javascript
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-
 const router = express.Router();
+
 const Item = require("../model/Item");
 const User = require("../model/User");
 
-// ===============================
 // AUTHENTICATION
-// ===============================
 function authenticateUser(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
@@ -27,7 +24,10 @@ function authenticateUser(req, res, next) {
             process.env.JWT_SECRET || "campus-secret-key"
         );
 
-        if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
+        if (
+            !decoded.id ||
+            !mongoose.isValidObjectId(decoded.id)
+        ) {
             return res.status(401).json({
                 message: "Invalid login token. Please login again."
             });
@@ -44,9 +44,7 @@ function authenticateUser(req, res, next) {
     }
 }
 
-// ===============================
 // GET ALL ITEMS
-// ===============================
 router.get("/", async (req, res) => {
     try {
         const items = await Item.find().sort({ createdAt: -1 });
@@ -60,9 +58,7 @@ router.get("/", async (req, res) => {
     }
 });
 
-// ===============================
-// CREATE NEW ITEM
-// ===============================
+// CREATE ITEM
 router.post("/", authenticateUser, async (req, res) => {
     try {
         const {
@@ -77,7 +73,6 @@ router.post("/", authenticateUser, async (req, res) => {
             image
         } = req.body;
 
-        // Support both the current frontend and older field names.
         const finalName = itemName ?? title;
         const finalType = type ?? status;
 
@@ -92,16 +87,24 @@ router.post("/", authenticateUser, async (req, res) => {
             !date
         ) {
             return res.status(400).json({
-                message: "Please fill in Item Name, Category, Report Type, Location and Date."
+                message: "Please fill in all required fields."
             });
         }
 
-        // Get the authenticated user from the database.
+        if (
+            typeof description !== "string" ||
+            !description.trim()
+        ) {
+            return res.status(400).json({
+                message: "Please enter an item description."
+            });
+        }
+
         const user = await User.findById(req.user.id);
 
         if (!user) {
             return res.status(401).json({
-                message: "User account not found. Please login again."
+                message: "User not found. Please login again."
             });
         }
 
@@ -109,10 +112,7 @@ router.post("/", authenticateUser, async (req, res) => {
             itemName: finalName.trim(),
             category: category.trim(),
             type: finalType,
-            description:
-                typeof description === "string"
-                    ? description.trim()
-                    : "",
+            description: description.trim(),
             location: location.trim(),
             date: String(date),
             image: typeof image === "string" ? image : "",
@@ -122,8 +122,6 @@ router.post("/", authenticateUser, async (req, res) => {
         });
 
         const savedItem = await newItem.save();
-
-        console.log("ITEM CREATED BY USER:", user.email);
 
         return res.status(201).json({
             message: "Item created successfully",
@@ -139,9 +137,7 @@ router.post("/", authenticateUser, async (req, res) => {
     }
 });
 
-// ===============================
 // DELETE ITEM - OWNER ONLY
-// ===============================
 router.delete("/:id", authenticateUser, async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
@@ -160,13 +156,13 @@ router.delete("/:id", authenticateUser, async (req, res) => {
 
         if (!item.userId) {
             return res.status(403).json({
-                message: "This older report has no recorded owner. An admin must review it."
+                message: "This report has no recorded owner."
             });
         }
 
         if (item.userId.toString() !== String(req.user.id)) {
             return res.status(403).json({
-                message: "You can only delete your own reports"
+                message: "You can only delete your own reports."
             });
         }
 
@@ -185,4 +181,3 @@ router.delete("/:id", authenticateUser, async (req, res) => {
 });
 
 module.exports = router;
-```
