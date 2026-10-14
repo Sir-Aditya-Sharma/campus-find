@@ -1,33 +1,26 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const router = express.Router();
 
+const router = express.Router();
 const Item = require("../model/Item");
 const User = require("../model/User");
 
-// AUTHENTICATION
 function authenticateUser(req, res, next) {
     try {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                message: "Please login first"
-            });
+            return res.status(401).json({ message: "Please login first" });
         }
 
         const token = authHeader.split(" ")[1];
-
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET || "campus-secret-key"
         );
 
-        if (
-            !decoded.id ||
-            !mongoose.isValidObjectId(decoded.id)
-        ) {
+        if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
             return res.status(401).json({
                 message: "Invalid login token. Please login again."
             });
@@ -37,23 +30,68 @@ function authenticateUser(req, res, next) {
         next();
     } catch (error) {
         console.error("Authentication error:", error.message);
-
         return res.status(401).json({
             message: "Invalid or expired login. Please login again."
         });
     }
 }
 
-// GET ALL ITEMS
-router.get("/", async (req, res) => {
+// GET ITEMS
+// The server computes isOwner from the login token.
+// It does not send owner IDs or contact emails to the page.
+router.get("/", authenticateUser, async (req, res) => {
     try {
-        const items = await Item.find().sort({ createdAt: -1 });
-        return res.json(items);
+        const items = await Item.find()
+            .select("-studentContact")
+            .sort({ createdAt: -1 });
+
+        const safeItems = items.map(doc => {
+            const item = doc.toObject();
+            const isOwner = String(item.userId) === String(req.user.id);
+
+            delete item.userId;
+            delete item.studentContact;
+
+            return { ...item, isOwner };
+        });
+
+        return res.json(safeItems);
     } catch (error) {
         console.error("GET ITEMS ERROR:", error);
-
         return res.status(500).json({
             message: "Failed to fetch items"
+        });
+    }
+});
+
+// GET POSTER CONTACT — logged-in users only
+router.get("/:id/contact", authenticateUser, async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({ message: "Invalid item ID" });
+        }
+
+        const item = await Item.findById(req.params.id)
+            .select("studentName studentContact userId");
+
+        if (!item) {
+            return res.status(404).json({ message: "Item not found" });
+        }
+
+        if (String(item.userId) === String(req.user.id)) {
+            return res.status(400).json({
+                message: "This is your own report."
+            });
+        }
+
+        return res.json({
+            studentName: item.studentName,
+            studentContact: item.studentContact
+        });
+    } catch (error) {
+        console.error("GET CONTACT ERROR:", error);
+        return res.status(500).json({
+            message: "Could not get poster contact"
         });
     }
 });
@@ -91,10 +129,7 @@ router.post("/", authenticateUser, async (req, res) => {
             });
         }
 
-        if (
-            typeof description !== "string" ||
-            !description.trim()
-        ) {
+        if (typeof description !== "string" || !description.trim()) {
             return res.status(400).json({
                 message: "Please enter an item description."
             });
@@ -129,7 +164,6 @@ router.post("/", authenticateUser, async (req, res) => {
         });
     } catch (error) {
         console.error("CREATE ITEM ERROR:", error);
-
         return res.status(500).json({
             message: "Failed to create item",
             error: error.message
@@ -137,21 +171,17 @@ router.post("/", authenticateUser, async (req, res) => {
     }
 });
 
-// DELETE ITEM - OWNER ONLY
+// DELETE ITEM — owner only
 router.delete("/:id", authenticateUser, async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
-            return res.status(400).json({
-                message: "Invalid item ID"
-            });
+            return res.status(400).json({ message: "Invalid item ID" });
         }
 
         const item = await Item.findById(req.params.id);
 
         if (!item) {
-            return res.status(404).json({
-                message: "Item not found"
-            });
+            return res.status(404).json({ message: "Item not found" });
         }
 
         if (!item.userId) {
@@ -160,7 +190,7 @@ router.delete("/:id", authenticateUser, async (req, res) => {
             });
         }
 
-        if (item.userId.toString() !== String(req.user.id)) {
+        if (String(item.userId) !== String(req.user.id)) {
             return res.status(403).json({
                 message: "You can only delete your own reports."
             });
@@ -168,12 +198,9 @@ router.delete("/:id", authenticateUser, async (req, res) => {
 
         await item.deleteOne();
 
-        return res.json({
-            message: "Item deleted successfully"
-        });
+        return res.json({ message: "Item deleted successfully" });
     } catch (error) {
         console.error("DELETE ITEM ERROR:", error);
-
         return res.status(500).json({
             message: "Failed to delete item"
         });
