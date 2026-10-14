@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CampusFind | Lost &amp; Found</title>
+<title>CampusFind | Lost & Found</title>
 
 <style>
 :root {
@@ -15,7 +15,11 @@
     --border: #e2e8f0;
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
     font-family: Arial, Helvetica, sans-serif;
@@ -24,7 +28,12 @@ body {
     line-height: 1.6;
 }
 
-button, input, select, textarea { font: inherit; }
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
 
 button {
     cursor: pointer;
@@ -34,14 +43,32 @@ button {
     font-weight: 600;
 }
 
-button:disabled { opacity: .6; cursor: not-allowed; }
-.primary-btn { background: var(--primary); color: #fff; }
-.primary-btn:hover { background: var(--primary-dark); }
-.secondary-btn { background: #eef2ff; color: var(--primary-dark); }
-.danger-btn { background: #fee2e2; color: #991b1b; }
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.primary-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.primary-btn:hover {
+    background: var(--primary-dark);
+}
+
+.secondary-btn {
+    background: #eef2ff;
+    color: var(--primary-dark);
+}
+
+.danger-btn {
+    background: #fee2e2;
+    color: #991b1b;
+}
 
 .navbar {
-    background: #fff;
+    background: white;
     padding: 15px 5%;
     display: flex;
     align-items: center;
@@ -53,9 +80,23 @@ button:disabled { opacity: .6; cursor: not-allowed; }
     z-index: 5;
 }
 
-.logo { font-size: 24px; font-weight: 800; color: var(--primary); }
-.nav-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-#welcomeText { color: var(--muted); font-size: 14px; }
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.nav-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#welcomeText {
+    color: var(--muted);
+    font-size: 14px;
+}
 
 .hero {
     margin: 28px auto;
@@ -63,7 +104,7 @@ button:disabled { opacity: .6; cursor: not-allowed; }
     max-width: 1200px;
     padding: 55px 30px;
     border-radius: 20px;
-    color: #fff;
+    color: white;
     background: linear-gradient(120deg, #4338ca, #7c3aed);
     text-align: center;
 }
@@ -74,9 +115,23 @@ button:disabled { opacity: .6; cursor: not-allowed; }
     margin-bottom: 14px;
 }
 
-.hero p { max-width: 650px; margin: 0 auto 24px; color: #e0e7ff; }
-.hero-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
-.hero-actions button { background: #fff; color: var(--primary-dark); }
+.hero p {
+    max-width: 650px;
+    margin: 0 auto 24px;
+    color: #e0e7ff;
+}
+
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.hero-actions button {
+    background: white;
+    color: var(--primary-dark);
+}
 
 .stats {
     width: 90%;
@@ -88,16 +143,27 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 }
 
 .stat-card {
-    background: #fff;
+    background: white;
     padding: 22px;
     border-radius: 14px;
     text-align: center;
     border: 1px solid var(--border);
 }
 
-.stat-card h2 { color: var(--primary); font-size: 30px; }
-.container { width: 90%; max-width: 1200px; margin: 35px auto; }
-.section-heading { margin-bottom: 20px; }
+.stat-card h2 {
+    color: var(--primary);
+    font-size: 30px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 35px auto;
+}
+
+.section-heading {
+    margin-bottom: 20px;
+}
 
 .filters {
     display: grid;
@@ -106,16 +172,21 @@ button:disabled { opacity: .6; cursor: not-allowed; }
     margin-bottom: 24px;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    background: #fff;
+    background: white;
     color: var(--text);
 }
 
-textarea { resize: vertical; min-height: 100px; }
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
 
 .items-grid {
     display: grid;
@@ -124,7 +195,7 @@ textarea { resize: vertical; min-height: 100px; }
 }
 
 .item-card {
-    background: #fff;
+    background: white;
     border: 1px solid var(--border);
     border-radius: 14px;
     overflow: hidden;
@@ -139,10 +210,28 @@ textarea { resize: vertical; min-height: 100px; }
     display: block;
 }
 
-.item-content { padding: 17px; }
-.item-content h3 { margin: 8px 0; overflow-wrap: anywhere; }
-.item-content p { margin: 7px 0; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
-.item-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.item-content {
+    padding: 17px;
+}
+
+.item-content h3 {
+    margin: 8px 0;
+    overflow-wrap: anywhere;
+}
+
+.item-content p {
+    margin: 7px 0;
+    color: var(--muted);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.item-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
 
 .status {
     display: inline-block;
@@ -152,19 +241,30 @@ textarea { resize: vertical; min-height: 100px; }
     font-weight: 700;
 }
 
-.status.Lost { background: #fee2e2; color: #991b1b; }
-.status.Found { background: #dcfce7; color: #166534; }
+.status.Lost {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status.Found {
+    background: #dcfce7;
+    color: #166534;
+}
 
 .empty-state {
     grid-column: 1 / -1;
-    background: #fff;
+    background: white;
     padding: 35px;
     text-align: center;
     border-radius: 12px;
     color: var(--muted);
 }
 
-footer { text-align: center; padding: 25px; color: var(--muted); }
+footer {
+    text-align: center;
+    padding: 25px;
+    color: var(--muted);
+}
 
 body.logged-out .hero,
 body.logged-out .stats,
@@ -185,25 +285,57 @@ body.logged-out footer {
     overflow-y: auto;
 }
 
-.modal-overlay.active { display: flex; }
+.modal-overlay.active {
+    display: flex;
+}
 
 .modal {
     width: 100%;
     max-width: 500px;
-    background: #fff;
+    background: white;
     border-radius: 16px;
     padding: 25px;
     max-height: 92vh;
     overflow-y: auto;
 }
 
-.modal h2 { margin-bottom: 8px; }
-.modal-subtitle { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; font-weight: 600; margin-bottom: 6px; }
-.form-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
-.form-actions button { flex: 1; min-width: 120px; }
-.auth-switch { text-align: center; margin-top: 18px; font-size: 14px; }
+.modal h2 {
+    margin-bottom: 8px;
+}
+
+.modal-subtitle {
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.form-actions button {
+    flex: 1;
+    min-width: 120px;
+}
+
+.auth-switch {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+}
 
 .text-button {
     color: var(--primary);
@@ -221,10 +353,20 @@ body.logged-out footer {
     overflow-wrap: anywhere;
 }
 
-.message.error { display: block; background: #fee2e2; color: #991b1b; }
-.message.success { display: block; background: #dcfce7; color: #166534; }
+.message.error {
+    display: block;
+    background: #fee2e2;
+    color: #991b1b;
+}
 
-#imagePreview, #detailImage {
+.message.success {
+    display: block;
+    background: #dcfce7;
+    color: #166534;
+}
+
+#imagePreview,
+#detailImage {
     display: none;
     width: 100%;
     max-height: 240px;
@@ -243,22 +385,69 @@ body.logged-out footer {
     background: #f8fafc;
 }
 
-.contact-card.visible { display: block; }
-.contact-card p { margin: 7px 0; overflow-wrap: anywhere; }
-.contact-card a { color: var(--primary-dark); }
+.contact-card.visible {
+    display: block;
+}
 
-#itemDetailsModal .modal > p { margin: 10px 0; overflow-wrap: anywhere; }
+.contact-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.contact-option {
+    display: block;
+    border-radius: 8px;
+    padding: 10px 12px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 600;
+    background: var(--primary);
+    color: white;
+}
+
+.contact-option:hover {
+    background: var(--primary-dark);
+}
+
+.contact-option.disabled {
+    background: #e2e8f0;
+    color: var(--muted);
+    cursor: not-allowed;
+}
 
 @media (max-width: 850px) {
-    .items-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .items-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 600px) {
-    .navbar { padding: 12px 4%; }
-    .logo { font-size: 21px; }
-    .hero { padding: 35px 20px; }
-    .stats, .filters, .items-grid { grid-template-columns: 1fr; }
-    .container, .stats, .hero { width: 92%; }
+    .navbar {
+        padding: 12px 4%;
+    }
+
+    .logo {
+        font-size: 21px;
+    }
+
+    .hero {
+        padding: 35px 20px;
+    }
+
+    .stats,
+    .filters,
+    .items-grid,
+    .contact-options {
+        grid-template-columns: 1fr;
+    }
+
+    .container,
+    .stats,
+    .hero {
+        width: 92%;
+    }
 }
 </style>
 </head>
@@ -267,24 +456,46 @@ body.logged-out footer {
 
 <header class="navbar">
     <div class="logo">🔎 CampusFind</div>
+
     <div class="nav-actions">
         <span id="welcomeText"></span>
-        <button id="phoneButton" class="secondary-btn"
-                onclick="openPhoneModal()" style="display:none">
+
+        <button
+            id="phoneButton"
+            class="secondary-btn"
+            onclick="openPhoneModal()"
+            style="display:none"
+        >
             My phone
         </button>
-        <button id="loginButton" class="primary-btn" onclick="openAuth('login')">
+
+        <button
+            id="loginButton"
+            class="primary-btn"
+            onclick="openAuth('login')"
+        >
             Login / Register
         </button>
-        <button id="logoutButton" class="secondary-btn"
-                onclick="logout()" style="display:none">Logout</button>
+
+        <button
+            id="logoutButton"
+            class="secondary-btn"
+            onclick="logout()"
+            style="display:none"
+        >
+            Logout
+        </button>
     </div>
 </header>
 
 <section class="hero">
     <h1>Lost Something on Campus?</h1>
-    <p>Find your missing belongings or help another student recover theirs.
-       Report lost and found items in one place.</p>
+
+    <p>
+        Find your missing belongings or help another student recover theirs.
+        Report lost and found items in one place.
+    </p>
+
     <div class="hero-actions">
         <button onclick="openReport('Lost')">＋ Report Lost Item</button>
         <button onclick="openReport('Found')">＋ Report Found Item</button>
@@ -292,9 +503,20 @@ body.logged-out footer {
 </section>
 
 <section class="stats">
-    <div class="stat-card"><p>Total Reports</p><h2 id="totalItems">0</h2></div>
-    <div class="stat-card"><p>Lost Items</p><h2 id="lostItems">0</h2></div>
-    <div class="stat-card"><p>Found Items</p><h2 id="foundItems">0</h2></div>
+    <div class="stat-card">
+        <p>Total Reports</p>
+        <h2 id="totalItems">0</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Lost Items</p>
+        <h2 id="lostItems">0</h2>
+    </div>
+
+    <div class="stat-card">
+        <p>Found Items</p>
+        <h2 id="foundItems">0</h2>
+    </div>
 </section>
 
 <main class="container">
@@ -304,100 +526,138 @@ body.logged-out footer {
     </div>
 
     <div class="filters">
-        <input id="searchInput" type="search"
-               placeholder="Search by item, location or description..."
-               oninput="renderItems()">
+        <input
+            id="searchInput"
+            type="search"
+            placeholder="Search by item, location or description..."
+            oninput="renderItems()"
+        >
 
         <select id="categoryFilter" onchange="renderItems()">
             <option value="">All Categories</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Books">Books</option>
-            <option value="ID Card">ID Card</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Keys">Keys</option>
             <option value="Bags">Bags</option>
+            <option value="Books">Books</option>
+            <option value="Electronics">Electronics</option>
+            <option value="ID Card">ID Card</option>
+            <option value="Keys">Keys</option>
+            <option value="Clothing">Clothing</option>
             <option value="Other">Other</option>
         </select>
 
         <select id="statusFilter" onchange="renderItems()">
-            <option value="">Lost &amp; Found</option>
-            <option value="Lost">Lost only</option>
-            <option value="Found">Found only</option>
+            <option value="">Lost & Found</option>
+            <option value="Lost">Lost</option>
+            <option value="Found">Found</option>
         </select>
     </div>
 
-    <div id="itemsContainer" class="items-grid">
-        <div class="empty-state">Loading reports...</div>
-    </div>
+    <div id="itemsContainer" class="items-grid"></div>
 </main>
 
-<footer>© 2026 CampusFind · College Lost &amp; Found Portal</footer>
+<footer>
+    © 2026 CampusFind · College Lost & Found Portal
+</footer>
 
-<!-- LOGIN / REGISTER -->
-<div class="modal-overlay active" id="authModal">
+<div class="modal-overlay" id="authModal">
     <div class="modal">
         <h2 id="authTitle">Welcome to CampusFind</h2>
-        <p class="modal-subtitle" id="authSubtitle">
-            Login to access campus Lost &amp; Found reports.
+
+        <p id="authSubtitle" class="modal-subtitle">
+            Login to access campus Lost & Found reports.
         </p>
+
         <div id="authMessage" class="message"></div>
 
         <form id="authForm">
             <div class="form-group" id="nameGroup" style="display:none">
-                <label for="authName">Full Name *</label>
-                <input id="authName" type="text" autocomplete="name"
-                       placeholder="Enter your name">
-            </div>
-
-            <div class="form-group" id="phoneGroup" style="display:none">
-                <label for="authPhone">Phone number (optional)</label>
-                <input id="authPhone" type="tel" autocomplete="tel"
-                       placeholder="Enter phone number if you want">
+                <label for="authName">Name *</label>
+                <input id="authName" type="text" placeholder="Your name">
             </div>
 
             <div class="form-group">
                 <label for="authEmail">Gmail / Email *</label>
-                <input id="authEmail" type="email" required autocomplete="email"
-                       placeholder="you@example.com">
+                <input
+                    id="authEmail"
+                    type="email"
+                    placeholder="you@gmail.com"
+                    required
+                >
+            </div>
+
+            <div class="form-group" id="phoneGroup" style="display:none">
+                <label for="authPhone">Phone number (optional)</label>
+                <input
+                    id="authPhone"
+                    type="tel"
+                    placeholder="+91 9876543210"
+                >
             </div>
 
             <div class="form-group">
                 <label for="authPassword">Password *</label>
-                <input id="authPassword" type="password" required minlength="6"
-                       autocomplete="current-password" placeholder="Enter your password">
+                <input
+                    id="authPassword"
+                    type="password"
+                    placeholder="Minimum 6 characters"
+                    required
+                >
             </div>
 
-            <button type="submit" id="authSubmit" class="primary-btn"
-                    style="width:100%">Login</button>
+            <div class="form-actions">
+                <button id="authSubmit" class="primary-btn" type="submit">
+                    Login
+                </button>
+            </div>
         </form>
 
         <div class="auth-switch">
             <span id="authSwitchText">New to CampusFind?</span>
-            <button type="button" class="text-button" id="authSwitchButton"
-                    onclick="switchAuthMode()">Create account</button>
+            <button
+                id="authSwitchButton"
+                class="text-button"
+                type="button"
+                onclick="switchAuthMode()"
+            >
+                Create account
+            </button>
         </div>
     </div>
 </div>
 
-<!-- OPTIONAL PHONE SETTINGS FOR EXISTING USERS -->
 <div class="modal-overlay" id="phoneModal">
     <div class="modal">
-        <h2>Phone number</h2>
+        <h2>My phone number</h2>
+
         <p class="modal-subtitle">
-            Optional. Other logged-in students can see it after requesting your contact.
+            Optional. Students can use this number to call you.
         </p>
+
         <div id="phoneMessage" class="message"></div>
 
         <form id="phoneForm">
             <div class="form-group">
-                <label for="profilePhone">Phone number (optional)</label>
-                <input id="profilePhone" type="tel" autocomplete="tel"
-                       placeholder="Leave blank if you don't want to share one">
+                <label for="profilePhone">Phone number</label>
+                <input
+                    id="profilePhone"
+                    type="tel"
+                    placeholder="+91 9876543210"
+                >
             </div>
+
             <div class="form-actions">
-                <button type="button" class="secondary-btn"
-                        onclick="closeModal('phoneModal')">Cancel</button>
-                <button type="submit" id="phoneSubmit" class="primary-btn">
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="closeModal('phoneModal')"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="phoneSubmit"
+                    type="submit"
+                    class="primary-btn"
+                >
                     Save phone
                 </button>
             </div>
@@ -405,46 +665,43 @@ body.logged-out footer {
     </div>
 </div>
 
-<!-- REPORT ITEM -->
 <div class="modal-overlay" id="reportModal">
     <div class="modal">
-        <h2 id="reportTitle">Report an Item</h2>
-        <p class="modal-subtitle">Provide the details below.</p>
+        <h2 id="reportTitle">Report Item</h2>
+
         <div id="reportMessage" class="message"></div>
 
         <form id="reportForm">
+            <input id="itemStatus" type="hidden">
+
             <div class="form-group">
-                <label for="itemTitle">Item Name *</label>
-                <input id="itemTitle" required maxlength="120"
-                       placeholder="e.g. Black wallet">
+                <label for="itemTitle">Item name *</label>
+                <input id="itemTitle" type="text" required>
             </div>
 
             <div class="form-group">
                 <label for="itemCategory">Category *</label>
+
                 <select id="itemCategory" required>
-                    <option value="">Choose category</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Books">Books</option>
-                    <option value="ID Card">ID Card</option>
-                    <option value="Clothing">Clothing</option>
-                    <option value="Keys">Keys</option>
+                    <option value="">Select category</option>
                     <option value="Bags">Bags</option>
+                    <option value="Books">Books</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="ID Card">ID Card</option>
+                    <option value="Keys">Keys</option>
+                    <option value="Clothing">Clothing</option>
                     <option value="Other">Other</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="itemStatus">Report Type *</label>
-                <select id="itemStatus" required>
-                    <option value="Lost">Lost</option>
-                    <option value="Found">Found</option>
-                </select>
-            </div>
-
-            <div class="form-group">
                 <label for="itemLocation">Location *</label>
-                <input id="itemLocation" required maxlength="200"
-                       placeholder="Where was it lost or found?">
+                <input
+                    id="itemLocation"
+                    type="text"
+                    placeholder="Example: Class no. 508B"
+                    required
+                >
             </div>
 
             <div class="form-group">
@@ -454,21 +711,33 @@ body.logged-out footer {
 
             <div class="form-group">
                 <label for="itemDescription">Description *</label>
-                <textarea id="itemDescription" required maxlength="2000"
-                          placeholder="Describe the item..."></textarea>
+                <textarea
+                    id="itemDescription"
+                    placeholder="Colour, brand, unique marks..."
+                    required
+                ></textarea>
             </div>
 
             <div class="form-group">
-                <label for="itemImage">Item Image (optional)</label>
-                <input id="itemImage" type="file"
-                       accept="image/png,image/jpeg,image/webp">
-                <img id="imagePreview" alt="Selected image preview">
+                <label for="itemImage">Photo (optional, max 2 MB)</label>
+                <input id="itemImage" type="file" accept="image/*">
+                <img id="imagePreview" alt="Item preview">
             </div>
 
             <div class="form-actions">
-                <button type="button" class="secondary-btn"
-                        onclick="closeModal('reportModal')">Cancel</button>
-                <button type="submit" id="reportSubmit" class="primary-btn">
+                <button
+                    type="button"
+                    class="secondary-btn"
+                    onclick="closeModal('reportModal')"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    id="reportSubmit"
+                    type="submit"
+                    class="primary-btn"
+                >
                     Submit Report
                 </button>
             </div>
@@ -476,12 +745,14 @@ body.logged-out footer {
     </div>
 </div>
 
-<!-- ITEM DETAILS AND CONTACT -->
 <div class="modal-overlay" id="itemDetailsModal">
     <div class="modal">
         <img id="detailImage" alt="">
+
         <span id="detailStatus" class="status"></span>
+
         <h2 id="detailTitle"></h2>
+
         <p><strong>Category:</strong> <span id="detailCategory"></span></p>
         <p><strong>Location:</strong> <span id="detailLocation"></span></p>
         <p><strong>Date:</strong> <span id="detailDate"></span></p>
@@ -492,12 +763,29 @@ body.logged-out footer {
         <div id="contactInfo" class="contact-card"></div>
 
         <div class="form-actions">
-            <button type="button" class="secondary-btn"
-                    onclick="closeModal('itemDetailsModal')">Close</button>
-            <button type="button" class="secondary-btn"
-                    id="detailContactButton">Contact poster</button>
-            <button type="button" class="primary-btn"
-                    id="detailClaimButton">Claim item</button>
+            <button
+                type="button"
+                class="secondary-btn"
+                onclick="closeModal('itemDetailsModal')"
+            >
+                Close
+            </button>
+
+            <button
+                type="button"
+                class="secondary-btn"
+                id="detailContactButton"
+            >
+                Contact
+            </button>
+
+            <button
+                type="button"
+                class="primary-btn"
+                id="detailClaimButton"
+            >
+                Claim item
+            </button>
         </div>
     </div>
 </div>
@@ -509,111 +797,82 @@ let allItems = [];
 let authMode = "login";
 let selectedImage = "";
 
-function isLoggedIn() {
-    return Boolean(localStorage.getItem("campusFindToken"));
+function escapeHTML(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function showMessage(id, text, type = "error") {
+    const element = document.getElementById(id);
+
+    element.textContent = text;
+    element.className = "message " + type;
+}
+
+function clearMessage(id) {
+    const element = document.getElementById(id);
+
+    element.textContent = "";
+    element.className = "message";
+}
+
+function getToken() {
+    return localStorage.getItem("campusFindToken") || "";
 }
 
 function getCurrentUser() {
     try {
-        return JSON.parse(localStorage.getItem("campusFindUser") || "null");
+        return JSON.parse(
+            localStorage.getItem("campusFindUser") || "null"
+        );
     } catch {
         return null;
     }
 }
 
-function getToken() {
-    return localStorage.getItem("campusFindToken");
+function isLoggedIn() {
+    return Boolean(getToken());
 }
 
-function authHeaders(extraHeaders = {}) {
-    const headers = { ...extraHeaders };
-    if (getToken()) headers.Authorization = "Bearer " + getToken();
-    return headers;
-}
+async function apiRequest(endpoint, options = {}) {
+    const headers = {
+        ...(options.headers || {})
+    };
 
-async function apiRequest(path, options = {}) {
-    const response = await fetch(API_BASE + path, {
+    if (getToken()) {
+        headers.Authorization = "Bearer " + getToken();
+    }
+
+    const response = await fetch(API_BASE + endpoint, {
         ...options,
-        headers: authHeaders(options.headers || {})
+        headers
     });
 
-    const text = await response.text();
+    const raw = await response.text();
     let data = {};
 
     try {
-        data = text ? JSON.parse(text) : {};
+        data = raw ? JSON.parse(raw) : {};
     } catch {
-        data = { message: text || "Unexpected server response." };
+        throw new Error("Unexpected server response.");
     }
 
     if (!response.ok) {
-        if (response.status === 401 && isLoggedIn()) {
+        if (response.status === 401) {
             clearSession();
             updateLoginUI();
         }
-        throw new Error(data.message || data.error || `Request failed (${response.status})`);
+
+        throw new Error(
+            data.message || data.error || "Something went wrong."
+        );
     }
 
     return data;
-}
-
-function showMessage(elementId, message, type = "error") {
-    const element = document.getElementById(elementId);
-    element.textContent = message;
-    element.className = "message " + type;
-}
-
-function clearMessage(elementId) {
-    const element = document.getElementById(elementId);
-    element.textContent = "";
-    element.className = "message";
-}
-
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, character => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-    })[character]);
-}
-
-function openAuth(mode = "login") {
-    authMode = mode;
-    updateAuthModal();
-    document.getElementById("authModal").classList.add("active");
-}
-
-function updateAuthModal() {
-    const registering = authMode === "register";
-
-    document.getElementById("authTitle").textContent =
-        registering ? "Create Your Account" : "Welcome to CampusFind";
-    document.getElementById("authSubtitle").textContent =
-        registering
-            ? "Register to access campus Lost & Found reports."
-            : "Login to access campus Lost & Found reports.";
-    document.getElementById("nameGroup").style.display =
-        registering ? "block" : "none";
-    document.getElementById("phoneGroup").style.display =
-        registering ? "block" : "none";
-    document.getElementById("authName").required = registering;
-    document.getElementById("authPassword").autocomplete =
-        registering ? "new-password" : "current-password";
-    document.getElementById("authSubmit").textContent =
-        registering ? "Create Account" : "Login";
-    document.getElementById("authSwitchText").textContent =
-        registering ? "Already have an account?" : "New to CampusFind?";
-    document.getElementById("authSwitchButton").textContent =
-        registering ? "Login" : "Create account";
-
-    clearMessage("authMessage");
-}
-
-function switchAuthMode() {
-    authMode = authMode === "login" ? "register" : "login";
-    updateAuthModal();
 }
 
 function clearSession() {
@@ -627,163 +886,232 @@ function updateLoginUI() {
     const user = getCurrentUser();
 
     document.body.classList.toggle("logged-out", !loggedIn);
+
     document.getElementById("loginButton").style.display =
         loggedIn ? "none" : "block";
+
     document.getElementById("logoutButton").style.display =
         loggedIn ? "block" : "none";
+
     document.getElementById("phoneButton").style.display =
         loggedIn ? "block" : "none";
+
     document.getElementById("welcomeText").style.display =
         loggedIn ? "block" : "none";
+
     document.getElementById("welcomeText").textContent =
-        loggedIn ? "Welcome, " + (user?.name || "Student") : "";
-    document.getElementById("authModal").classList.toggle("active", !loggedIn);
+        loggedIn
+            ? "Welcome, " + (user?.name || "Student")
+            : "";
+
+    document.getElementById("authModal").classList.toggle(
+        "active",
+        !loggedIn
+    );
+}
+
+function openAuth(mode) {
+    authMode = mode;
+    updateAuthModal();
+    document.getElementById("authModal").classList.add("active");
+}
+
+function updateAuthModal() {
+    const registering = authMode === "register";
+
+    document.getElementById("authTitle").textContent =
+        registering ? "Create account" : "Welcome to CampusFind";
+
+    document.getElementById("authSubtitle").textContent =
+        registering
+            ? "Create an account to access CampusFind."
+            : "Login to access campus Lost & Found reports.";
+
+    document.getElementById("nameGroup").style.display =
+        registering ? "block" : "none";
+
+    document.getElementById("phoneGroup").style.display =
+        registering ? "block" : "none";
+
+    document.getElementById("authName").required = registering;
+
+    document.getElementById("authSubmit").textContent =
+        registering ? "Create Account" : "Login";
+
+    document.getElementById("authSwitchText").textContent =
+        registering
+            ? "Already have an account?"
+            : "New to CampusFind?";
+
+    document.getElementById("authSwitchButton").textContent =
+        registering ? "Login" : "Create account";
+
+    clearMessage("authMessage");
+}
+
+function switchAuthMode() {
+    authMode = authMode === "login" ? "register" : "login";
+    updateAuthModal();
 }
 
 function logout() {
     clearSession();
     updateLoginUI();
-    closeModal("reportModal");
-    closeModal("phoneModal");
-    closeModal("itemDetailsModal");
     openAuth("login");
 }
 
 function closeModal(modalId) {
-    if (modalId === "authModal" && !isLoggedIn()) return;
+    if (modalId === "authModal" && !isLoggedIn()) {
+        return;
+    }
+
     document.getElementById(modalId)?.classList.remove("active");
 }
 
 document.querySelectorAll(".modal-overlay").forEach(modal => {
     modal.addEventListener("click", event => {
-        if (event.target !== modal) return;
-        if (modal.id === "authModal" && !isLoggedIn()) return;
+        if (event.target !== modal) {
+            return;
+        }
+
+        if (modal.id === "authModal" && !isLoggedIn()) {
+            return;
+        }
+
         modal.classList.remove("active");
     });
 });
 
-// LOGIN / REGISTER
-document.getElementById("authForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    clearMessage("authMessage");
+document.getElementById("authForm").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
 
-    const submitButton = document.getElementById("authSubmit");
-    submitButton.disabled = true;
+        clearMessage("authMessage");
 
-    const email = document.getElementById("authEmail").value.trim();
-    const password = document.getElementById("authPassword").value;
-    const name = document.getElementById("authName").value.trim();
-    const phone = document.getElementById("authPhone").value.trim();
+        const button = document.getElementById("authSubmit");
+        button.disabled = true;
 
-    try {
-        const endpoint = authMode === "register"
-            ? "/api/auth/register"
-            : "/api/auth/login";
-
-        const body = authMode === "register"
-            ? { name, email, password, phone }
-            : { email, password };
-
-        const response = await fetch(API_BASE + endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
-
-        const raw = await response.text();
-        let data;
+        const name = document.getElementById("authName").value.trim();
+        const email = document.getElementById("authEmail").value.trim();
+        const password = document.getElementById("authPassword").value;
+        const phone = document.getElementById("authPhone").value.trim();
 
         try {
-            data = raw ? JSON.parse(raw) : {};
-        } catch {
-            throw new Error("Unexpected server response. Check the backend logs.");
-        }
+            const endpoint =
+                authMode === "register"
+                    ? "/api/auth/register"
+                    : "/api/auth/login";
 
-        if (!response.ok) {
-            throw new Error(data.message || data.error || "Authentication failed.");
-        }
+            const body =
+                authMode === "register"
+                    ? { name, email, password, phone }
+                    : { email, password };
 
-        if (authMode === "register") {
-            authMode = "login";
-            updateAuthModal();
-            showMessage(
-                "authMessage",
-                data.message || "Account created. Please log in.",
-                "success"
+            const response = await fetch(API_BASE + endpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Authentication failed."
+                );
+            }
+
+            if (authMode === "register") {
+                authMode = "login";
+                updateAuthModal();
+
+                showMessage(
+                    "authMessage",
+                    "Account created. Please login.",
+                    "success"
+                );
+
+                return;
+            }
+
+            localStorage.setItem("campusFindToken", data.token);
+
+            localStorage.setItem(
+                "campusFindUser",
+                JSON.stringify(data.user)
             );
-            document.getElementById("authPassword").value = "";
-            document.getElementById("authPhone").value = "";
-            return;
+
+            updateLoginUI();
+            closeModal("authModal");
+
+            await loadItemsFromDatabase();
+        } catch (error) {
+            showMessage("authMessage", error.message);
+        } finally {
+            button.disabled = false;
         }
-
-        const payload = data.data || data;
-        const token = payload.token || payload.accessToken ||
-                      data.token || data.accessToken;
-
-        if (!token) throw new Error("No login token was returned by the backend.");
-
-        const user = payload.user || data.user || {
-            name: payload.name || email.split("@")[0],
-            email: payload.email || email,
-            phone: payload.phone || ""
-        };
-
-        localStorage.setItem("campusFindToken", token);
-        localStorage.setItem("campusFindUser", JSON.stringify(user));
-
-        updateLoginUI();
-        await loadItemsFromDatabase();
-    } catch (error) {
-        showMessage("authMessage", error.message || "Something went wrong.");
-    } finally {
-        submitButton.disabled = false;
     }
-});
+);
 
-// OPTIONAL PHONE FOR EXISTING ACCOUNTS
 function openPhoneModal() {
     const user = getCurrentUser();
-    document.getElementById("profilePhone").value = user?.phone || "";
+
+    document.getElementById("profilePhone").value =
+        user?.phone || "";
+
     clearMessage("phoneMessage");
+
     document.getElementById("phoneModal").classList.add("active");
 }
 
-document.getElementById("phoneForm").addEventListener("submit", async event => {
-    event.preventDefault();
+document.getElementById("phoneForm").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
 
-    const button = document.getElementById("phoneSubmit");
-    button.disabled = true;
-    clearMessage("phoneMessage");
+        const button = document.getElementById("phoneSubmit");
+        button.disabled = true;
 
-    try {
-        const result = await apiRequest("/api/auth/phone", {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                phone: document.getElementById("profilePhone").value.trim()
-            })
-        });
+        try {
+            const result = await apiRequest("/api/auth/phone", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    phone: document
+                        .getElementById("profilePhone")
+                        .value
+                        .trim()
+                })
+            });
 
-        const user = getCurrentUser() || {};
-        user.phone = result.phone || "";
-        localStorage.setItem("campusFindUser", JSON.stringify(user));
+            const user = getCurrentUser() || {};
+            user.phone = result.phone || "";
 
-        showMessage("phoneMessage", result.message || "Phone saved.", "success");
-        setTimeout(() => closeModal("phoneModal"), 900);
-    } catch (error) {
-        showMessage("phoneMessage", error.message || "Could not save phone.");
-    } finally {
-        button.disabled = false;
+            localStorage.setItem(
+                "campusFindUser",
+                JSON.stringify(user)
+            );
+
+            showMessage(
+                "phoneMessage",
+                result.message || "Phone number saved.",
+                "success"
+            );
+        } catch (error) {
+            showMessage("phoneMessage", error.message);
+        } finally {
+            button.disabled = false;
+        }
     }
-});
+);
 
-// ITEMS
-function normalizeItems(data) {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data.items)) return data.items;
-    if (Array.isArray(data.data)) return data.data;
-    if (data.data && Array.isArray(data.data.items)) return data.data.items;
-    return [];
+function getItemId(item) {
+    return item._id || item.id || "";
 }
 
 function getItemName(item) {
@@ -794,36 +1122,49 @@ function getItemType(item) {
     return item.type || item.status || "Lost";
 }
 
-function getItemId(item) {
-    return item._id || item.id || "";
+function normalizeItems(data) {
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    if (Array.isArray(data.items)) {
+        return data.items;
+    }
+
+    return [];
 }
 
 async function loadItemsFromDatabase() {
     if (!isLoggedIn()) {
-        allItems = [];
-        document.getElementById("itemsContainer").innerHTML = "";
-        updateStats([]);
         return;
     }
 
-    document.getElementById("itemsContainer").innerHTML =
+    const container = document.getElementById("itemsContainer");
+
+    container.innerHTML =
         '<div class="empty-state">Loading reports...</div>';
 
     try {
         const data = await apiRequest("/api/items");
+
         allItems = normalizeItems(data);
+
         updateStats(allItems);
         renderItems();
     } catch (error) {
-        document.getElementById("itemsContainer").innerHTML =
-            `<div class="empty-state">Could not load reports. ${escapeHTML(error.message)}</div>`;
+        container.innerHTML =
+            '<div class="empty-state">' +
+            escapeHTML(error.message) +
+            "</div>";
     }
 }
 
 function updateStats(items) {
     document.getElementById("totalItems").textContent = items.length;
+
     document.getElementById("lostItems").textContent =
         items.filter(item => getItemType(item) === "Lost").length;
+
     document.getElementById("foundItems").textContent =
         items.filter(item => getItemType(item) === "Found").length;
 }
@@ -831,13 +1172,12 @@ function updateStats(items) {
 function renderItems() {
     const container = document.getElementById("itemsContainer");
 
-    if (!isLoggedIn()) {
-        container.innerHTML = "";
-        updateStats([]);
-        return;
-    }
+    const query = document
+        .getElementById("searchInput")
+        .value
+        .trim()
+        .toLowerCase();
 
-    const query = document.getElementById("searchInput").value.trim().toLowerCase();
     const category = document.getElementById("categoryFilter").value;
     const status = document.getElementById("statusFilter").value;
 
@@ -849,14 +1189,17 @@ function renderItems() {
             item.location
         ].join(" ").toLowerCase();
 
-        return (!query || searchable.includes(query)) &&
-               (!category || item.category === category) &&
-               (!status || getItemType(item) === status);
+        return (
+            (!query || searchable.includes(query)) &&
+            (!category || item.category === category) &&
+            (!status || getItemType(item) === status)
+        );
     });
 
     if (!filtered.length) {
         container.innerHTML =
-            '<div class="empty-state">No reports found. Try another search or add a report.</div>';
+            '<div class="empty-state">No reports found.</div>';
+
         return;
     }
 
@@ -864,45 +1207,47 @@ function renderItems() {
         const id = getItemId(item);
         const safeId = escapeHTML(id);
         const title = escapeHTML(getItemName(item));
-        const itemCategory = escapeHTML(item.category || "Other");
-        const itemStatus = getItemType(item) === "Found" ? "Found" : "Lost";
-        const location = escapeHTML(item.location || "Not specified");
-        const description = escapeHTML(item.description || "No description provided.");
-        const date = escapeHTML(item.date || "Not specified");
-        const image = typeof item.image === "string" ? item.image : "";
+        const type = getItemType(item) === "Found" ? "Found" : "Lost";
+        const image = item.image || "";
 
         const imageHTML = image
-            ? `<img class="item-image" src="${escapeHTML(image)}" alt="${title}" loading="lazy">`
+            ? `<img class="item-image" src="${escapeHTML(image)}" alt="${title}">`
             : `<div class="item-image" style="display:flex;align-items:center;justify-content:center;font-size:48px">📦</div>`;
 
-        const detailsButton = id
-            ? `<button class="secondary-btn" onclick="openItemDetails('${safeId}')">View details</button>`
+        const contactButton = !item.isOwner
+            ? `<button class="secondary-btn" onclick="openContactOptions('${safeId}')">Contact</button>`
             : "";
 
-        const contactButton = id && !item.isOwner
-            ? `<button class="secondary-btn" onclick="showContactInfo('${safeId}')">Contact</button>`
+        const claimButton = !item.isOwner
+            ? `<button class="primary-btn" onclick="openClaimOptions('${safeId}')">Claim item</button>`
             : "";
 
-        const claimButton = id && !item.isOwner
-            ? `<button class="primary-btn" onclick="claimItem('${safeId}')">Claim item</button>`
-            : "";
-
-        const deleteButton = id && item.isOwner
+        const deleteButton = item.isOwner
             ? `<button class="danger-btn" onclick="deleteItem('${safeId}')">Delete Report</button>`
             : "";
 
         return `
             <article class="item-card">
                 ${imageHTML}
+
                 <div class="item-content">
-                    <span class="status ${itemStatus}">${itemStatus}</span>
+                    <span class="status ${type}">${type}</span>
+
                     <h3>${title}</h3>
-                    <p><strong>Category:</strong> ${itemCategory}</p>
-                    <p><strong>Location:</strong> ${location}</p>
-                    <p><strong>Date:</strong> ${date}</p>
-                    <p>${description}</p>
+
+                    <p><strong>Category:</strong> ${escapeHTML(item.category || "Other")}</p>
+                    <p><strong>Location:</strong> ${escapeHTML(item.location || "Not specified")}</p>
+                    <p><strong>Date:</strong> ${escapeHTML(item.date || "Not specified")}</p>
+                    <p>${escapeHTML(item.description || "No description provided.")}</p>
+
                     <div class="item-buttons">
-                        ${detailsButton}
+                        <button
+                            class="secondary-btn"
+                            onclick="openItemDetails('${safeId}')"
+                        >
+                            View details
+                        </button>
+
                         ${contactButton}
                         ${claimButton}
                         ${deleteButton}
@@ -913,22 +1258,33 @@ function renderItems() {
     }).join("");
 }
 
-// ITEM DETAILS
 function openItemDetails(id) {
-    const item = allItems.find(report => getItemId(report) === id);
+    const item = allItems.find(
+        report => getItemId(report) === id
+    );
 
     if (!item) {
-        alert("This report could not be found.");
         return;
     }
 
-    document.getElementById("detailTitle").textContent = getItemName(item);
-    document.getElementById("detailStatus").textContent = getItemType(item);
-    document.getElementById("detailStatus").className = "status " + getItemType(item);
-    document.getElementById("detailCategory").textContent = item.category || "Other";
+    document.getElementById("detailTitle").textContent =
+        getItemName(item);
+
+    document.getElementById("detailStatus").textContent =
+        getItemType(item);
+
+    document.getElementById("detailStatus").className =
+        "status " + getItemType(item);
+
+    document.getElementById("detailCategory").textContent =
+        item.category || "Other";
+
     document.getElementById("detailLocation").textContent =
         item.location || "Not specified";
-    document.getElementById("detailDate").textContent = item.date || "Not specified";
+
+    document.getElementById("detailDate").textContent =
+        item.date || "Not specified";
+
     document.getElementById("detailDescription").textContent =
         item.description || "No description provided.";
 
@@ -936,78 +1292,109 @@ function openItemDetails(id) {
 
     if (item.image) {
         image.src = item.image;
-        image.alt = getItemName(item);
         image.style.display = "block";
     } else {
         image.removeAttribute("src");
         image.style.display = "none";
     }
 
-    const contactButton = document.getElementById("detailContactButton");
-    const claimButton = document.getElementById("detailClaimButton");
+    const contactButton =
+        document.getElementById("detailContactButton");
 
-    contactButton.style.display = item.isOwner ? "none" : "block";
-    claimButton.style.display = item.isOwner ? "none" : "block";
+    const claimButton =
+        document.getElementById("detailClaimButton");
+
+    contactButton.style.display =
+        item.isOwner ? "none" : "block";
+
+    claimButton.style.display =
+        item.isOwner ? "none" : "block";
+
     contactButton.onclick = () => showContactInfo(id);
     claimButton.onclick = () => claimItem(id);
 
-    document.getElementById("contactInfo").className = "contact-card";
+    document.getElementById("contactInfo").className =
+        "contact-card";
+
     document.getElementById("contactInfo").innerHTML = "";
+
     clearMessage("contactMessage");
+
     document.getElementById("itemDetailsModal").classList.add("active");
 }
 
-// CONTACT: show Gmail and optional phone in the details modal
+function openContactOptions(id) {
+    openItemDetails(id);
+    showContactInfo(id);
+}
+
+function openClaimOptions(id) {
+    openItemDetails(id);
+    claimItem(id);
+}
+
 async function showContactInfo(id) {
-    if (!isLoggedIn()) {
-        openAuth("login");
-        return;
-    }
-
-    const panel = document.getElementById("contactInfo");
-    panel.className = "contact-card";
-    panel.innerHTML = "";
-    clearMessage("contactMessage");
-
     try {
         const contact = await apiRequest(
             `/api/items/${encodeURIComponent(id)}/contact`
         );
+
+        const item = allItems.find(
+            report => getItemId(report) === id
+        );
+
+        const itemName = item
+            ? getItemName(item)
+            : "this item";
 
         const email = contact.studentContact || "";
         const phone = contact.studentPhone || "";
 
-        let html = `<strong>Contact ${escapeHTML(contact.studentName || "poster")}</strong>`;
+        const gmailUrl =
+            "https://mail.google.com/mail/?view=cm&fs=1" +
+            `&to=${encodeURIComponent(email)}` +
+            `&su=${encodeURIComponent("Regarding " + itemName + " on CampusFind")}` +
+            `&body=${encodeURIComponent(
+                "Hi " + (contact.studentName || "there") +
+                ",\n\nI want to contact you about: " +
+                itemName + ".\n\n"
+            )}`;
 
-        if (email) {
-            html += `<p>Gmail: <a href="mailto:${encodeURIComponent(email)}">${escapeHTML(email)}</a></p>`;
-        }
+        const phoneUrl = phone.replace(/[^\d+]/g, "");
 
-        if (phone) {
-            const telNumber = phone.replace(/[^\d+]/g, "");
-            html += `<p>Phone: <a href="tel:${encodeURIComponent(telNumber)}">${escapeHTML(phone)}</a></p>`;
-        } else {
-            html += `<p>Phone: Not provided</p>`;
-        }
+        document.getElementById("contactInfo").innerHTML = `
+            <strong>Contact ${escapeHTML(contact.studentName || "poster")}</strong>
 
-        panel.innerHTML = html;
-        panel.className = "contact-card visible";
+            <p style="margin-top:8px">Choose one option:</p>
+
+            <div class="contact-options">
+                ${
+                    email
+                        ? `<a class="contact-option" href="${gmailUrl}" target="_blank" rel="noopener">Email poster</a>`
+                        : `<span class="contact-option disabled">Email unavailable</span>`
+                }
+
+                ${
+                    phone
+                        ? `<a class="contact-option" href="tel:${encodeURIComponent(phoneUrl)}">Call ${escapeHTML(phone)}</a>`
+                        : `<span class="contact-option disabled">Phone not provided</span>`
+                }
+            </div>
+        `;
+
+        document.getElementById("contactInfo").className =
+            "contact-card visible";
     } catch (error) {
-        showMessage("contactMessage", error.message || "Could not load contact details.");
+        showMessage("contactMessage", error.message);
     }
 }
 
-// CLAIM: opens a separate claim email draft
 async function claimItem(id) {
-    if (!isLoggedIn()) {
-        openAuth("login");
-        return;
-    }
-
-    const item = allItems.find(report => getItemId(report) === id);
+    const item = allItems.find(
+        report => getItemId(report) === id
+    );
 
     if (!item) {
-        alert("This report could not be found.");
         return;
     }
 
@@ -1016,161 +1403,175 @@ async function claimItem(id) {
             `/api/items/${encodeURIComponent(id)}/contact`
         );
 
-        if (!contact.studentContact) {
-            throw new Error("The poster has no email address.");
-        }
+        const subject =
+            "Claim request for " + getItemName(item);
 
-        const subject = encodeURIComponent(
-            `Claim request for ${getItemName(item)}`
-        );
-        const body = encodeURIComponent(
-            `Hi ${contact.studentName || "there"},\n\n` +
-            `I believe this item may belong to me. I can privately provide ` +
-            `details to help verify ownership.\n\n` +
-            `Item: ${getItemName(item)}\n\n`
-        );
+        const body =
+            "Hi " + (contact.studentName || "there") +
+            ",\n\nI believe this item may belong to me. " +
+            "I can privately provide details to verify ownership.\n\n" +
+            "Item: " + getItemName(item) + "\n\n";
 
-        window.location.href =
-            `mailto:${encodeURIComponent(contact.studentContact)}` +
-            `?subject=${subject}&body=${body}`;
+        const gmailUrl =
+            "https://mail.google.com/mail/?view=cm&fs=1" +
+            `&to=${encodeURIComponent(contact.studentContact)}` +
+            `&su=${encodeURIComponent(subject)}` +
+            `&body=${encodeURIComponent(body)}`;
+
+        document.getElementById("contactInfo").innerHTML = `
+            <strong>Claim ${escapeHTML(getItemName(item))}</strong>
+
+            <p style="margin-top:8px">
+                Click below to open Gmail with a claim message.
+            </p>
+
+            <div class="contact-options" style="grid-template-columns:1fr">
+                <a
+                    class="contact-option"
+                    href="${gmailUrl}"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    Send claim email
+                </a>
+            </div>
+        `;
+
+        document.getElementById("contactInfo").className =
+            "contact-card visible";
     } catch (error) {
-        if (document.getElementById("itemDetailsModal").classList.contains("active")) {
-            showMessage("contactMessage", error.message || "Could not create claim email.");
-        } else {
-            alert(error.message || "Could not create claim email.");
-        }
+        showMessage("contactMessage", error.message);
     }
 }
 
-// REPORT FORM
 function openReport(status) {
-    if (!isLoggedIn()) {
-        openAuth("login");
-        return;
-    }
+    document.getElementById("reportForm").reset();
+
+    document.getElementById("itemStatus").value = status;
 
     document.getElementById("reportTitle").textContent =
-        status === "Lost" ? "Report a Lost Item" : "Report a Found Item";
-    document.getElementById("reportForm").reset();
-    document.getElementById("itemStatus").value = status;
+        status === "Lost"
+            ? "Report a Lost Item"
+            : "Report a Found Item";
+
     document.getElementById("itemDate").value =
         new Date().toISOString().slice(0, 10);
 
     selectedImage = "";
+
     document.getElementById("imagePreview").style.display = "none";
+
     clearMessage("reportMessage");
+
     document.getElementById("reportModal").classList.add("active");
 }
 
-document.getElementById("itemImage").addEventListener("change", event => {
-    const file = event.target.files[0];
-    const preview = document.getElementById("imagePreview");
+document.getElementById("itemImage").addEventListener(
+    "change",
+    event => {
+        const file = event.target.files[0];
 
-    selectedImage = "";
-    preview.style.display = "none";
+        if (!file) {
+            return;
+        }
 
-    if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            showMessage("reportMessage", "Please select an image.");
+            return;
+        }
 
-    if (!file.type.startsWith("image/")) {
-        showMessage("reportMessage", "Please select an image file.");
-        event.target.value = "";
-        return;
+        if (file.size > 2 * 1024 * 1024) {
+            showMessage(
+                "reportMessage",
+                "Image must be smaller than 2 MB."
+            );
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            selectedImage = reader.result;
+
+            const preview =
+                document.getElementById("imagePreview");
+
+            preview.src = reader.result;
+            preview.style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
     }
+);
 
-    if (file.size > 2 * 1024 * 1024) {
-        showMessage("reportMessage", "Image must be smaller than 2 MB.");
-        event.target.value = "";
-        return;
+document.getElementById("reportForm").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const button = document.getElementById("reportSubmit");
+        button.disabled = true;
+
+        try {
+            await apiRequest("/api/items", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    title: document.getElementById("itemTitle").value.trim(),
+                    category: document.getElementById("itemCategory").value,
+                    status: document.getElementById("itemStatus").value,
+                    location: document.getElementById("itemLocation").value.trim(),
+                    date: document.getElementById("itemDate").value,
+                    description: document
+                        .getElementById("itemDescription")
+                        .value
+                        .trim(),
+                    image: selectedImage
+                })
+            });
+
+            closeModal("reportModal");
+
+            await loadItemsFromDatabase();
+
+            alert("Report submitted successfully!");
+        } catch (error) {
+            showMessage("reportMessage", error.message);
+        } finally {
+            button.disabled = false;
+        }
     }
+);
 
-    const reader = new FileReader();
-
-    reader.onload = () => {
-        selectedImage = reader.result;
-        preview.src = reader.result;
-        preview.style.display = "block";
-    };
-
-    reader.onerror = () => {
-        showMessage("reportMessage", "Could not read this image.");
-    };
-
-    reader.readAsDataURL(file);
-});
-
-document.getElementById("reportForm").addEventListener("submit", async event => {
-    event.preventDefault();
-
-    if (!isLoggedIn()) {
-        closeModal("reportModal");
-        openAuth("login");
-        return;
-    }
-
-    clearMessage("reportMessage");
-
-    const button = document.getElementById("reportSubmit");
-    button.disabled = true;
-
-    const item = {
-        title: document.getElementById("itemTitle").value.trim(),
-        category: document.getElementById("itemCategory").value,
-        status: document.getElementById("itemStatus").value,
-        location: document.getElementById("itemLocation").value.trim(),
-        date: document.getElementById("itemDate").value,
-        description: document.getElementById("itemDescription").value.trim(),
-        image: selectedImage
-    };
-
-    try {
-        await apiRequest("/api/items", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(item)
-        });
-
-        closeModal("reportModal");
-        document.getElementById("reportForm").reset();
-        selectedImage = "";
-        await loadItemsFromDatabase();
-        alert("Report submitted successfully!");
-    } catch (error) {
-        showMessage("reportMessage", error.message || "Could not submit report.");
-    } finally {
-        button.disabled = false;
-    }
-});
-
-// DELETE ITEM — owner only
 async function deleteItem(id) {
-    if (!isLoggedIn()) {
-        openAuth("login");
+    if (!confirm("Are you sure you want to delete this report?")) {
         return;
     }
 
-    if (!confirm("Are you sure you want to delete this report?")) return;
-
     try {
-        await apiRequest("/api/items/" + encodeURIComponent(id), {
-            method: "DELETE"
-        });
+        await apiRequest(
+            "/api/items/" + encodeURIComponent(id),
+            {
+                method: "DELETE"
+            }
+        );
 
         await loadItemsFromDatabase();
+
         alert("Report deleted.");
     } catch (error) {
-        alert("Could not delete report: " + error.message);
+        alert(error.message);
     }
 }
 
-// INITIAL LOAD
 document.addEventListener("DOMContentLoaded", async () => {
     updateLoginUI();
 
     if (isLoggedIn()) {
         await loadItemsFromDatabase();
     } else {
-        allItems = [];
-        updateStats([]);
         openAuth("login");
     }
 });
