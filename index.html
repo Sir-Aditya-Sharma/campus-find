@@ -35,13 +35,13 @@ button {
 }
 
 button:disabled { opacity: .6; cursor: not-allowed; }
-.primary-btn { background: var(--primary); color: white; }
+.primary-btn { background: var(--primary); color: #fff; }
 .primary-btn:hover { background: var(--primary-dark); }
 .secondary-btn { background: #eef2ff; color: var(--primary-dark); }
 .danger-btn { background: #fee2e2; color: #991b1b; }
 
 .navbar {
-    background: white;
+    background: #fff;
     padding: 15px 5%;
     display: flex;
     align-items: center;
@@ -63,7 +63,7 @@ button:disabled { opacity: .6; cursor: not-allowed; }
     max-width: 1200px;
     padding: 55px 30px;
     border-radius: 20px;
-    color: white;
+    color: #fff;
     background: linear-gradient(120deg, #4338ca, #7c3aed);
     text-align: center;
 }
@@ -76,7 +76,7 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 
 .hero p { max-width: 650px; margin: 0 auto 24px; color: #e0e7ff; }
 .hero-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
-.hero-actions button { background: white; color: var(--primary-dark); }
+.hero-actions button { background: #fff; color: var(--primary-dark); }
 
 .stats {
     width: 90%;
@@ -88,7 +88,7 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 }
 
 .stat-card {
-    background: white;
+    background: #fff;
     padding: 22px;
     border-radius: 14px;
     text-align: center;
@@ -111,7 +111,7 @@ input, select, textarea {
     padding: 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    background: white;
+    background: #fff;
     color: var(--text);
 }
 
@@ -124,7 +124,7 @@ textarea { resize: vertical; min-height: 100px; }
 }
 
 .item-card {
-    background: white;
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 14px;
     overflow: hidden;
@@ -142,7 +142,7 @@ textarea { resize: vertical; min-height: 100px; }
 .item-content { padding: 17px; }
 .item-content h3 { margin: 8px 0; overflow-wrap: anywhere; }
 .item-content p { margin: 7px 0; color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
-.item-buttons { margin-top: 14px; }
+.item-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
 .status {
     display: inline-block;
@@ -157,7 +157,7 @@ textarea { resize: vertical; min-height: 100px; }
 
 .empty-state {
     grid-column: 1 / -1;
-    background: white;
+    background: #fff;
     padding: 35px;
     text-align: center;
     border-radius: 12px;
@@ -190,7 +190,7 @@ body.logged-out footer {
 .modal {
     width: 100%;
     max-width: 480px;
-    background: white;
+    background: #fff;
     border-radius: 16px;
     padding: 25px;
     max-height: 92vh;
@@ -224,15 +224,17 @@ body.logged-out footer {
 .message.error { display: block; background: #fee2e2; color: #991b1b; }
 .message.success { display: block; background: #dcfce7; color: #166534; }
 
-#imagePreview {
+#imagePreview, #detailImage {
     display: none;
     width: 100%;
-    max-height: 180px;
+    max-height: 240px;
     object-fit: contain;
-    margin-top: 10px;
+    margin: 12px 0;
     border-radius: 8px;
     background: #f1f5f9;
 }
+
+#itemDetailsModal .modal > p { margin: 10px 0; overflow-wrap: anywhere; }
 
 @media (max-width: 850px) {
     .items-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -316,6 +318,7 @@ body.logged-out footer {
 
 <footer>© 2026 CampusFind · College Lost &amp; Found Portal</footer>
 
+<!-- LOGIN / REGISTER -->
 <div class="modal-overlay active" id="authModal">
     <div class="modal">
         <h2 id="authTitle">Welcome to CampusFind</h2>
@@ -352,6 +355,7 @@ body.logged-out footer {
     </div>
 </div>
 
+<!-- REPORT ITEM -->
 <div class="modal-overlay" id="reportModal">
     <div class="modal">
         <h2 id="reportTitle">Report an Item</h2>
@@ -415,12 +419,35 @@ body.logged-out footer {
     </div>
 </div>
 
+<!-- ITEM DETAILS -->
+<div class="modal-overlay" id="itemDetailsModal">
+    <div class="modal">
+        <img id="detailImage" alt="">
+        <span id="detailStatus" class="status"></span>
+        <h2 id="detailTitle"></h2>
+        <p><strong>Category:</strong> <span id="detailCategory"></span></p>
+        <p><strong>Location:</strong> <span id="detailLocation"></span></p>
+        <p><strong>Date:</strong> <span id="detailDate"></span></p>
+        <p><strong>Description:</strong></p>
+        <p id="detailDescription"></p>
+        <div id="contactMessage" class="message"></div>
+        <div class="form-actions">
+            <button type="button" class="secondary-btn"
+                    onclick="closeModal('itemDetailsModal')">Close</button>
+            <button type="button" class="primary-btn" id="detailContactButton">
+                Contact / Claim
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 const API_BASE = "https://campus-find-hmyj.onrender.com";
 
 let allItems = [];
 let authMode = "login";
 let selectedImage = "";
+let selectedDetailItem = null;
 
 function isLoggedIn() {
     return Boolean(localStorage.getItem("campusFindToken"));
@@ -543,6 +570,7 @@ function logout() {
     clearSession();
     updateLoginUI();
     closeModal("reportModal");
+    closeModal("itemDetailsModal");
     openAuth("login");
 }
 
@@ -614,9 +642,7 @@ document.getElementById("authForm").addEventListener("submit", async event => {
         const token = payload.token || payload.accessToken ||
                       data.token || data.accessToken;
 
-        if (!token) {
-            throw new Error("No login token was returned by the backend.");
-        }
+        if (!token) throw new Error("No login token was returned by the backend.");
 
         const user = payload.user || data.user || {
             name: payload.name || email.split("@")[0],
@@ -635,7 +661,7 @@ document.getElementById("authForm").addEventListener("submit", async event => {
     }
 });
 
-// ITEMS
+// ITEM HELPERS AND REPORT LIST
 function normalizeItems(data) {
     if (Array.isArray(data)) return data;
     if (Array.isArray(data.items)) return data.items;
@@ -654,6 +680,16 @@ function getItemType(item) {
 
 function getItemId(item) {
     return item._id || item.id || "";
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
 }
 
 async function loadItemsFromDatabase() {
@@ -684,16 +720,6 @@ function updateStats(items) {
         items.filter(item => getItemType(item) === "Lost").length;
     document.getElementById("foundItems").textContent =
         items.filter(item => getItemType(item) === "Found").length;
-}
-
-function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, character => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-    })[character]);
 }
 
 function renderItems() {
@@ -730,6 +756,7 @@ function renderItems() {
 
     container.innerHTML = filtered.map(item => {
         const id = getItemId(item);
+        const escapedId = escapeHTML(id);
         const title = escapeHTML(getItemName(item));
         const itemCategory = escapeHTML(item.category || "Other");
         const itemStatus = getItemType(item) === "Found" ? "Found" : "Lost";
@@ -742,12 +769,16 @@ function renderItems() {
             ? `<img class="item-image" src="${escapeHTML(image)}" alt="${title}" loading="lazy">`
             : `<div class="item-image" style="display:flex;align-items:center;justify-content:center;font-size:48px">📦</div>`;
 
-        // This button is shown only when the backend confirms ownership.
-        const deleteButton = item.isOwner && id
-            ? `<button class="danger-btn"
-                       onclick="deleteItem('${escapeHTML(id)}')">
-                   Delete Report
-               </button>`
+        const detailsButton = id
+            ? `<button class="secondary-btn" onclick="openItemDetails('${escapedId}')">View details</button>`
+            : "";
+
+        const contactButton = id && !item.isOwner
+            ? `<button class="primary-btn" onclick="contactPoster('${escapedId}')">Contact / Claim</button>`
+            : "";
+
+        const deleteButton = id && item.isOwner
+            ? `<button class="danger-btn" onclick="deleteItem('${escapedId}')">Delete Report</button>`
             : "";
 
         return `
@@ -760,13 +791,107 @@ function renderItems() {
                     <p><strong>Location:</strong> ${location}</p>
                     <p><strong>Date:</strong> ${date}</p>
                     <p>${description}</p>
-                    ${deleteButton
-                        ? `<div class="item-buttons">${deleteButton}</div>`
-                        : ""}
+                    <div class="item-buttons">
+                        ${detailsButton}
+                        ${contactButton}
+                        ${deleteButton}
+                    </div>
                 </div>
             </article>
         `;
     }).join("");
+}
+
+// DETAILS MODAL
+function openItemDetails(id) {
+    selectedDetailItem = allItems.find(item => getItemId(item) === id);
+
+    if (!selectedDetailItem) {
+        alert("This report could not be found.");
+        return;
+    }
+
+    const item = selectedDetailItem;
+    const itemStatus = getItemType(item) === "Found" ? "Found" : "Lost";
+
+    document.getElementById("detailTitle").textContent = getItemName(item);
+    document.getElementById("detailStatus").textContent = itemStatus;
+    document.getElementById("detailStatus").className = "status " + itemStatus;
+    document.getElementById("detailCategory").textContent = item.category || "Other";
+    document.getElementById("detailLocation").textContent =
+        item.location || "Not specified";
+    document.getElementById("detailDate").textContent =
+        item.date || "Not specified";
+    document.getElementById("detailDescription").textContent =
+        item.description || "No description provided.";
+
+    const image = document.getElementById("detailImage");
+
+    if (item.image) {
+        image.src = item.image;
+        image.alt = getItemName(item);
+        image.style.display = "block";
+    } else {
+        image.removeAttribute("src");
+        image.style.display = "none";
+    }
+
+    const contactButton = document.getElementById("detailContactButton");
+    contactButton.style.display = item.isOwner ? "none" : "block";
+    contactButton.onclick = () => contactPoster(getItemId(item));
+
+    clearMessage("contactMessage");
+    document.getElementById("itemDetailsModal").classList.add("active");
+}
+
+// CONTACT / CLAIM
+// Fetches the poster's email only after a logged-in user clicks the button.
+// Opens an email draft; it does not send the message automatically.
+async function contactPoster(id) {
+    if (!isLoggedIn()) {
+        openAuth("login");
+        return;
+    }
+
+    const item = allItems.find(report => getItemId(report) === id);
+    if (!item) {
+        alert("This report could not be found.");
+        return;
+    }
+
+    if (item.isOwner) {
+        alert("This is your own report.");
+        return;
+    }
+
+    try {
+        const contact = await apiRequest(
+            `/api/items/${encodeURIComponent(id)}/contact`
+        );
+
+        if (!contact.studentContact) {
+            throw new Error("The poster has no contact email.");
+        }
+
+        const subject = encodeURIComponent(
+            `CampusFind question about ${getItemName(item)}`
+        );
+        const body = encodeURIComponent(
+            `Hi ${contact.studentName || "there"},\n\n` +
+            `I am contacting you about your CampusFind report for ` +
+            `"${getItemName(item)}".\n\n`
+        );
+
+        window.location.href =
+            `mailto:${encodeURIComponent(contact.studentContact)}` +
+            `?subject=${subject}&body=${body}`;
+    } catch (error) {
+        if (document.getElementById("itemDetailsModal").classList.contains("active")) {
+            showMessage("contactMessage", error.message || "Could not contact poster.");
+        } else {
+            alert(error.message || "Could not contact poster.");
+        }
+    }
 }
 
 // REPORT FORM
@@ -835,6 +960,7 @@ document.getElementById("reportForm").addEventListener("submit", async event => 
     }
 
     clearMessage("reportMessage");
+
     const button = document.getElementById("reportSubmit");
     button.disabled = true;
 
@@ -867,7 +993,7 @@ document.getElementById("reportForm").addEventListener("submit", async event => 
     }
 });
 
-// DELETE ITEM
+// DELETE ITEM — backend checks ownership again
 async function deleteItem(id) {
     if (!isLoggedIn()) {
         openAuth("login");
@@ -888,7 +1014,7 @@ async function deleteItem(id) {
     }
 }
 
-// INITIAL PAGE LOAD
+// INITIAL LOAD
 document.addEventListener("DOMContentLoaded", async () => {
     updateLoginUI();
 
