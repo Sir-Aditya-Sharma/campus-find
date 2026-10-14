@@ -36,14 +36,10 @@ function authenticateUser(req, res, next) {
     }
 }
 
-// GET ITEMS
-// The server computes isOwner from the login token.
-// It does not send owner IDs or contact emails to the page.
+// GET ITEMS. Contact details are not included in the report list.
 router.get("/", authenticateUser, async (req, res) => {
     try {
-        const items = await Item.find()
-            .select("-studentContact")
-            .sort({ createdAt: -1 });
+        const items = await Item.find().sort({ createdAt: -1 });
 
         const safeItems = items.map(doc => {
             const item = doc.toObject();
@@ -64,15 +60,14 @@ router.get("/", authenticateUser, async (req, res) => {
     }
 });
 
-// GET POSTER CONTACT — logged-in users only
+// GET CONTACT DETAILS ONLY AFTER A LOGGED-IN USER REQUESTS THEM
 router.get("/:id/contact", authenticateUser, async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
             return res.status(400).json({ message: "Invalid item ID" });
         }
 
-        const item = await Item.findById(req.params.id)
-            .select("studentName studentContact userId");
+        const item = await Item.findById(req.params.id).select("userId");
 
         if (!item) {
             return res.status(404).json({ message: "Item not found" });
@@ -84,14 +79,24 @@ router.get("/:id/contact", authenticateUser, async (req, res) => {
             });
         }
 
+        const poster = await User.findById(item.userId)
+            .select("name email phone");
+
+        if (!poster) {
+            return res.status(404).json({
+                message: "Poster account not found."
+            });
+        }
+
         return res.json({
-            studentName: item.studentName,
-            studentContact: item.studentContact
+            studentName: poster.name,
+            studentContact: poster.email,
+            studentPhone: poster.phone || ""
         });
     } catch (error) {
         console.error("GET CONTACT ERROR:", error);
         return res.status(500).json({
-            message: "Could not get poster contact"
+            message: "Could not get poster contact."
         });
     }
 });
@@ -171,7 +176,7 @@ router.post("/", authenticateUser, async (req, res) => {
     }
 });
 
-// DELETE ITEM — owner only
+// DELETE ITEM — OWNER ONLY
 router.delete("/:id", authenticateUser, async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) {
@@ -184,13 +189,7 @@ router.delete("/:id", authenticateUser, async (req, res) => {
             return res.status(404).json({ message: "Item not found" });
         }
 
-        if (!item.userId) {
-            return res.status(403).json({
-                message: "This report has no recorded owner."
-            });
-        }
-
-        if (String(item.userId) !== String(req.user.id)) {
+        if (!item.userId || String(item.userId) !== String(req.user.id)) {
             return res.status(403).json({
                 message: "You can only delete your own reports."
             });

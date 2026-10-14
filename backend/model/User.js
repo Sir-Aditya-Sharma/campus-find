@@ -19,6 +19,14 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true
+        },
+
+        // Optional. Email remains required.
+        phone: {
+            type: String,
+            default: "",
+            trim: true,
+            maxlength: 30
         }
     },
     {
