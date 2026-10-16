@@ -449,10 +449,372 @@ body.logged-out footer {
         width: 92%;
     }
 }
+
+:root {
+    --primary: #6246f5;
+    --primary-dark: #4d35d7;
+    --background: #0b0e17;
+    --text: #edf1ff;
+    --muted: #9aa4bd;
+    --border: #222a3d;
+}
+
+body {
+    min-height: 100vh;
+    background: #0b0e17;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.navbar {
+    min-height: 60px;
+    padding: 10px 24px;
+    background: #101523;
+    border-bottom: 1px solid #222a3d;
+    box-shadow: none;
+}
+
+.logo { color: #f6f7ff; font-size: 20px; }
+.nav-actions { gap: 12px; }
+#welcomeText { color: #aeb8d0; }
+
+.alert-strip {
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 18px;
+    background: linear-gradient(90deg, #35105e, #201040);
+    color: #e5d6ff;
+    font-size: 11px;
+}
+
+.alert-strip strong { color: #ff819c; }
+.alert-strip .college-year { color: #c6b4ff; }
+
+.primary-btn {
+    background: linear-gradient(135deg, #7055ff, #5637df);
+}
+
+.secondary-btn {
+    background: #1a2233;
+    color: #d5dcef;
+    border: 1px solid #2a354a;
+}
+
+.danger-btn {
+    background: #3a1727;
+    color: #ff8da7;
+}
+
+.hero { display: none; }
+
+.dashboard-layout {
+    width: min(1160px, calc(100% - 40px));
+    margin: 16px auto 40px;
+    display: grid;
+    grid-template-columns: 194px minmax(380px, 1fr) 194px;
+    align-items: start;
+    gap: 16px;
+}
+
+.dashboard-sidebar,
+.dashboard-aside {
+    display: grid;
+    gap: 10px;
+}
+
+.panel,
+.dashboard-sidebar .panel,
+.dashboard-aside .panel {
+    padding: 12px;
+    border: 1px solid #222a3d;
+    border-radius: 16px;
+    background: #101523;
+}
+
+.panel-title {
+    margin-bottom: 9px;
+    color: #bac4d9;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.nav-list {
+    display: grid;
+    gap: 4px;
+}
+
+.nav-list button {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #aeb8d0;
+    text-align: left;
+    font-size: 11px;
+}
+
+.nav-list button:hover,
+.nav-list button.active {
+    background: #241c4a;
+    border-color: #453595;
+    color: #c7bdff;
+}
+
+.nav-list .count {
+    float: right;
+    color: #8e9ab6;
+}
+
+.zone-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.zone-list button {
+    padding: 6px 8px;
+    background: #1a2233;
+    border: 1px solid #2a354a;
+    color: #bbc5da;
+    font-size: 10px;
+}
+
+.dashboard-content { min-width: 0; }
+
+.stats {
+    width: 100%;
+    max-width: none;
+    margin: 0 0 10px;
+    gap: 8px;
+}
+
+.stat-card {
+    padding: 10px 8px;
+    background: #101523;
+    border: 1px solid #263047;
+    border-radius: 15px;
+    color: #aab4cb;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.stat-card h2 {
+    color: #f2f4ff;
+    font-size: 24px;
+    line-height: 1.2;
+}
+
+.stat-card:nth-child(2) { border-color: #482139; }
+.stat-card:nth-child(2) h2 { color: #ff6483; }
+.stat-card:nth-child(3) { border-color: #17443f; }
+.stat-card:nth-child(3) h2 { color: #23d6ab; }
+
+.container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid #222a3d;
+    border-radius: 16px;
+    background: #101523;
+}
+
+.section-heading { display: none; }
+
+.filters {
+    grid-template-columns: 1fr auto auto;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #222a3d;
+}
+
+input,
+select,
+textarea {
+    padding: 9px 10px;
+    border-color: #2a354a;
+    border-radius: 10px;
+    background: #0d1220;
+    color: #e5e9f6;
+    font-size: 12px;
+}
+
+.items-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.item-card {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #273148;
+    border-radius: 14px;
+    background: linear-gradient(145deg, #111827, #0c1120);
+    box-shadow: none;
+}
+
+.item-image {
+    width: 56px;
+    height: 64px;
+    border-radius: 10px;
+}
+
+.item-content {
+    min-width: 0;
+    padding: 0;
+}
+
+.item-content h3 {
+    display: inline-block;
+    margin: 6px 7px 2px 0;
+    color: #f2f4ff;
+    font-size: 13px;
+}
+
+.item-content p { display: none; }
+
+.item-content p:last-of-type {
+    display: block;
+    margin: 2px 0 6px;
+    color: #aab4cb;
+    font-size: 11px;
+}
+
+.status {
+    padding: 3px 8px;
+    font-size: 9px;
+}
+
+.status.Lost {
+    background: #451b2b;
+    color: #ff7995;
+}
+
+.status.Found {
+    background: #12392f;
+    color: #52dfb2;
+}
+
+.item-buttons {
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.item-buttons button {
+    padding: 6px 8px;
+    font-size: 10px;
+}
+
+.hotspot {
+    margin: 7px 0;
+    color: #bdc6d9;
+    font-size: 10px;
+}
+
+.hotspot span {
+    float: right;
+    color: #c9bbff;
+}
+
+.hotspot-track {
+    height: 3px;
+    margin-top: 4px;
+    border-radius: 9px;
+    background: #252d40;
+}
+
+.hotspot-track i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #6550f5, #c17bff);
+}
+
+.how-list {
+    padding-left: 14px;
+    color: #aeb8d0;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.how-list li + li { margin-top: 5px; }
+
+.high-value-badge {
+    position: fixed;
+    right: 0;
+    top: 52%;
+    padding: 9px 13px;
+    border-radius: 12px 0 0 12px;
+    background: linear-gradient(90deg, #d51655, #f03270);
+    color: white;
+    font-weight: 800;
+    font-size: 10px;
+    box-shadow: 0 8px 25px #e3165540;
+}
+
+footer {
+    color: #68738b;
+    font-size: 11px;
+}
+
+body.logged-out .dashboard-layout,
+body.logged-out .high-value-badge {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .dashboard-layout {
+        grid-template-columns: 170px minmax(0, 1fr);
+    }
+
+    .dashboard-aside { display: none; }
+}
+
+@media (max-width: 620px) {
+    .navbar { padding: 10px 12px; }
+    .logo { font-size: 17px; }
+
+    .dashboard-layout {
+        width: calc(100% - 20px);
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-sidebar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dashboard-content { min-width: 0; }
+
+    .filters { grid-template-columns: 1fr 1fr; }
+    .filters input { grid-column: 1 / -1; }
+
+    .stats { gap: 5px; }
+
+    .stat-card {
+        padding: 8px 4px;
+        font-size: 8px;
+    }
+
+    .stat-card h2 { font-size: 19px; }
+}
 </style>
 </head>
 
 <body class="logged-out">
+
+<div class="alert-strip">
+    <span><strong>● URGENT ALERT</strong> &nbsp; ⚠ High value item: HP Laptop Bag lost in Library 3rd Floor. Click to report!</span>
+    <span class="college-year">♟ College Portal 2026</span>
+</div>
 
 <header class="navbar">
     <div class="logo">🔎 CampusFind</div>
@@ -472,9 +834,9 @@ body.logged-out footer {
         <button
             id="loginButton"
             class="primary-btn"
-            onclick="openAuth('login')"
+            onclick="handlePrimaryAction()"
         >
-            Login / Register
+            Report Item
         </button>
 
         <button
@@ -488,74 +850,131 @@ body.logged-out footer {
     </div>
 </header>
 
-<section class="hero">
-    <h1>Lost Something on Campus?</h1>
+<div class="dashboard-layout">
+    <aside class="dashboard-sidebar">
+        <section class="panel">
+            <div class="panel-title">Navigation</div>
+            <div class="nav-list">
+                <button class="active" onclick="document.getElementById('statusFilter').value=''; renderItems()">
+                    ◉ All Live Feeds <span class="count" id="navTotal">0</span>
+                </button>
+                <button onclick="document.getElementById('statusFilter').value='Lost'; renderItems()">
+                    ● Lost Items Only <span class="count" id="navLost">0</span>
+                </button>
+                <button onclick="document.getElementById('statusFilter').value='Found'; renderItems()">
+                    ● Found Items Only <span class="count" id="navFound">0</span>
+                </button>
+                <button onclick="document.getElementById('statusFilter').value='Lost'; renderItems()">
+                    ▲ High-Value Alerts <span class="count">3</span>
+                </button>
+                <button onclick="openReport('Lost')">▣ My Active Reports</button>
+                <button onclick="document.getElementById('searchInput').focus()">▮ Saved Items</button>
+                <button onclick="openAuth('login')">☷ Other Options &amp; Support　›</button>
+            </div>
+        </section>
 
-    <p>
-        Find your missing belongings or help another student recover theirs.
-        Report lost and found items in one place.
-    </p>
+        <section class="panel">
+            <div class="panel-title">Campus Zones</div>
+            <div class="zone-list">
+                <button onclick="document.getElementById('searchInput').value='Engineering'; renderItems()">Engineering</button>
+                <button onclick="document.getElementById('searchInput').value='Library'; renderItems()">Library</button>
+                <button onclick="document.getElementById('searchInput').value='Canteen'; renderItems()">Canteen</button>
+                <button onclick="document.getElementById('searchInput').value='Sports'; renderItems()">Sports</button>
+            </div>
+        </section>
+    </aside>
 
-    <div class="hero-actions">
-        <button onclick="openReport('Lost')">＋ Report Lost Item</button>
-        <button onclick="openReport('Found')">＋ Report Found Item</button>
+    <div class="dashboard-content">
+        <section class="hero">
+            <h1>Lost Something on Campus?</h1>
+            <p>
+                Find your missing belongings or help another student recover theirs.
+                Report lost and found items in one place.
+            </p>
+            <div class="hero-actions">
+                <button onclick="openReport('Lost')">＋ Report Lost Item</button>
+                <button onclick="openReport('Found')">＋ Report Found Item</button>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <p>Total Reports</p>
+                <h2 id="totalItems">0</h2>
+            </div>
+            <div class="stat-card">
+                <p>Lost Items</p>
+                <h2 id="lostItems">0</h2>
+            </div>
+            <div class="stat-card">
+                <p>Found Items</p>
+                <h2 id="foundItems">0</h2>
+            </div>
+        </section>
+
+        <main class="container">
+            <div class="section-heading">
+                <h2>Campus Reports</h2>
+                <p style="color:#64748b">Search and browse reported items.</p>
+            </div>
+
+            <div class="filters">
+                <input
+                    id="searchInput"
+                    type="search"
+                    placeholder="Search by item, location or description..."
+                    oninput="renderItems()"
+                >
+
+                <select id="categoryFilter" onchange="renderItems()">
+                    <option value="">All Categories</option>
+                    <option value="Bags">Bags</option>
+                    <option value="Books">Books</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="ID Card">ID Card</option>
+                    <option value="Keys">Keys</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <select id="statusFilter" onchange="renderItems()">
+                    <option value="">Lost &amp; Found</option>
+                    <option value="Lost">Lost</option>
+                    <option value="Found">Found</option>
+                </select>
+            </div>
+
+            <div id="itemsContainer" class="items-grid"></div>
+        </main>
     </div>
-</section>
 
-<section class="stats">
-    <div class="stat-card">
-        <p>Total Reports</p>
-        <h2 id="totalItems">0</h2>
-    </div>
+    <aside class="dashboard-aside">
+        <section class="panel">
+            <div class="panel-title">Top Loss Hotspots</div>
+            <div class="hotspot">
+                Central Library <span>42%</span>
+                <div class="hotspot-track"><i style="width:42%"></i></div>
+            </div>
+            <div class="hotspot">
+                Main Canteen <span>28%</span>
+                <div class="hotspot-track"><i style="width:28%"></i></div>
+            </div>
+        </section>
 
-    <div class="stat-card">
-        <p>Lost Items</p>
-        <h2 id="lostItems">0</h2>
-    </div>
+        <section class="panel">
+            <div class="panel-title">ⓘ How CampusFind Works</div>
+            <ul class="how-list">
+                <li>Post detailed descriptions and photos of lost or found items.</li>
+                <li>Contact fellow students directly via verified email or phone number.</li>
+            </ul>
+        </section>
+    </aside>
+</div>
 
-    <div class="stat-card">
-        <p>Found Items</p>
-        <h2 id="foundItems">0</h2>
-    </div>
-</section>
-
-<main class="container">
-    <div class="section-heading">
-        <h2>Campus Reports</h2>
-        <p style="color:#64748b">Search and browse reported items.</p>
-    </div>
-
-    <div class="filters">
-        <input
-            id="searchInput"
-            type="search"
-            placeholder="Search by item, location or description..."
-            oninput="renderItems()"
-        >
-
-        <select id="categoryFilter" onchange="renderItems()">
-            <option value="">All Categories</option>
-            <option value="Bags">Bags</option>
-            <option value="Books">Books</option>
-            <option value="Electronics">Electronics</option>
-            <option value="ID Card">ID Card</option>
-            <option value="Keys">Keys</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Other">Other</option>
-        </select>
-
-        <select id="statusFilter" onchange="renderItems()">
-            <option value="">Lost & Found</option>
-            <option value="Lost">Lost</option>
-            <option value="Found">Found</option>
-        </select>
-    </div>
-
-    <div id="itemsContainer" class="items-grid"></div>
-</main>
+<div class="high-value-badge">⚠ HIGH-VALUE ALERT</div>
 
 <footer>
-    © 2026 CampusFind · College Lost & Found Portal
+    © 2026 CampusFind · College Lost &amp; Found Portal
 </footer>
 
 <div class="modal-overlay" id="authModal">
@@ -563,7 +982,7 @@ body.logged-out footer {
         <h2 id="authTitle">Welcome to CampusFind</h2>
 
         <p id="authSubtitle" class="modal-subtitle">
-            Login to access campus Lost & Found reports.
+            Login to access campus Lost &amp; Found reports.
         </p>
 
         <div id="authMessage" class="message"></div>
@@ -681,7 +1100,6 @@ body.logged-out footer {
 
             <div class="form-group">
                 <label for="itemCategory">Category *</label>
-
                 <select id="itemCategory" required>
                     <option value="">Select category</option>
                     <option value="Bags">Bags</option>
@@ -750,7 +1168,6 @@ body.logged-out footer {
         <img id="detailImage" alt="">
 
         <span id="detailStatus" class="status"></span>
-
         <h2 id="detailTitle"></h2>
 
         <p><strong>Category:</strong> <span id="detailCategory"></span></p>
@@ -808,14 +1225,12 @@ function escapeHTML(value) {
 
 function showMessage(id, text, type = "error") {
     const element = document.getElementById(id);
-
     element.textContent = text;
     element.className = "message " + type;
 }
 
 function clearMessage(id) {
     const element = document.getElementById(id);
-
     element.textContent = "";
     element.className = "message";
 }
@@ -887,8 +1302,9 @@ function updateLoginUI() {
 
     document.body.classList.toggle("logged-out", !loggedIn);
 
-    document.getElementById("loginButton").style.display =
-        loggedIn ? "none" : "block";
+    document.getElementById("loginButton").style.display = "block";
+    document.getElementById("loginButton").textContent =
+        loggedIn ? "＋ Report Item" : "Login / Register";
 
     document.getElementById("logoutButton").style.display =
         loggedIn ? "block" : "none";
@@ -908,6 +1324,14 @@ function updateLoginUI() {
         "active",
         !loggedIn
     );
+}
+
+function handlePrimaryAction() {
+    if (isLoggedIn()) {
+        openReport("Lost");
+    } else {
+        openAuth("login");
+    }
 }
 
 function openAuth(mode) {
@@ -986,7 +1410,6 @@ document.getElementById("authForm").addEventListener(
     "submit",
     async event => {
         event.preventDefault();
-
         clearMessage("authMessage");
 
         const button = document.getElementById("authSubmit");
@@ -1038,7 +1461,6 @@ document.getElementById("authForm").addEventListener(
             }
 
             localStorage.setItem("campusFindToken", data.token);
-
             localStorage.setItem(
                 "campusFindUser",
                 JSON.stringify(data.user)
@@ -1046,7 +1468,6 @@ document.getElementById("authForm").addEventListener(
 
             updateLoginUI();
             closeModal("authModal");
-
             await loadItemsFromDatabase();
         } catch (error) {
             showMessage("authMessage", error.message);
@@ -1063,7 +1484,6 @@ function openPhoneModal() {
         user?.phone || "";
 
     clearMessage("phoneMessage");
-
     document.getElementById("phoneModal").classList.add("active");
 }
 
@@ -1140,13 +1560,11 @@ async function loadItemsFromDatabase() {
     }
 
     const container = document.getElementById("itemsContainer");
-
     container.innerHTML =
         '<div class="empty-state">Loading reports...</div>';
 
     try {
         const data = await apiRequest("/api/items");
-
         allItems = normalizeItems(data);
 
         updateStats(allItems);
@@ -1162,11 +1580,20 @@ async function loadItemsFromDatabase() {
 function updateStats(items) {
     document.getElementById("totalItems").textContent = items.length;
 
-    document.getElementById("lostItems").textContent =
-        items.filter(item => getItemType(item) === "Lost").length;
+    const lostCount = items.filter(
+        item => getItemType(item) === "Lost"
+    ).length;
 
-    document.getElementById("foundItems").textContent =
-        items.filter(item => getItemType(item) === "Found").length;
+    document.getElementById("lostItems").textContent = lostCount;
+
+    const foundCount = items.filter(
+        item => getItemType(item) === "Found"
+    ).length;
+
+    document.getElementById("foundItems").textContent = foundCount;
+    document.getElementById("navTotal").textContent = items.length;
+    document.getElementById("navLost").textContent = lostCount;
+    document.getElementById("navFound").textContent = foundCount;
 }
 
 function renderItems() {
@@ -1199,7 +1626,6 @@ function renderItems() {
     if (!filtered.length) {
         container.innerHTML =
             '<div class="empty-state">No reports found.</div>';
-
         return;
     }
 
@@ -1232,7 +1658,6 @@ function renderItems() {
 
                 <div class="item-content">
                     <span class="status ${type}">${type}</span>
-
                     <h3>${title}</h3>
 
                     <p><strong>Category:</strong> ${escapeHTML(item.category || "Other")}</p>
@@ -1364,7 +1789,6 @@ async function showContactInfo(id) {
 
         document.getElementById("contactInfo").innerHTML = `
             <strong>Contact ${escapeHTML(contact.studentName || "poster")}</strong>
-
             <p style="margin-top:8px">Choose one option:</p>
 
             <div class="contact-options">
@@ -1446,7 +1870,6 @@ async function claimItem(id) {
 
 function openReport(status) {
     document.getElementById("reportForm").reset();
-
     document.getElementById("itemStatus").value = status;
 
     document.getElementById("reportTitle").textContent =
@@ -1458,11 +1881,8 @@ function openReport(status) {
         new Date().toISOString().slice(0, 10);
 
     selectedImage = "";
-
     document.getElementById("imagePreview").style.display = "none";
-
     clearMessage("reportMessage");
-
     document.getElementById("reportModal").classList.add("active");
 }
 
@@ -1533,9 +1953,7 @@ document.getElementById("reportForm").addEventListener(
             });
 
             closeModal("reportModal");
-
             await loadItemsFromDatabase();
-
             alert("Report submitted successfully!");
         } catch (error) {
             showMessage("reportMessage", error.message);
@@ -1559,7 +1977,6 @@ async function deleteItem(id) {
         );
 
         await loadItemsFromDatabase();
-
         alert("Report deleted.");
     } catch (error) {
         alert(error.message);
