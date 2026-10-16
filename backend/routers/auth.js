@@ -11,14 +11,19 @@ function authenticateUser(req, res, next) {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ message: "Please login first" });
+            return res.status(401).json({
+                message: "Please login first."
+            });
+        }
+
+        if (!process.env.JWT_SECRET) {
+            return res.status(503).json({
+                message: "Login is not configured on the server."
+            });
         }
 
         const token = authHeader.split(" ")[1];
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET || "campus-secret-key"
-        );
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
             return res.status(401).json({
@@ -29,14 +34,12 @@ function authenticateUser(req, res, next) {
         req.user = decoded;
         next();
     } catch (error) {
-        console.error("Authentication error:", error.message);
         return res.status(401).json({
             message: "Invalid or expired login. Please login again."
         });
     }
 }
 
-// REGISTER
 router.post("/register", async (req, res) => {
     try {
         const { name, email, password, phone } = req.body;
@@ -47,9 +50,14 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        if (password.length < 6) {
+        if (
+            typeof name !== "string" ||
+            typeof email !== "string" ||
+            typeof password !== "string" ||
+            password.length < 6
+        ) {
             return res.status(400).json({
-                message: "Password must be at least 6 characters."
+                message: "Enter a name, valid email, and password of at least 6 characters."
             });
         }
 
@@ -58,7 +66,7 @@ router.post("/register", async (req, res) => {
 
         if (cleanPhone && !/^[+0-9().\-\s]{7,30}$/.test(cleanPhone)) {
             return res.status(400).json({
-                message: "Please enter a valid phone number, or leave it blank."
+                message: "Enter a valid phone number, or leave it blank."
             });
         }
 
@@ -85,15 +93,12 @@ router.post("/register", async (req, res) => {
             message: "Registration successful."
         });
     } catch (error) {
-        console.error("REGISTER ERROR:", error);
         return res.status(500).json({
-            message: "Server error",
-            error: error.message
+            message: "Could not create the account."
         });
     }
 });
 
-// LOGIN
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -104,8 +109,15 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        const cleanEmail = email.trim().toLowerCase();
-        const user = await User.findOne({ email: cleanEmail });
+        if (!process.env.JWT_SECRET) {
+            return res.status(503).json({
+                message: "Login is not configured on the server."
+            });
+        }
+
+        const user = await User.findOne({
+            email: String(email).trim().toLowerCase()
+        });
 
         if (!user) {
             return res.status(401).json({
@@ -113,7 +125,10 @@ router.post("/login", async (req, res) => {
             });
         }
 
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
 
         if (!passwordMatch) {
             return res.status(401).json({
@@ -123,11 +138,13 @@ router.post("/login", async (req, res) => {
 
         const token = jwt.sign(
             {
-                id: user._id,
+                id: String(user._id),
                 email: user.email
             },
-            process.env.JWT_SECRET || "campus-secret-key",
-            { expiresIn: "7d" }
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "7d"
+            }
         );
 
         return res.json({
@@ -141,15 +158,12 @@ router.post("/login", async (req, res) => {
             }
         });
     } catch (error) {
-        console.error("LOGIN ERROR:", error);
         return res.status(500).json({
-            message: "Server error",
-            error: error.message
+            message: "Could not log in."
         });
     }
 });
 
-// UPDATE OPTIONAL PHONE FOR AN EXISTING ACCOUNT
 router.patch("/phone", authenticateUser, async (req, res) => {
     try {
         const phone = typeof req.body.phone === "string"
@@ -158,14 +172,16 @@ router.patch("/phone", authenticateUser, async (req, res) => {
 
         if (phone && !/^[+0-9().\-\s]{7,30}$/.test(phone)) {
             return res.status(400).json({
-                message: "Please enter a valid phone number, or leave it blank."
+                message: "Enter a valid phone number, or leave it blank."
             });
         }
 
         const user = await User.findById(req.user.id);
 
         if (!user) {
-            return res.status(404).json({ message: "User not found." });
+            return res.status(404).json({
+                message: "User not found."
+            });
         }
 
         user.phone = phone;
@@ -178,7 +194,6 @@ router.patch("/phone", authenticateUser, async (req, res) => {
             phone: user.phone
         });
     } catch (error) {
-        console.error("UPDATE PHONE ERROR:", error);
         return res.status(500).json({
             message: "Could not update phone number."
         });

@@ -41,6 +41,11 @@
             cursor: pointer;
         }
 
+        button:disabled {
+            cursor: not-allowed;
+            opacity: .65;
+        }
+
         .navbar {
             position: sticky;
             top: 0;
@@ -83,14 +88,8 @@
             transition: background .15s ease, transform .15s ease;
         }
 
-        button:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-1px);
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-            opacity: .6;
-            transform: none;
         }
 
         .primary-btn {
@@ -98,7 +97,7 @@
             color: #fff;
         }
 
-        .primary-btn:hover {
+        .primary-btn:hover:not(:disabled) {
             background: var(--primary-dark);
         }
 
@@ -108,7 +107,7 @@
             color: var(--primary-dark);
         }
 
-        .secondary-btn:hover {
+        .secondary-btn:hover:not(:disabled) {
             background: #e0e7ff;
         }
 
@@ -116,6 +115,10 @@
             background: #fff1f2;
             border-color: #ffe4e6;
             color: #be123c;
+        }
+
+        .danger-btn:hover:not(:disabled) {
+            background: #ffe4e6;
         }
 
         .urgent-banner {
@@ -366,6 +369,28 @@
         .contact-links a {
             color: var(--primary);
             font-weight: 700;
+        }
+
+        .workflow-note {
+            margin-top: 9px !important;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12px !important;
+        }
+
+        .workflow-note.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .workflow-note.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .workflow-note.returned {
+            background: #dcfce7;
+            color: #166534;
         }
 
         .empty-state {
@@ -703,7 +728,7 @@
                     <input
                         id="authEmail"
                         type="email"
-                        placeholder="you@gmail.com"
+                        placeholder="you@example.com"
                         required
                     >
                 </div>
@@ -797,6 +822,10 @@
         <div class="modal">
             <h2 id="reportTitle">Report Item</h2>
 
+            <p class="modal-subtitle">
+                New reports are checked by an admin before other students can see them.
+            </p>
+
             <div id="reportMessage" class="message"></div>
 
             <form id="reportForm">
@@ -879,17 +908,8 @@
         let authMode = "login";
         let selectedImage = "";
 
-        function escapeHTML(value) {
-            return String(value ?? "")
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function getToken() {
-            return localStorage.getItem("campusFindToken") || "";
+        function isLoggedIn() {
+            return Boolean(localStorage.getItem("campusFindToken"));
         }
 
         function getCurrentUser() {
@@ -902,18 +922,69 @@
             }
         }
 
-        function isLoggedIn() {
-            return Boolean(getToken());
+        function getToken() {
+            return localStorage.getItem("campusFindToken");
         }
 
-        function showMessage(id, text, type = "error") {
-            const element = document.getElementById(id);
-            element.textContent = text;
-            element.className = "message " + type;
+        function authHeaders(extraHeaders = {}) {
+            const headers = { ...extraHeaders };
+
+            if (getToken()) {
+                headers.Authorization = `Bearer ${getToken()}`;
+            }
+
+            return headers;
         }
 
-        function clearMessage(id) {
-            const element = document.getElementById(id);
+        async function apiRequest(path, options = {}) {
+            const response = await fetch(API_BASE + path, {
+                ...options,
+                headers: authHeaders(options.headers || {})
+            });
+
+            const text = await response.text();
+            let data = {};
+
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch {
+                data = {
+                    message: text || "Unexpected server response."
+                };
+            }
+
+            if (!response.ok) {
+                if (response.status === 401 && isLoggedIn()) {
+                    clearSession();
+                    updateLoginUI();
+                }
+
+                throw new Error(
+                    data.message || data.error || `Request failed (${response.status})`
+                );
+            }
+
+            return data;
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? "").replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+        }
+
+        function showMessage(elementId, message, type = "error") {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `message ${type}`;
+        }
+
+        function clearMessage(elementId) {
+            const element = document.getElementById(elementId);
             element.textContent = "";
             element.className = "message";
         }
@@ -922,41 +993,6 @@
             localStorage.removeItem("campusFindToken");
             localStorage.removeItem("campusFindUser");
             allItems = [];
-        }
-
-        async function apiRequest(endpoint, options = {}) {
-            const headers = { ...(options.headers || {}) };
-
-            if (getToken()) {
-                headers.Authorization = "Bearer " + getToken();
-            }
-
-            const response = await fetch(API_BASE + endpoint, {
-                ...options,
-                headers
-            });
-
-            const raw = await response.text();
-            let data = {};
-
-            try {
-                data = raw ? JSON.parse(raw) : {};
-            } catch {
-                throw new Error("Unexpected server response.");
-            }
-
-            if (!response.ok) {
-                if (response.status === 401) {
-                    clearSession();
-                    updateLoginUI();
-                }
-
-                throw new Error(
-                    data.message || data.error || "Something went wrong."
-                );
-            }
-
-            return data;
         }
 
         function updateLoginUI() {
@@ -976,7 +1012,7 @@
 
             document.getElementById("welcomeText").textContent =
                 loggedIn
-                    ? "Welcome, " + (user?.name || "Student")
+                    ? `Welcome, ${user?.name || "Student"}`
                     : "";
 
             document.getElementById("authModal").classList.toggle(
@@ -993,7 +1029,7 @@
             }
         }
 
-        function openAuth(mode) {
+        function openAuth(mode = "login") {
             authMode = mode;
             updateAuthModal();
             document.getElementById("authModal").classList.add("active");
@@ -1003,11 +1039,13 @@
             const registering = authMode === "register";
 
             document.getElementById("authTitle").textContent =
-                registering ? "Create account" : "Welcome to CampusFind";
+                registering
+                    ? "Create Your Account"
+                    : "Welcome to CampusFind";
 
             document.getElementById("authSubtitle").textContent =
                 registering
-                    ? "Create an account to access CampusFind."
+                    ? "Register to access campus Lost & Found reports."
                     : "Login to access campus Lost & Found reports.";
 
             document.getElementById("nameGroup").style.display =
@@ -1017,6 +1055,9 @@
                 registering ? "block" : "none";
 
             document.getElementById("authName").required = registering;
+
+            document.getElementById("authPassword").autocomplete =
+                registering ? "new-password" : "current-password";
 
             document.getElementById("authSubmit").textContent =
                 registering ? "Create Account" : "Login";
@@ -1053,10 +1094,15 @@
 
         document.querySelectorAll(".modal-overlay").forEach(modal => {
             modal.addEventListener("click", event => {
-                if (event.target === modal &&
-                    (modal.id !== "authModal" || isLoggedIn())) {
-                    modal.classList.remove("active");
+                if (event.target !== modal) {
+                    return;
                 }
+
+                if (modal.id === "authModal" && !isLoggedIn()) {
+                    return;
+                }
+
+                modal.classList.remove("active");
             });
         });
 
@@ -1069,10 +1115,14 @@
                 const button = document.getElementById("authSubmit");
                 button.disabled = true;
 
-                const name = document.getElementById("authName").value.trim();
-                const email = document.getElementById("authEmail").value.trim();
-                const password = document.getElementById("authPassword").value;
-                const phone = document.getElementById("authPhone").value.trim();
+                const name =
+                    document.getElementById("authName").value.trim();
+                const email =
+                    document.getElementById("authEmail").value.trim();
+                const password =
+                    document.getElementById("authPassword").value;
+                const phone =
+                    document.getElementById("authPhone").value.trim();
 
                 try {
                     const endpoint =
@@ -1087,7 +1137,9 @@
 
                     const response = await fetch(API_BASE + endpoint, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
                         body: JSON.stringify(body)
                     });
 
@@ -1103,9 +1155,12 @@
                         authMode = "login";
                         updateAuthModal();
 
+                        document.getElementById("authEmail").value = email;
+                        document.getElementById("authPassword").value = "";
+
                         showMessage(
                             "authMessage",
-                            "Account created. Please login.",
+                            "Account created. Please log in.",
                             "success"
                         );
 
@@ -1122,7 +1177,10 @@
                     closeModal("authModal");
                     await loadItemsFromDatabase();
                 } catch (error) {
-                    showMessage("authMessage", error.message);
+                    showMessage(
+                        "authMessage",
+                        error.message || "Something went wrong."
+                    );
                 } finally {
                     button.disabled = false;
                 }
@@ -1150,7 +1208,9 @@
                 try {
                     const result = await apiRequest("/api/auth/phone", {
                         method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
                         body: JSON.stringify({
                             phone: document
                                 .getElementById("profilePhone")
@@ -1201,6 +1261,10 @@
                 return data.items;
             }
 
+            if (Array.isArray(data.data)) {
+                return data.data;
+            }
+
             return [];
         }
 
@@ -1219,9 +1283,7 @@
                 renderItems();
             } catch (error) {
                 container.innerHTML =
-                    '<div class="empty-state">' +
-                    escapeHTML(error.message) +
-                    "</div>";
+                    `<div class="empty-state">${escapeHTML(error.message)}</div>`;
             }
         }
 
@@ -1267,16 +1329,48 @@
                 const type =
                     getItemType(item) === "Found" ? "Found" : "Lost";
 
-                const imageHTML = item.image
-                    ? `<img class="item-image" src="${escapeHTML(item.image)}" alt="${title}">`
+                const reviewStatus = item.reviewStatus || "Approved";
+                const resolutionStatus =
+                    item.resolutionStatus || "Open";
+
+                const imageSource =
+                    typeof item.image === "string" &&
+                    /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i
+                        .test(item.image)
+                        ? item.image
+                        : "";
+
+                const imageHTML = imageSource
+                    ? `<img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}">`
                     : `<div class="item-placeholder" aria-label="No photo">📦</div>`;
 
-                const ownerButton = item.isOwner
-                    ? `<button class="danger-btn" type="button" data-action="delete" data-id="${id}">Delete report</button>`
-                    : "";
+                let workflowNote = "";
 
-                const contactButton = !item.isOwner
-                    ? `<button class="primary-btn" type="button" data-action="contact" data-id="${id}">Contact</button>`
+                if (item.isOwner && reviewStatus === "Pending") {
+                    workflowNote =
+                        '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
+                } else if (item.isOwner && reviewStatus === "Rejected") {
+                    workflowNote =
+                        '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
+                } else if (resolutionStatus === "Returned") {
+                    workflowNote =
+                        '<p class="workflow-note returned">Returned — this report is closed.</p>';
+                }
+
+                const contactButton =
+                    !item.isOwner && resolutionStatus === "Open"
+                        ? `<button class="primary-btn" type="button" data-action="contact" data-id="${id}">${type === "Found" ? "Claim / Contact" : "Contact poster"}</button>`
+                        : "";
+
+                const returnedButton =
+                    item.isOwner &&
+                    reviewStatus === "Approved" &&
+                    resolutionStatus === "Open"
+                        ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${id}">Mark returned</button>`
+                        : "";
+
+                const deleteButton = item.isOwner
+                    ? `<button class="danger-btn" type="button" data-action="delete" data-id="${id}">Delete report</button>`
                     : "";
 
                 return `
@@ -1293,10 +1387,12 @@
                             <p><strong>Campus location:</strong> ${escapeHTML(item.location || "Not specified")}</p>
                             <p><strong>Date:</strong> ${escapeHTML(item.date || "Not specified")}</p>
                             <p>${escapeHTML(item.description || "No description provided.")}</p>
+                            ${workflowNote}
 
                             <div class="item-buttons">
                                 ${contactButton}
-                                ${ownerButton}
+                                ${returnedButton}
+                                ${deleteButton}
                             </div>
 
                             <div class="contact-result"></div>
@@ -1339,6 +1435,10 @@
                 if (action === "delete") {
                     await deleteItem(id);
                 }
+
+                if (action === "resolve") {
+                    await markReturned(id);
+                }
             }
         );
 
@@ -1355,8 +1455,8 @@
                 );
 
                 const name = escapeHTML(contact.studentName || "Student");
-                const email = contact.studentContact || "";
-                const phone = contact.studentPhone || "";
+                const email = String(contact.studentContact || "");
+                const phone = String(contact.studentPhone || "");
 
                 const emailLink = email
                     ? `<a href="mailto:${encodeURIComponent(email)}">Email ${name}</a>`
@@ -1385,7 +1485,7 @@
 
             try {
                 await apiRequest(
-                    "/api/items/" + encodeURIComponent(id),
+                    `/api/items/${encodeURIComponent(id)}`,
                     { method: "DELETE" }
                 );
 
@@ -1396,7 +1496,39 @@
             }
         }
 
+        async function markReturned(id) {
+            if (!confirm("Has this item been returned to its owner?")) {
+                return;
+            }
+
+            try {
+                await apiRequest(
+                    `/api/items/${encodeURIComponent(id)}/resolve`,
+                    { method: "PATCH" }
+                );
+
+                await loadItemsFromDatabase();
+                alert("Report marked as returned.");
+            } catch (error) {
+                alert(error.message);
+            }
+        }
+
+        function localDateString() {
+            const now = new Date();
+            const localDate = new Date(
+                now.getTime() - now.getTimezoneOffset() * 60000
+            );
+
+            return localDate.toISOString().slice(0, 10);
+        }
+
         function openReport(status) {
+            if (!isLoggedIn()) {
+                openAuth("login");
+                return;
+            }
+
             document.getElementById("reportForm").reset();
             document.getElementById("itemStatus").value = status;
 
@@ -1405,11 +1537,14 @@
                     ? "Report a Lost Item"
                     : "Report a Found Item";
 
-            document.getElementById("itemDate").value =
-                new Date().toISOString().slice(0, 10);
+            document.getElementById("itemDate").value = localDateString();
 
             selectedImage = "";
-            document.getElementById("imagePreview").style.display = "none";
+
+            const preview = document.getElementById("imagePreview");
+            preview.removeAttribute("src");
+            preview.style.display = "none";
+
             clearMessage("reportMessage");
             document.getElementById("reportModal").classList.add("active");
         }
@@ -1418,6 +1553,12 @@
             "change",
             event => {
                 const file = event.target.files[0];
+                const preview = document.getElementById("imagePreview");
+
+                selectedImage = "";
+                preview.removeAttribute("src");
+                preview.style.display = "none";
+                clearMessage("reportMessage");
 
                 if (!file) {
                     return;
@@ -1425,6 +1566,7 @@
 
                 if (!file.type.startsWith("image/")) {
                     showMessage("reportMessage", "Please select an image.");
+                    event.target.value = "";
                     return;
                 }
 
@@ -1433,19 +1575,23 @@
                         "reportMessage",
                         "Image must be smaller than 2 MB."
                     );
+                    event.target.value = "";
                     return;
                 }
 
                 const reader = new FileReader();
 
                 reader.onload = () => {
-                    selectedImage = reader.result;
-
-                    const preview =
-                        document.getElementById("imagePreview");
-
-                    preview.src = reader.result;
+                    selectedImage = String(reader.result || "");
+                    preview.src = selectedImage;
                     preview.style.display = "block";
+                };
+
+                reader.onerror = () => {
+                    showMessage(
+                        "reportMessage",
+                        "Could not read that image. Please try another one."
+                    );
                 };
 
                 reader.readAsDataURL(file);
@@ -1459,11 +1605,14 @@
 
                 const button = document.getElementById("reportSubmit");
                 button.disabled = true;
+                clearMessage("reportMessage");
 
                 try {
                     await apiRequest("/api/items", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
                         body: JSON.stringify({
                             title: document
                                 .getElementById("itemTitle")
@@ -1492,7 +1641,10 @@
 
                     closeModal("reportModal");
                     await loadItemsFromDatabase();
-                    alert("Report submitted successfully!");
+
+                    alert(
+                        "Report submitted. It will appear to everyone after admin approval."
+                    );
                 } catch (error) {
                     showMessage("reportMessage", error.message);
                 } finally {
