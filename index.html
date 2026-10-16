@@ -118,6 +118,26 @@
             color: #be123c;
         }
 
+        .urgent-banner {
+            display: block;
+            width: min(1100px, calc(100% - 32px));
+            margin: 18px auto 0;
+            padding: 12px 16px;
+            border: 1px solid #fecaca;
+            border-radius: 12px;
+            background: #fff1f2;
+            color: #9f1239;
+            text-align: left;
+        }
+
+        .urgent-banner:hover {
+            background: #ffe4e6;
+        }
+
+        .urgent-banner strong {
+            margin-right: 7px;
+        }
+
         .hero,
         .container {
             width: min(1100px, calc(100% - 32px));
@@ -126,7 +146,7 @@
         }
 
         .hero {
-            margin-top: 22px;
+            margin-top: 18px;
             margin-bottom: 18px;
             padding: 28px;
             border: 1px solid #dfe4ff;
@@ -467,6 +487,7 @@
             object-fit: contain;
         }
 
+        body.logged-out .urgent-banner,
         body.logged-out .hero,
         body.logged-out .container,
         body.logged-out footer {
@@ -497,9 +518,14 @@
                 display: none;
             }
 
+            .urgent-banner,
             .hero,
             .container {
                 width: calc(100% - 20px);
+            }
+
+            .urgent-banner {
+                margin-top: 12px;
             }
 
             .hero {
@@ -581,6 +607,15 @@
         </div>
     </header>
 
+    <button
+        class="urgent-banner"
+        type="button"
+        onclick="openReport('Lost')"
+    >
+        <strong>⚠ High-Value Alert</strong>
+        Lost something valuable? Click here to open the complete report form.
+    </button>
+
     <section class="hero">
         <h1>Lost something on campus?</h1>
         <p>
@@ -589,10 +624,19 @@
         </p>
 
         <div class="hero-actions">
-            <button class="primary-btn" type="button" onclick="openReport('Lost')">
+            <button
+                class="primary-btn"
+                type="button"
+                onclick="openReport('Lost')"
+            >
                 ＋ Report Lost Item
             </button>
-            <button class="secondary-btn" type="button" onclick="openReport('Found')">
+
+            <button
+                class="secondary-btn"
+                type="button"
+                onclick="openReport('Found')"
+            >
                 ＋ Report Found Item
             </button>
         </div>
@@ -641,6 +685,7 @@
     <div class="modal-overlay" id="authModal">
         <div class="modal">
             <h2 id="authTitle">Welcome to CampusFind</h2>
+
             <p id="authSubtitle" class="modal-subtitle">
                 Login to access campus Lost &amp; Found reports.
             </p>
@@ -665,7 +710,11 @@
 
                 <div class="form-group" id="phoneGroup" style="display:none">
                     <label for="authPhone">Phone number (optional)</label>
-                    <input id="authPhone" type="tel" placeholder="+91 9876543210">
+                    <input
+                        id="authPhone"
+                        type="tel"
+                        placeholder="+91 9876543210"
+                    >
                 </div>
 
                 <div class="form-group">
@@ -679,7 +728,11 @@
                 </div>
 
                 <div class="form-actions">
-                    <button id="authSubmit" class="primary-btn" type="submit">
+                    <button
+                        id="authSubmit"
+                        class="primary-btn"
+                        type="submit"
+                    >
                         Login
                     </button>
                 </div>
@@ -702,6 +755,7 @@
     <div class="modal-overlay" id="phoneModal">
         <div class="modal">
             <h2>My phone number</h2>
+
             <p class="modal-subtitle">
                 Optional. Students can use this number to call you.
             </p>
@@ -711,7 +765,11 @@
             <form id="phoneForm">
                 <div class="form-group">
                     <label for="profilePhone">Phone number</label>
-                    <input id="profilePhone" type="tel" placeholder="+91 9876543210">
+                    <input
+                        id="profilePhone"
+                        type="tel"
+                        placeholder="+91 9876543210"
+                    >
                 </div>
 
                 <div class="form-actions">
@@ -722,7 +780,12 @@
                     >
                         Cancel
                     </button>
-                    <button id="phoneSubmit" type="submit" class="primary-btn">
+
+                    <button
+                        id="phoneSubmit"
+                        type="submit"
+                        class="primary-btn"
+                    >
                         Save phone
                     </button>
                 </div>
@@ -733,6 +796,7 @@
     <div class="modal-overlay" id="reportModal">
         <div class="modal">
             <h2 id="reportTitle">Report Item</h2>
+
             <div id="reportMessage" class="message"></div>
 
             <form id="reportForm">
@@ -795,7 +859,12 @@
                     >
                         Cancel
                     </button>
-                    <button id="reportSubmit" type="submit" class="primary-btn">
+
+                    <button
+                        id="reportSubmit"
+                        type="submit"
+                        class="primary-btn"
+                    >
                         Submit Report
                     </button>
                 </div>
@@ -825,7 +894,9 @@
 
         function getCurrentUser() {
             try {
-                return JSON.parse(localStorage.getItem("campusFindUser") || "null");
+                return JSON.parse(
+                    localStorage.getItem("campusFindUser") || "null"
+                );
             } catch {
                 return null;
             }
@@ -904,7 +975,9 @@
                 loggedIn ? "inline-block" : "none";
 
             document.getElementById("welcomeText").textContent =
-                loggedIn ? "Welcome, " + (user?.name || "Student") : "";
+                loggedIn
+                    ? "Welcome, " + (user?.name || "Student")
+                    : "";
 
             document.getElementById("authModal").classList.toggle(
                 "active",
@@ -949,7 +1022,9 @@
                 registering ? "Create Account" : "Login";
 
             document.getElementById("authSwitchText").textContent =
-                registering ? "Already have an account?" : "New to CampusFind?";
+                registering
+                    ? "Already have an account?"
+                    : "New to CampusFind?";
 
             document.getElementById("authSwitchButton").textContent =
                 registering ? "Login" : "Create account";
@@ -978,7 +1053,8 @@
 
         document.querySelectorAll(".modal-overlay").forEach(modal => {
             modal.addEventListener("click", event => {
-                if (event.target === modal && (modal.id !== "authModal" || isLoggedIn())) {
+                if (event.target === modal &&
+                    (modal.id !== "authModal" || isLoggedIn())) {
                     modal.classList.remove("active");
                 }
             });
@@ -1018,17 +1094,21 @@
                     const data = await response.json();
 
                     if (!response.ok) {
-                        throw new Error(data.message || "Authentication failed.");
+                        throw new Error(
+                            data.message || "Authentication failed."
+                        );
                     }
 
                     if (authMode === "register") {
                         authMode = "login";
                         updateAuthModal();
+
                         showMessage(
                             "authMessage",
                             "Account created. Please login.",
                             "success"
                         );
+
                         return;
                     }
 
@@ -1154,8 +1234,11 @@
                 .trim()
                 .toLowerCase();
 
-            const category = document.getElementById("categoryFilter").value;
-            const status = document.getElementById("statusFilter").value;
+            const category =
+                document.getElementById("categoryFilter").value;
+
+            const status =
+                document.getElementById("statusFilter").value;
 
             const filtered = allItems.filter(item => {
                 const searchable = [
@@ -1181,11 +1264,11 @@
             container.innerHTML = filtered.map(item => {
                 const id = escapeHTML(getItemId(item));
                 const title = escapeHTML(getItemName(item));
-                const type = getItemType(item) === "Found" ? "Found" : "Lost";
-                const image = item.image || "";
+                const type =
+                    getItemType(item) === "Found" ? "Found" : "Lost";
 
-                const imageHTML = image
-                    ? `<img class="item-image" src="${escapeHTML(image)}" alt="${title}">`
+                const imageHTML = item.image
+                    ? `<img class="item-image" src="${escapeHTML(item.image)}" alt="${title}">`
                     : `<div class="item-placeholder" aria-label="No photo">📦</div>`;
 
                 const ownerButton = item.isOwner
@@ -1262,6 +1345,7 @@
         async function showContactInfo(id, button) {
             const card = button.closest(".item-card");
             const result = card.querySelector(".contact-result");
+
             result.textContent = "Loading contact information...";
             result.classList.add("visible");
 
@@ -1276,11 +1360,11 @@
 
                 const emailLink = email
                     ? `<a href="mailto:${encodeURIComponent(email)}">Email ${name}</a>`
-                    : `<span>Email unavailable</span>`;
+                    : "<span>Email unavailable</span>";
 
                 const phoneLink = phone
                     ? `<a href="tel:${encodeURIComponent(phone)}">Call ${escapeHTML(phone)}</a>`
-                    : `<span>Phone not provided</span>`;
+                    : "<span>Phone not provided</span>";
 
                 result.innerHTML = `
                     <strong>Contact ${name}</strong>
@@ -1381,11 +1465,23 @@
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            title: document.getElementById("itemTitle").value.trim(),
-                            category: document.getElementById("itemCategory").value,
-                            status: document.getElementById("itemStatus").value,
-                            location: document.getElementById("itemLocation").value.trim(),
-                            date: document.getElementById("itemDate").value,
+                            title: document
+                                .getElementById("itemTitle")
+                                .value
+                                .trim(),
+                            category: document
+                                .getElementById("itemCategory")
+                                .value,
+                            status: document
+                                .getElementById("itemStatus")
+                                .value,
+                            location: document
+                                .getElementById("itemLocation")
+                                .value
+                                .trim(),
+                            date: document
+                                .getElementById("itemDate")
+                                .value,
                             description: document
                                 .getElementById("itemDescription")
                                 .value
