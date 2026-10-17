@@ -1270,42 +1270,194 @@
   </div>
 
   <script>
-    const API_BASE = "https://campus-find-hmyj.onrender.com";
+  const API_BASE = "https://campus-find-hmyj.onrender.com";
 
-    let allItems = [];
-    let authMode = "login";
-    let selectedImage = "";
+  let allItems = [];
+  let selectedImage = "";
 
-    function isLoggedIn() {
-      return Boolean(localStorage.getItem("campusFindToken"));
+  function isLoggedIn() {
+    return Boolean(localStorage.getItem("campusFindToken"));
+  }
+
+  function getCurrentUser() {
+    try {
+      return JSON.parse(localStorage.getItem("campusFindUser") || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function getToken() {
+    return localStorage.getItem("campusFindToken");
+  }
+
+  function authHeaders(extraHeaders = {}) {
+    const headers = { ...extraHeaders };
+
+    if (getToken()) {
+      headers.Authorization = `Bearer ${getToken()}`;
     }
 
-    function getCurrentUser() {
-      try {
-        return JSON.parse(localStorage.getItem("campusFindUser") || "null");
-      } catch {
-        return null;
+    return headers;
+  }
+
+  async function apiRequest(path, options = {}) {
+    const response = await fetch(API_BASE + path, {
+      ...options,
+      headers: authHeaders(options.headers || {})
+    });
+
+    const text = await response.text();
+    let data = {};
+
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      data = { message: text || "Unexpected server response." };
+    }
+
+    if (!response.ok) {
+      if (response.status === 401 && isLoggedIn()) {
+        clearSession();
+        updateLoginUI();
+      }
+
+      throw new Error(
+        data.message || data.error || `Request failed (${response.status})`
+      );
+    }
+
+    return data;
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[character]);
+  }
+
+  function showMessage(elementId, message, type = "error") {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    element.textContent = message;
+    element.className = `message ${type}`;
+  }
+
+  function clearMessage(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+
+    element.textContent = "";
+    element.className = "message";
+  }
+
+  function clearSession() {
+    localStorage.removeItem("campusFindToken");
+    localStorage.removeItem("campusFindUser");
+    allItems = [];
+  }
+
+  function updateLoginUI() {
+    const loggedIn = isLoggedIn();
+    const user = getCurrentUser();
+
+    document.body.classList.toggle("logged-out", !loggedIn);
+
+    const loginButton = document.getElementById("loginButton");
+    const logoutButton = document.getElementById("logoutButton");
+    const phoneButton = document.getElementById("phoneButton");
+    const welcomeText = document.getElementById("welcomeText");
+    const authModal = document.getElementById("authModal");
+
+    if (loginButton) {
+      loginButton.textContent = loggedIn ? "＋ Report Item" : "Login";
+    }
+
+    if (logoutButton) {
+      logoutButton.style.display = loggedIn ? "inline-block" : "none";
+    }
+
+    if (phoneButton) {
+      phoneButton.style.display = loggedIn ? "inline-block" : "none";
+    }
+
+    if (welcomeText) {
+      welcomeText.textContent =
+        loggedIn ? `Welcome, ${user?.name || "Student"}` : "";
+    }
+
+    if (authModal) {
+      authModal.classList.toggle("active", !loggedIn);
+    }
+
+    if (!loggedIn) {
+      const itemsContainer = document.getElementById("itemsContainer");
+      if (itemsContainer) {
+        itemsContainer.innerHTML =
+          '<div class="empty-state">Login to view campus reports.</div>';
       }
     }
+  }
 
-    function getToken() {
-      return localStorage.getItem("campusFindToken");
+  function handlePrimaryAction() {
+    if (isLoggedIn()) {
+      openReport("Lost");
+    } else {
+      openAuth();
+    }
+  }
+
+  function openAuth() {
+    clearMessage("authMessage");
+    document.getElementById("authModal")?.classList.add("active");
+  }
+
+  function logout() {
+    clearSession();
+    updateLoginUI();
+    openAuth();
+  }
+
+  function closeModal(modalId) {
+    if (modalId === "authModal" && !isLoggedIn()) {
+      return;
     }
 
-    function authHeaders(extraHeaders = {}) {
-      const headers = { ...extraHeaders };
+    document.getElementById(modalId)?.classList.remove("active");
+  }
 
-      if (getToken()) {
-        headers.Authorization = `Bearer ${getToken()}`;
+  document.querySelectorAll(".modal-overlay").forEach(modal => {
+    modal.addEventListener("click", event => {
+      if (event.target !== modal) return;
+
+      if (modal.id === "authModal" && !isLoggedIn()) {
+        return;
       }
 
-      return headers;
-    }
+      modal.classList.remove("active");
+    });
+  });
 
-    async function apiRequest(path, options = {}) {
-      const response = await fetch(API_BASE + path, {
-        ...options,
-        headers: authHeaders(options.headers || {})
+  document.getElementById("authForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    clearMessage("authMessage");
+
+    const button = document.getElementById("authSubmit");
+    button.disabled = true;
+
+    try {
+      const email = document.getElementById("authEmail").value.trim();
+      const password = document.getElementById("authPassword").value;
+
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
       });
 
       const text = await response.text();
@@ -1314,750 +1466,633 @@
       try {
         data = text ? JSON.parse(text) : {};
       } catch {
-        data = { message: text || "Unexpected server response." };
+        data = { message: "Unexpected server response." };
       }
 
       if (!response.ok) {
-        if (response.status === 401 && isLoggedIn()) {
-          clearSession();
-          updateLoginUI();
-        }
-
-        throw new Error(
-          data.message || data.error || `Request failed (${response.status})`
-        );
+        throw new Error(data.message || "Login failed.");
       }
 
-      return data;
-    }
-
-    function escapeHTML(value) {
-      return String(value ?? "").replace(/[&<>"']/g, character => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-      })[character]);
-    }
-
-    function showMessage(elementId, message, type = "error") {
-      const element = document.getElementById(elementId);
-      element.textContent = message;
-      element.className = `message ${type}`;
-    }
-
-    function clearMessage(elementId) {
-      const element = document.getElementById(elementId);
-      element.textContent = "";
-      element.className = "message";
-    }
-
-    function clearSession() {
-      localStorage.removeItem("campusFindToken");
-      localStorage.removeItem("campusFindUser");
-      allItems = [];
-    }
-
-    function updateLoginUI() {
-      const loggedIn = isLoggedIn();
-      const user = getCurrentUser();
-
-      document.body.classList.toggle("logged-out", !loggedIn);
-
-      document.getElementById("loginButton").textContent =
-        loggedIn ? "＋ Report Item" : "Login / Register";
-
-      document.getElementById("logoutButton").style.display =
-        loggedIn ? "inline-block" : "none";
-
-      document.getElementById("phoneButton").style.display =
-        loggedIn ? "inline-block" : "none";
-
-      document.getElementById("welcomeText").textContent =
-        loggedIn ? `Welcome, ${user?.name || "Student"}` : "";
-
-      document.getElementById("authModal").classList.toggle(
-        "active",
-        !loggedIn
-      );
-    }
-
-    function handlePrimaryAction() {
-      if (isLoggedIn()) {
-        openReport("Lost");
-      } else {
-        openAuth("login");
+      if (!data.token || !data.user) {
+        throw new Error("Login response was incomplete. Please try again.");
       }
-    }
 
-    function openAuth(mode = "login") {
-      authMode = mode;
-      updateAuthModal();
-      document.getElementById("authModal").classList.add("active");
-    }
+      localStorage.setItem("campusFindToken", data.token);
+      localStorage.setItem("campusFindUser", JSON.stringify(data.user));
 
-    function updateAuthModal() {
-      const registering = authMode === "register";
-
-      document.getElementById("authTitle").textContent =
-        registering ? "Create Your Account" : "Welcome to CampusFind";
-
-      document.getElementById("authSubtitle").textContent =
-        registering
-          ? "Register to access campus Lost & Found reports."
-          : "Login to access campus Lost & Found reports.";
-
-      document.getElementById("nameGroup").style.display =
-        registering ? "block" : "none";
-
-      document.getElementById("phoneGroup").style.display =
-        registering ? "block" : "none";
-
-      document.getElementById("authName").required = registering;
-
-      document.getElementById("authPassword").autocomplete =
-        registering ? "new-password" : "current-password";
-
-      document.getElementById("authSubmit").textContent =
-        registering ? "Create account" : "Login";
-
-      document.getElementById("authSwitchText").textContent =
-        registering ? "Already have an account?" : "New to CampusFind?";
-
-      document.getElementById("authSwitchButton").textContent =
-        registering ? "Login" : "Create account";
-
-      clearMessage("authMessage");
-    }
-
-    function switchAuthMode() {
-      authMode = authMode === "login" ? "register" : "login";
-      updateAuthModal();
-    }
-
-    function logout() {
-      clearSession();
       updateLoginUI();
-      openAuth("login");
+      closeModal("authModal");
+      await loadItemsFromDatabase();
+    } catch (error) {
+      showMessage("authMessage", error.message || "Something went wrong.");
+    } finally {
+      button.disabled = false;
     }
+  });
 
-    function closeModal(modalId) {
-      if (modalId === "authModal" && !isLoggedIn()) {
-        return;
-      }
+  function openPhoneModal() {
+    const user = getCurrentUser();
 
-      document.getElementById(modalId)?.classList.remove("active");
-    }
+    document.getElementById("profilePhone").value = user?.phone || "";
+    clearMessage("phoneMessage");
+    document.getElementById("phoneModal").classList.add("active");
+  }
 
-    document.querySelectorAll(".modal-overlay").forEach(modal => {
-      modal.addEventListener("click", event => {
-        if (event.target !== modal) {
-          return;
-        }
+  document.getElementById("phoneForm").addEventListener("submit", async event => {
+    event.preventDefault();
 
-        if (modal.id === "authModal" && !isLoggedIn()) {
-          return;
-        }
+    const button = document.getElementById("phoneSubmit");
+    button.disabled = true;
 
-        modal.classList.remove("active");
+    try {
+      const result = await apiRequest("/api/auth/phone", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: document.getElementById("profilePhone").value.trim()
+        })
       });
-    });
 
-    document.getElementById("authForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      clearMessage("authMessage");
+      const user = getCurrentUser() || {};
+      user.phone = result.phone || "";
 
-      const button = document.getElementById("authSubmit");
-      button.disabled = true;
+      localStorage.setItem("campusFindUser", JSON.stringify(user));
 
-      const name = document.getElementById("authName").value.trim();
-      const email = document.getElementById("authEmail").value.trim();
-      const password = document.getElementById("authPassword").value;
-      const phone = document.getElementById("authPhone").value.trim();
-
-      try {
-        const endpoint =
-          authMode === "register"
-            ? "/api/auth/register"
-            : "/api/auth/login";
-
-        const body =
-          authMode === "register"
-            ? { name, email, password, phone }
-            : { email, password };
-
-        const response = await fetch(API_BASE + endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Authentication failed.");
-        }
-
-        if (authMode === "register") {
-          authMode = "login";
-          updateAuthModal();
-          document.getElementById("authEmail").value = email;
-          document.getElementById("authPassword").value = "";
-
-          showMessage(
-            "authMessage",
-            "Account created. Please log in.",
-            "success"
-          );
-
-          return;
-        }
-
-        localStorage.setItem("campusFindToken", data.token);
-        localStorage.setItem("campusFindUser", JSON.stringify(data.user));
-
-        updateLoginUI();
-        closeModal("authModal");
-        await loadItemsFromDatabase();
-      } catch (error) {
-        showMessage("authMessage", error.message || "Something went wrong.");
-      } finally {
-        button.disabled = false;
-      }
-    });
-
-    function openPhoneModal() {
-      const user = getCurrentUser();
-      document.getElementById("profilePhone").value = user?.phone || "";
-      clearMessage("phoneMessage");
-      document.getElementById("phoneModal").classList.add("active");
+      showMessage(
+        "phoneMessage",
+        result.message || "Phone number saved.",
+        "success"
+      );
+    } catch (error) {
+      showMessage("phoneMessage", error.message || "Could not save phone number.");
+    } finally {
+      button.disabled = false;
     }
+  });
 
-    document.getElementById("phoneForm").addEventListener("submit", async event => {
-      event.preventDefault();
+  function getItemId(item) {
+    return item?._id || item?.id || "";
+  }
 
-      const button = document.getElementById("phoneSubmit");
-      button.disabled = true;
+  function getItemName(item) {
+    return item?.itemName || item?.title || "Untitled item";
+  }
 
-      try {
-        const result = await apiRequest("/api/auth/phone", {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            phone: document.getElementById("profilePhone").value.trim()
-          })
-        });
+  function getItemType(item) {
+    return item?.type || item?.status || "Lost";
+  }
 
-        const user = getCurrentUser() || {};
-        user.phone = result.phone || "";
+  function getCourse(item) {
+    return item?.course || item?.studentCourse || "Not provided";
+  }
 
-        localStorage.setItem("campusFindUser", JSON.stringify(user));
+  function getDepartment(item) {
+    return item?.department || item?.studentDepartment || "Not provided";
+  }
 
-        showMessage(
-          "phoneMessage",
-          result.message || "Phone number saved.",
-          "success"
-        );
-      } catch (error) {
-        showMessage("phoneMessage", error.message);
-      } finally {
-        button.disabled = false;
-      }
-    });
+  function getBatch(item) {
+    return item?.batch || item?.studentBatch || "Not provided";
+  }
 
-    function getItemId(item) {
-      return item._id || item.id || "";
-    }
+  function getSemester(item) {
+    return item?.semester || item?.studentSemester || "Not provided";
+  }
 
-    function getItemName(item) {
-      return item.itemName || item.title || "Untitled item";
-    }
+  function normalizeItems(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
+    return [];
+  }
 
-    function getItemType(item) {
-      return item.type || item.status || "Lost";
-    }
+  async function loadItemsFromDatabase() {
+    if (!isLoggedIn()) return;
 
-    function normalizeItems(data) {
-      if (Array.isArray(data)) {
-        return data;
-      }
+    const container = document.getElementById("itemsContainer");
+    container.innerHTML =
+      '<div class="empty-state">Loading reports...</div>';
 
-      if (Array.isArray(data.items)) {
-        return data.items;
-      }
-
-      if (Array.isArray(data.data)) {
-        return data.data;
-      }
-
-      return [];
-    }
-
-    async function loadItemsFromDatabase() {
-      if (!isLoggedIn()) {
-        return;
-      }
-
-      const container = document.getElementById("itemsContainer");
+    try {
+      const data = await apiRequest("/api/items");
+      allItems = normalizeItems(data);
+      renderItems();
+    } catch (error) {
       container.innerHTML =
-        '<div class="empty-state">Loading reports...</div>';
+        `<div class="empty-state">${escapeHTML(error.message)}</div>`;
+    }
+  }
 
-      try {
-        const data = await apiRequest("/api/items");
-        allItems = normalizeItems(data);
-        renderItems();
-      } catch (error) {
-        container.innerHTML =
-          `<div class="empty-state">${escapeHTML(error.message)}</div>`;
-      }
+  function updateDashboardStats() {
+    const total = allItems.length;
+    const lost = allItems.filter(item => getItemType(item) !== "Found").length;
+    const found = allItems.filter(item => getItemType(item) === "Found").length;
+    const returned = allItems.filter(
+      item => item.resolutionStatus === "Returned"
+    ).length;
+
+    document.getElementById("statTotal").textContent = total;
+    document.getElementById("statLost").textContent = lost;
+    document.getElementById("statFound").textContent = found;
+    document.getElementById("statReturned").textContent = returned;
+
+    document.getElementById("navTotal").textContent = total;
+    document.getElementById("navLost").textContent = lost;
+    document.getElementById("navFound").textContent = found;
+
+    const locations = {};
+
+    allItems.forEach(item => {
+      const place = (item.location || "Other campus areas")
+        .split(",")[0]
+        .trim();
+
+      locations[place] = (locations[place] || 0) + 1;
+    });
+
+    const topLocations = Object.entries(locations)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+
+    const hotspotList = document.getElementById("hotspotList");
+
+    if (!topLocations.length) {
+      hotspotList.innerHTML =
+        '<div class="hotspot-row">No reports yet.</div>';
+      return;
     }
 
-    function updateDashboardStats() {
-      const total = allItems.length;
-      const lost = allItems.filter(item => getItemType(item) !== "Found").length;
-      const found = allItems.filter(item => getItemType(item) === "Found").length;
-      const returned = allItems.filter(
-        item => item.resolutionStatus === "Returned"
-      ).length;
+    hotspotList.innerHTML = topLocations.map(([place, count]) => {
+      const percent = total ? Math.round((count / total) * 100) : 0;
 
-      document.getElementById("statTotal").textContent = total;
-      document.getElementById("statLost").textContent = lost;
-      document.getElementById("statFound").textContent = found;
-      document.getElementById("statReturned").textContent = returned;
-      document.getElementById("navTotal").textContent = total;
-      document.getElementById("navLost").textContent = lost;
-      document.getElementById("navFound").textContent = found;
-
-      const locations = {};
-
-      allItems.forEach(item => {
-        const place = (item.location || "Other campus areas")
-          .split(",")[0]
-          .trim();
-
-        locations[place] = (locations[place] || 0) + 1;
-      });
-
-      const topLocations = Object.entries(locations)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
-
-      const hotspotList = document.getElementById("hotspotList");
-
-      if (!topLocations.length) {
-        hotspotList.innerHTML =
-          '<div class="hotspot-row">No reports yet.</div>';
-        return;
-      }
-
-      hotspotList.innerHTML = topLocations.map(([place, count]) => {
-        const percent = Math.round((count / total) * 100);
-
-        return `
-          <div class="hotspot-row">
-            ${escapeHTML(place)}
-            <span style="float:right;color:#a99dff">${percent}%</span>
-            <div class="hotspot-track">
-              <span class="hotspot-fill" style="width:${percent}%"></span>
-            </div>
+      return `
+        <div class="hotspot-row">
+          ${escapeHTML(place)}
+          <span style="float:right;color:#a99dff">${percent}%</span>
+          <div class="hotspot-track">
+            <span class="hotspot-fill" style="width:${percent}%"></span>
           </div>
-        `;
-      }).join("");
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderItems() {
+    updateDashboardStats();
+
+    const container = document.getElementById("itemsContainer");
+    const query = document
+      .getElementById("searchInput")
+      .value
+      .trim()
+      .toLowerCase();
+
+    const category = document.getElementById("categoryFilter").value;
+    const status = document.getElementById("statusFilter").value;
+
+    const filtered = allItems.filter(item => {
+      const searchable = [
+        getItemName(item),
+        item.category,
+        item.description,
+        item.location,
+        getCourse(item),
+        getDepartment(item),
+        getBatch(item),
+        getSemester(item),
+        item.studentName
+      ].join(" ").toLowerCase();
+
+      return (
+        (!query || searchable.includes(query)) &&
+        (!category || item.category === category) &&
+        (!status || getItemType(item) === status)
+      );
+    });
+
+    if (!filtered.length) {
+      container.innerHTML =
+        '<div class="empty-state">No reports found.</div>';
+      return;
     }
 
-    function renderItems() {
-      updateDashboardStats();
+    container.innerHTML = filtered.map(item => {
+      const id = escapeHTML(getItemId(item));
+      const title = escapeHTML(getItemName(item));
+      const type = getItemType(item) === "Found" ? "Found" : "Lost";
+      const course = escapeHTML(getCourse(item));
+      const reviewStatus = item.reviewStatus || "Approved";
+      const resolutionStatus = item.resolutionStatus || "Open";
 
-      const container = document.getElementById("itemsContainer");
-      const query = document
-        .getElementById("searchInput")
-        .value
-        .trim()
-        .toLowerCase();
-
-      const category = document.getElementById("categoryFilter").value;
-      const status = document.getElementById("statusFilter").value;
-
-      const filtered = allItems.filter(item => {
-        const searchable = [
-          getItemName(item),
-          item.category,
-          item.description,
-          item.location
-        ].join(" ").toLowerCase();
-
-        return (
-          (!query || searchable.includes(query)) &&
-          (!category || item.category === category) &&
-          (!status || getItemType(item) === status)
-        );
-      });
-
-      if (!filtered.length) {
-        container.innerHTML =
-          '<div class="empty-state">No reports found.</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(item => {
-        const id = escapeHTML(getItemId(item));
-        const title = escapeHTML(getItemName(item));
-        const type = getItemType(item) === "Found" ? "Found" : "Lost";
-        const reviewStatus = item.reviewStatus || "Approved";
-        const resolutionStatus = item.resolutionStatus || "Open";
-
-        const imageSource =
-          typeof item.image === "string" &&
-          /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(item.image)
-            ? item.image
-            : "";
-
-        const imageHTML = imageSource
-          ? `<img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}">`
-          : '<div class="item-placeholder" aria-label="No photo">📦</div>';
-
-        let workflowNote = "";
-
-        if (item.isOwner && reviewStatus === "Pending") {
-          workflowNote =
-            '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
-        } else if (item.isOwner && reviewStatus === "Rejected") {
-          workflowNote =
-            '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
-        } else if (resolutionStatus === "Returned") {
-          workflowNote =
-            '<p class="workflow-note returned">Returned — this report is closed.</p>';
-        }
-
-        const contactButton =
-          !item.isOwner && resolutionStatus === "Open"
-            ? `<button class="primary-btn" type="button" data-action="contact" data-id="${id}">${type === "Found" ? "Claim / Contact" : "Contact poster"}</button>`
-            : "";
-
-        const returnedButton =
-          item.isOwner &&
-          reviewStatus === "Approved" &&
-          resolutionStatus === "Open"
-            ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${id}">Mark returned</button>`
-            : "";
-
-        const deleteButton = item.isOwner
-          ? `<button class="danger-btn" type="button" data-action="delete" data-id="${id}">Delete report</button>`
+      const imageSource =
+        typeof item.image === "string" &&
+        /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(item.image)
+          ? item.image
           : "";
 
-        return `
-          <article class="item-card">
-            ${imageHTML}
+      const imageHTML = imageSource
+        ? `<img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}">`
+        : '<div class="item-placeholder" aria-label="No photo">📦</div>';
 
-            <div class="item-content">
-              <div class="item-heading">
-                <span class="status ${type}">${type}</span>
-                <h3>${title}</h3>
-              </div>
+      let workflowNote = "";
 
-              <p><strong>Category:</strong> ${escapeHTML(item.category || "Other")}</p>
-              <p><strong>Campus location:</strong> ${escapeHTML(item.location || "Not specified")}</p>
-              <p><strong>Date:</strong> ${escapeHTML(item.date || "Not specified")}</p>
-              <p>${escapeHTML(item.description || "No description provided.")}</p>
-              ${workflowNote}
+      if (item.isOwner && reviewStatus === "Pending") {
+        workflowNote =
+          '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
+      } else if (item.isOwner && reviewStatus === "Rejected") {
+        workflowNote =
+          '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
+      } else if (resolutionStatus === "Returned") {
+        workflowNote =
+          '<p class="workflow-note returned">Returned — this report is closed.</p>';
+      }
 
-              <div class="item-buttons">
-                ${contactButton}
-                ${returnedButton}
-                ${deleteButton}
-              </div>
+      const moreInfoButton =
+        reviewStatus === "Approved"
+          ? `<button class="primary-btn" type="button" data-action="more-info" data-id="${id}" aria-expanded="false">More information</button>`
+          : "";
 
-              <div class="contact-result"></div>
+      const returnedButton =
+        item.isOwner &&
+        reviewStatus === "Approved" &&
+        resolutionStatus === "Open"
+          ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${id}">Mark returned</button>`
+          : "";
+
+      const deleteButton = item.isOwner
+        ? `<button class="danger-btn" type="button" data-action="delete" data-id="${id}">Delete report</button>`
+        : "";
+
+      return `
+        <article class="item-card">
+          ${imageHTML}
+
+          <div class="item-content">
+            <div class="item-heading">
+              <span class="status ${type}">${type}</span>
+              <h3>${title}</h3>
             </div>
-          </article>
-        `;
-      }).join("");
-    }
 
-    document.getElementById("searchInput").addEventListener("input", renderItems);
-    document.getElementById("categoryFilter").addEventListener("change", renderItems);
-    document.getElementById("statusFilter").addEventListener("change", event => {
-      const selected = event.target.value;
+            <p><strong>Category:</strong> ${escapeHTML(item.category || "Other")}</p>
+            <p><strong>Course:</strong> ${course}</p>
+            <p><strong>Campus location:</strong> ${escapeHTML(item.location || "Not specified")}</p>
+            <p><strong>Date:</strong> ${escapeHTML(item.date || "Not specified")}</p>
+            <p>${escapeHTML(item.description || "No description provided.")}</p>
 
-      document.querySelectorAll("[data-status-filter]").forEach(button => {
-        button.classList.toggle(
+            ${workflowNote}
+
+            <div class="item-buttons">
+              ${moreInfoButton}
+              ${returnedButton}
+              ${deleteButton}
+            </div>
+
+            <div class="contact-result" aria-live="polite"></div>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  document.getElementById("searchInput").addEventListener("input", renderItems);
+  document.getElementById("categoryFilter").addEventListener("change", renderItems);
+
+  document.getElementById("statusFilter").addEventListener("change", event => {
+    const selected = event.target.value;
+
+    document.querySelectorAll("[data-status-filter]").forEach(button => {
+      button.classList.toggle(
+        "active",
+        button.dataset.statusFilter === selected
+      );
+    });
+
+    renderItems();
+  });
+
+  document.querySelectorAll("[data-status-filter]").forEach(button => {
+    button.addEventListener("click", () => {
+      const selected = button.dataset.statusFilter;
+      document.getElementById("statusFilter").value = selected;
+
+      document.querySelectorAll("[data-status-filter]").forEach(option => {
+        option.classList.toggle(
           "active",
-          button.dataset.statusFilter === selected
+          option.dataset.statusFilter === selected
         );
       });
 
       renderItems();
     });
+  });
 
-    document.querySelectorAll("[data-status-filter]").forEach(button => {
-      button.addEventListener("click", () => {
-        const selected = button.dataset.statusFilter;
-        document.getElementById("statusFilter").value = selected;
-
-        document.querySelectorAll("[data-status-filter]").forEach(option => {
-          option.classList.toggle(
-            "active",
-            option.dataset.statusFilter === selected
-          );
-        });
-
-        renderItems();
-      });
+  document.querySelectorAll("[data-zone]").forEach(button => {
+    button.addEventListener("click", () => {
+      document.getElementById("searchInput").value = button.dataset.zone;
+      renderItems();
     });
+  });
 
-    document.querySelectorAll("[data-zone]").forEach(button => {
-      button.addEventListener("click", () => {
-        document.getElementById("searchInput").value = button.dataset.zone;
-        renderItems();
-      });
-    });
+  document.getElementById("itemsContainer").addEventListener(
+    "click",
+    async event => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
 
-    document.getElementById("itemsContainer").addEventListener(
-      "click",
-      async event => {
-        const button = event.target.closest("button[data-action]");
+      const { action, id } = button.dataset;
 
-        if (!button) {
-          return;
-        }
-
-        const { action, id } = button.dataset;
-
-        if (action === "contact") {
-          await showContactInfo(id, button);
-        }
-
-        if (action === "delete") {
-          await deleteItem(id);
-        }
-
-        if (action === "resolve") {
-          await markReturned(id);
-        }
+      if (action === "more-info") {
+        await showMoreInfo(id, button);
       }
+
+      if (action === "delete") {
+        await deleteItem(id);
+      }
+
+      if (action === "resolve") {
+        await markReturned(id);
+      }
+    }
+  );
+
+  function detailLine(label, value) {
+    return `
+      <p>
+        <strong>${escapeHTML(label)}:</strong>
+        ${escapeHTML(value || "Not provided")}
+      </p>
+    `;
+  }
+
+  async function showMoreInfo(id, button) {
+    const card = button.closest(".item-card");
+    const result = card.querySelector(".contact-result");
+
+    if (result.classList.contains("visible")) {
+      result.classList.remove("visible");
+      button.textContent = "More information";
+      button.setAttribute("aria-expanded", "false");
+      return;
+    }
+
+    result.classList.add("visible");
+    result.innerHTML = "<p>Loading full report information...</p>";
+    button.textContent = "Hide information";
+    button.setAttribute("aria-expanded", "true");
+
+    const item = allItems.find(
+      report => String(getItemId(report)) === String(id)
     );
 
-    async function showContactInfo(id, button) {
-      const card = button.closest(".item-card");
-      const result = card.querySelector(".contact-result");
-
-      result.textContent = "Loading contact information...";
-      result.classList.add("visible");
-
-      try {
-        const contact = await apiRequest(
-          `/api/items/${encodeURIComponent(id)}/contact`
-        );
-
-        const name = escapeHTML(contact.studentName || "Student");
-        const email = String(contact.studentContact || "");
-        const phone = String(contact.studentPhone || "");
-
-        const emailLink = email
-          ? `<a href="mailto:${encodeURIComponent(email)}">Email ${name}</a>`
-          : "<span>Email unavailable</span>";
-
-        const phoneLink = phone
-          ? `<a href="tel:${encodeURIComponent(phone)}">Call ${escapeHTML(phone)}</a>`
-          : "<span>Phone not provided</span>";
-
-        result.innerHTML = `
-          <strong>Contact ${name}</strong>
-          <div class="contact-links">
-            ${emailLink}
-            ${phoneLink}
-          </div>
-        `;
-      } catch (error) {
-        result.textContent = error.message;
-      }
+    if (!item) {
+      result.innerHTML = "<p>Report details could not be found.</p>";
+      return;
     }
 
-    async function deleteItem(id) {
-      if (!confirm("Are you sure you want to delete this report?")) {
-        return;
-      }
+    let contact = {};
 
-      try {
-        await apiRequest(
-          `/api/items/${encodeURIComponent(id)}`,
-          { method: "DELETE" }
-        );
-
-        await loadItemsFromDatabase();
-        alert("Report deleted.");
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-
-    async function markReturned(id) {
-      if (!confirm("Has this item been returned to its owner?")) {
-        return;
-      }
-
-      try {
-        await apiRequest(
-          `/api/items/${encodeURIComponent(id)}/resolve`,
-          { method: "PATCH" }
-        );
-
-        await loadItemsFromDatabase();
-        alert("Report marked as returned.");
-      } catch (error) {
-        alert(error.message);
-      }
-    }
-
-    function localDateString() {
-      const now = new Date();
-      const localDate = new Date(
-        now.getTime() - now.getTimezoneOffset() * 60000
+    try {
+      const response = await apiRequest(
+        `/api/items/${encodeURIComponent(id)}/contact`
       );
 
-      return localDate.toISOString().slice(0, 10);
+      contact = response.contact || response;
+    } catch (error) {
+      contact = {};
     }
 
-    function setReportType(status) {
-      const selected = status === "Found" ? "Found" : "Lost";
+    const studentName =
+      contact.studentName || item.studentName || "Student";
+    const email =
+      contact.studentContact ||
+      contact.studentEmail ||
+      contact.email ||
+      item.studentContact ||
+      "";
+    const phone =
+      contact.studentPhone ||
+      contact.phone ||
+      item.studentPhone ||
+      "";
 
-      document.getElementById("itemStatus").value = selected;
-      document.getElementById("reportTitle").textContent =
-        selected === "Lost" ? "Report a Lost Item" : "Report a Found Item";
+    const type = getItemType(item) === "Found" ? "Found" : "Lost";
 
-      document.querySelectorAll(".type-option").forEach(button => {
-        const active = button.dataset.itemType === selected;
-        button.classList.toggle("active", active);
-        button.setAttribute("aria-pressed", String(active));
-      });
+    const emailActions = email
+      ? `
+        <div class="contact-links">
+          <a
+            href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Open Gmail</a>
+          <a href="mailto:${encodeURIComponent(email)}">Open email app</a>
+        </div>
+      `
+      : '<p>Email/Gmail: Not available</p>';
+
+    const phoneAction = phone
+      ? `<div class="contact-links"><a href="tel:${encodeURIComponent(phone)}">Call ${escapeHTML(phone)}</a></div>`
+      : "<p>Phone: Not provided</p>";
+
+    result.innerHTML = `
+      <strong>Complete item information</strong>
+      ${detailLine("Item", getItemName(item))}
+      ${detailLine("Status", type)}
+      ${detailLine("Category", item.category)}
+      ${detailLine("Location", item.location)}
+      ${detailLine("Date", item.date)}
+      ${detailLine("Description", item.description)}
+      <hr style="margin:8px 0;border-color:#283550">
+      <strong>Student information</strong>
+      ${detailLine("Name", studentName)}
+      ${detailLine("Course", getCourse(item))}
+      ${detailLine("Department", getDepartment(item))}
+      ${detailLine("Batch", getBatch(item))}
+      ${detailLine("Semester", getSemester(item))}
+      ${emailActions}
+      ${phoneAction}
+    `;
+  }
+
+  async function deleteItem(id) {
+    if (!confirm("Are you sure you want to delete this report?")) {
+      return;
     }
 
-    document.querySelectorAll(".type-option").forEach(button => {
-      button.addEventListener("click", () => {
-        setReportType(button.dataset.itemType);
-      });
-    });
+    try {
+      await apiRequest(
+        `/api/items/${encodeURIComponent(id)}`,
+        { method: "DELETE" }
+      );
 
-    function openReport(status) {
-      if (!isLoggedIn()) {
-        openAuth("login");
-        return;
-      }
+      await loadItemsFromDatabase();
+      alert("Report deleted.");
+    } catch (error) {
+      alert(error.message || "Could not delete this report.");
+    }
+  }
 
-      document.getElementById("reportForm").reset();
-      setReportType(status);
-      document.getElementById("itemDate").value = localDateString();
-      document.getElementById("studentName").value = getCurrentUser()?.name || "";
-
-      selectedImage = "";
-
-      const preview = document.getElementById("imagePreview");
-      preview.removeAttribute("src");
-      preview.style.display = "none";
-
-      clearMessage("reportMessage");
-      document.getElementById("reportModal").classList.add("active");
+  async function markReturned(id) {
+    if (!confirm("Has this item been returned to its owner?")) {
+      return;
     }
 
-    document.getElementById("itemImage").addEventListener("change", event => {
-      const file = event.target.files[0];
-      const preview = document.getElementById("imagePreview");
+    try {
+      await apiRequest(
+        `/api/items/${encodeURIComponent(id)}/resolve`,
+        { method: "PATCH" }
+      );
 
-      selectedImage = "";
-      preview.removeAttribute("src");
-      preview.style.display = "none";
-      clearMessage("reportMessage");
+      await loadItemsFromDatabase();
+      alert("Report marked as returned.");
+    } catch (error) {
+      alert(error.message || "Could not update this report.");
+    }
+  }
 
-      if (!file) {
-        return;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        showMessage("reportMessage", "Please select an image.");
-        event.target.value = "";
-        return;
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        showMessage("reportMessage", "Image must be 10 MB or smaller.");
-        event.target.value = "";
-        return;
-      }
-
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        selectedImage = String(reader.result || "");
-        preview.src = selectedImage;
-        preview.style.display = "block";
-      };
-
-      reader.onerror = () => {
-        showMessage(
-          "reportMessage",
-          "Could not read that image. Please try another one."
-        );
-      };
-
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById("reportForm").addEventListener(
-      "submit",
-      async event => {
-        event.preventDefault();
-
-        const button = document.getElementById("reportSubmit");
-        button.disabled = true;
-        clearMessage("reportMessage");
-
-        try {
-          await apiRequest("/api/items", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              title: document.getElementById("itemTitle").value.trim(),
-              studentName: document.getElementById("studentName").value.trim(),
-              course: document.getElementById("studentCourse").value.trim(),
-              department: document.getElementById("studentDepartment").value.trim(),
-              batch: document.getElementById("studentBatch").value.trim(),
-              semester: document.getElementById("studentSemester").value,
-              category: document.getElementById("itemCategory").value,
-              status: document.getElementById("itemStatus").value,
-              location: document.getElementById("itemLocation").value.trim(),
-              date: document.getElementById("itemDate").value,
-              description: document.getElementById("itemDescription").value.trim(),
-              image: selectedImage
-            })
-          });
-
-          closeModal("reportModal");
-          await loadItemsFromDatabase();
-
-          alert(
-            "Report submitted. It will appear to everyone after admin approval."
-          );
-        } catch (error) {
-          showMessage("reportMessage", error.message);
-        } finally {
-          button.disabled = false;
-        }
-      }
+  function localDateString() {
+    const now = new Date();
+    const localDate = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60000
     );
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      updateLoginUI();
+    return localDate.toISOString().slice(0, 10);
+  }
 
-      if (isLoggedIn()) {
-        await loadItemsFromDatabase();
-      } else {
-        openAuth("login");
-      }
+  function setReportType(status) {
+    const selected = status === "Found" ? "Found" : "Lost";
+
+    document.getElementById("itemStatus").value = selected;
+    document.getElementById("reportTitle").textContent =
+      selected === "Lost" ? "Report a Lost Item" : "Report a Found Item";
+
+    document.querySelectorAll(".type-option").forEach(button => {
+      const active = button.dataset.itemType === selected;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
     });
-  </script>
+  }
+
+  document.querySelectorAll(".type-option").forEach(button => {
+    button.addEventListener("click", () => {
+      setReportType(button.dataset.itemType);
+    });
+  });
+
+  function openReport(status) {
+    if (!isLoggedIn()) {
+      openAuth();
+      return;
+    }
+
+    document.getElementById("reportForm").reset();
+    setReportType(status);
+    document.getElementById("itemDate").value = localDateString();
+    document.getElementById("studentName").value =
+      getCurrentUser()?.name || "";
+
+    selectedImage = "";
+
+    const preview = document.getElementById("imagePreview");
+    preview.removeAttribute("src");
+    preview.style.display = "none";
+
+    clearMessage("reportMessage");
+    document.getElementById("reportModal").classList.add("active");
+  }
+
+  document.getElementById("itemImage").addEventListener("change", event => {
+    const file = event.target.files[0];
+    const preview = document.getElementById("imagePreview");
+
+    selectedImage = "";
+    preview.removeAttribute("src");
+    preview.style.display = "none";
+    clearMessage("reportMessage");
+
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      showMessage("reportMessage", "Please select an image.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      showMessage("reportMessage", "Image must be 10 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      selectedImage = String(reader.result || "");
+      preview.src = selectedImage;
+      preview.style.display = "block";
+    };
+
+    reader.onerror = () => {
+      showMessage(
+        "reportMessage",
+        "Could not read that image. Please try another one."
+      );
+    };
+
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("reportForm").addEventListener(
+    "submit",
+    async event => {
+      event.preventDefault();
+
+      const button = document.getElementById("reportSubmit");
+      button.disabled = true;
+      clearMessage("reportMessage");
+
+      try {
+        await apiRequest("/api/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            title: document.getElementById("itemTitle").value.trim(),
+            studentName: document.getElementById("studentName").value.trim(),
+            course: document.getElementById("studentCourse").value.trim(),
+            department: document.getElementById("studentDepartment").value.trim(),
+            batch: document.getElementById("studentBatch").value.trim(),
+            semester: document.getElementById("studentSemester").value,
+            category: document.getElementById("itemCategory").value,
+            status: document.getElementById("itemStatus").value,
+            location: document.getElementById("itemLocation").value.trim(),
+            date: document.getElementById("itemDate").value,
+            description: document.getElementById("itemDescription").value.trim(),
+            image: selectedImage
+          })
+        });
+
+        closeModal("reportModal");
+        await loadItemsFromDatabase();
+
+        alert(
+          "Report submitted. It will appear to everyone after admin approval."
+        );
+      } catch (error) {
+        showMessage("reportMessage", error.message || "Could not submit report.");
+      } finally {
+        button.disabled = false;
+      }
+    }
+  );
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    updateLoginUI();
+
+    if (isLoggedIn()) {
+      await loadItemsFromDatabase();
+    } else {
+      openAuth();
+    }
+  });
+</script>
 </body>
 </html>
-
-
-
