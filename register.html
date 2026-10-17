@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Account | CampusFind</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      display: grid;
+      place-items: center;
+      background: #090d17;
+      color: #e8edff;
+      font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    .card {
+      width: min(100%, 440px);
+      padding: 28px;
+      border: 1px solid #283550;
+      border-radius: 18px;
+      background: #101727;
+      box-shadow: 0 18px 55px #0005;
+    }
+
+    .logo {
+      margin-bottom: 20px;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 850;
+    }
+
+    .logo span {
+      color: #a99dff;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .intro,
+    .footnote {
+      color: #8e9bb8;
+      font-size: 13px;
+    }
+
+    .field {
+      margin: 16px 0;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: #c3cde2;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #303d58;
+      border-radius: 9px;
+      background: #0b1220;
+      color: #e8edff;
+      font: inherit;
+    }
+
+    input:focus {
+      outline: 2px solid #6858ff66;
+      border-color: #6958ff;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px;
+      border: 0;
+      border-radius: 9px;
+      background: #6958ff;
+      color: white;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: .65;
+    }
+
+    .message {
+      display: none;
+      margin: 12px 0;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+      font-size: 13px;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    .message.error {
+      background: #3a1b22;
+      color: #ffabb5;
+    }
+
+    .message.success {
+      background: #12352e;
+      color: #80edca;
+    }
+
+    a {
+      color: #a99dff;
+    }
+
+    .back {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .footnote {
+      margin-top: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #151f32;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <div class="logo">🔎 Campus<span>Find</span></div>
+
+    <h1>Request an account</h1>
+    <p class="intro">
+      Send your details to the campus admin. You can log in after your account is approved.
+    </p>
+
+    <div id="message" class="message" role="status"></div>
+
+    <form id="registerForm">
+      <div class="field">
+        <label for="name">Full name *</label>
+        <input
+          id="name"
+          name="name"
+          type="text"
+          maxlength="100"
+          autocomplete="name"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="email">Email *</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          maxlength="254"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone number (optional)</label>
+        <input
+          id="phone"
+          name="phone"
+          type="tel"
+          maxlength="30"
+          placeholder="+91 9876543210"
+          autocomplete="tel"
+        >
+      </div>
+
+      <div class="field">
+        <label for="password">Password (at least 8 characters) *</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          minlength="8"
+          autocomplete="new-password"
+          required
+        >
+      </div>
+
+      <button id="submitButton" type="submit">Send account request</button>
+    </form>
+
+    <div class="footnote">
+      Your account stays pending until an admin approves it. Passwords are stored securely and are not visible to the admin.
+    </div>
+
+    <p class="back"><a href="/">← Back to login</a></p>
+  </main>
+
+  <script>
+    const API_BASE = "https://campus-find-hmyj.onrender.com";
+
+    const form = document.getElementById("registerForm");
+    const message = document.getElementById("message");
+    const submitButton = document.getElementById("submitButton");
+
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "message show " + type;
+    }
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending…";
+      message.className = "message";
+
+      const account = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        password: document.getElementById("password").value
+      };
+
+      try {
+        const response = await fetch(API_BASE + "/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(account)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || "Could not send the account request.");
+        }
+
+        showMessage(
+          result.message || "Account request sent. Wait for admin approval before logging in.",
+          "success"
+        );
+
+        form.reset();
+      } catch (error) {
+        showMessage(error.message || "Could not connect to CampusFind. Try again.", "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Send account request";
+      }
+    });
+  </script>
+</body>
+</html>

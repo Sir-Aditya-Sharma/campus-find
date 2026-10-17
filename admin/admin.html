@@ -1,419 +1,521 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CampusFind Admin</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFind Admin</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body {
-            margin: 0;
-            background: #f4f6fb;
-            color: #1e293b;
-        }
+    body {
+      margin: 0;
+      background: #f3f5fb;
+      color: #172554;
+      font: 14px/1.5 Arial, sans-serif;
+    }
 
-        header {
-            padding: 16px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-        }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px max(18px, calc((100% - 1100px) / 2));
+      background: white;
+      border-bottom: 1px solid #dbe3f4;
+    }
 
-        header h1 {
-            margin: 0;
-            color: #3730a3;
-            font-size: 21px;
-        }
+    header a,
+    a {
+      color: #5145ed;
+    }
 
-        header a {
-            color: #3730a3;
-            font-weight: bold;
-        }
+    main {
+      width: min(1100px, calc(100% - 28px));
+      margin: 26px auto;
+    }
 
-        main {
-            width: min(1200px, 94%);
-            margin: 28px auto;
-        }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+    }
 
-        .intro {
-            margin-bottom: 20px;
-        }
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
 
-        .intro h2 {
-            margin-bottom: 5px;
-        }
+    .muted {
+      color: #52627d;
+    }
 
-        .intro p {
-            color: #64748b;
-        }
+    .panel {
+      margin: 18px 0;
+      padding: 18px;
+      overflow-x: auto;
+      border: 1px solid #dbe3f4;
+      border-radius: 14px;
+      background: white;
+    }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
+    .login-panel {
+      width: min(100%, 420px);
+      margin: 24px auto;
+    }
 
-        .stat {
-            padding: 18px;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-        }
+    label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: 700;
+    }
 
-        .stat span {
-            display: block;
-            color: #64748b;
-            font-size: 13px;
-        }
+    input {
+      width: 100%;
+      padding: 10px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+    }
 
-        .stat strong {
-            display: block;
-            margin-top: 7px;
-            color: #3730a3;
-            font-size: 25px;
-        }
+    button {
+      margin: 3px;
+      padding: 8px 11px;
+      border: 0;
+      border-radius: 7px;
+      background: #5145ed;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-        .panel {
-            padding: 16px;
-            overflow-x: auto;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-        }
+    button:hover {
+      filter: brightness(.94);
+    }
 
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
+    button:disabled {
+      cursor: wait;
+      opacity: .6;
+    }
 
-        button {
-            padding: 8px 11px;
-            border: 0;
-            border-radius: 7px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    button.red {
+      background: #b42318;
+    }
 
-        .approve {
-            background: #dcfce7;
-            color: #166534;
-        }
+    button.gray {
+      background: #52627d;
+    }
 
-        .reject {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+    .message {
+      margin: 12px 0;
+      padding: 10px;
+      border-radius: 8px;
+      background: #eef2ff;
+      color: #27356a;
+      overflow-wrap: anywhere;
+    }
 
-        .delete {
-            background: #1e293b;
-            color: white;
-        }
+    .message.error {
+      background: #fee4e2;
+      color: #b42318;
+    }
 
-        table {
-            width: 100%;
-            min-width: 950px;
-            border-collapse: collapse;
-        }
+    .message.success {
+      background: #dcfae6;
+      color: #067647;
+    }
 
-        th,
-        td {
-            padding: 11px;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: left;
-            vertical-align: middle;
-            font-size: 13px;
-        }
+    .hidden {
+      display: none !important;
+    }
 
-        th {
-            background: #eef2ff;
-            color: #312e81;
-        }
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+    }
 
-        .item-image {
-            width: 52px;
-            height: 52px;
-            border-radius: 7px;
-            object-fit: cover;
-            background: #f1f5f9;
-        }
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #e5eaf4;
+      text-align: left;
+      vertical-align: top;
+    }
 
-        .message {
-            margin: 12px 0;
-            padding: 11px;
-            border-radius: 8px;
-            background: #eef2ff;
-            color: #312e81;
-        }
+    th {
+      background: #eef2ff;
+    }
 
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
+    .actions {
+      min-width: 230px;
+    }
 
-        .empty {
-            padding: 28px;
-            color: #64748b;
-            text-align: center;
-        }
-
-        @media (max-width: 700px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            header {
-                padding: 14px;
-            }
-        }
-    </style>
+    .status {
+      font-weight: 700;
+    }
+  </style>
 </head>
 
 <body>
-    <header>
-        <h1>CampusFind Admin</h1>
-        <a href="../index.html">Open CampusFind</a>
-    </header>
+  <header>
+    <strong>CampusFind Admin</strong>
+    <a href="/">Open CampusFind</a>
+  </header>
 
-    <main>
-        <section class="intro">
-            <h2>Admin dashboard</h2>
-            <p>Log into CampusFind with the admin account first, then reload this page.</p>
-            <button type="button" onclick="loadAdminItems()">Refresh reports</button>
-            <div id="pageMessage" class="message">Loading reports...</div>
-        </section>
+  <main>
+    <section id="loginPanel" class="panel login-panel">
+      <h1>Admin login</h1>
+      <p class="muted">Admin account se sign in karo.</p>
 
-        <section class="stats">
-            <div class="stat"><span>Total reports</span><strong id="totalCount">0</strong></div>
-            <div class="stat"><span>Lost</span><strong id="lostCount">0</strong></div>
-            <div class="stat"><span>Found</span><strong id="foundCount">0</strong></div>
-            <div class="stat"><span>Pending review</span><strong id="pendingCount">0</strong></div>
-            <div class="stat"><span>Expired</span><strong id="expiredCount">0</strong></div>
-        </section>
+      <div id="loginMessage" class="message hidden"></div>
 
-        <section class="panel">
-            <div class="toolbar">
-                <strong>All reports</strong>
-                <span>Reports older than 30 days are hidden from students.</span>
-            </div>
+      <form id="loginForm">
+        <label for="adminEmail">Admin email</label>
+        <input
+          id="adminEmail"
+          type="email"
+          autocomplete="username"
+          required
+        >
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Photo</th>
-                        <th>Item</th>
-                        <th>Type</th>
-                        <th>Location</th>
-                        <th>Student</th>
-                        <th>Contact</th>
-                        <th>Review</th>
-                        <th>Listing</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="itemsTable">
-                    <tr><td colspan="9" class="empty">Loading...</td></tr>
-                </tbody>
-            </table>
-        </section>
-    </main>
+        <label for="adminPassword">Password</label>
+        <input
+          id="adminPassword"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
 
-    <script>
-        const API_BASE = "https://campus-find-hmyj.onrender.com";
+        <button id="loginButton" type="submit">Login</button>
+      </form>
+    </section>
 
-        function escapeHTML(value) {
-            return String(value ?? "").replace(/[&<>"']/g, character => ({
-                "&": "&amp;",
-                "<": "&lt;",
-                ">": "&gt;",
-                '"': "&quot;",
-                "'": "&#39;"
-            })[character]);
+    <section id="dashboard" class="hidden">
+      <h1>Admin dashboard</h1>
+      <p class="muted">
+        Account requests aur item reports yahan review karo.
+      </p>
+      <p id="dashboardMessage" class="message">Loading…</p>
+
+      <section class="panel">
+        <h2>Student account requests</h2>
+        <div id="users">Loading accounts…</div>
+      </section>
+
+      <section class="panel">
+        <h2>Item reports</h2>
+        <div id="reports">Loading reports…</div>
+      </section>
+
+      <button id="logoutButton" class="gray" type="button">Logout admin</button>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "https://campus-find-hmyj.onrender.com";
+
+    const loginPanel = document.getElementById("loginPanel");
+    const dashboard = document.getElementById("dashboard");
+    const loginMessage = document.getElementById("loginMessage");
+    const dashboardMessage = document.getElementById("dashboardMessage");
+
+    function showMessage(element, text, type = "") {
+      element.textContent = text;
+      element.className = "message" + (type ? " " + type : "");
+    }
+
+    function getToken() {
+      return localStorage.getItem("campusFindToken") || "";
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[character]);
+    }
+
+    async function apiRequest(path, options = {}) {
+      const response = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(getToken()
+            ? { Authorization: "Bearer " + getToken() }
+            : {}),
+          ...(options.headers || {})
+        }
+      });
+
+      const text = await response.text();
+      let data = {};
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { message: text || "Unexpected server response." };
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Request failed.");
+      }
+
+      return data;
+    }
+
+    async function login(email, password) {
+      const result = await apiRequest("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!result.user || !result.user.isAdmin) {
+        throw new Error("Is account ko admin access nahi hai.");
+      }
+
+      localStorage.setItem("campusFindToken", result.token);
+      localStorage.setItem("campusFindUser", JSON.stringify(result.user));
+
+      await openDashboard();
+    }
+
+    async function loadUsers() {
+      const users = await apiRequest("/api/auth/admin/users");
+      const container = document.getElementById("users");
+
+      if (!users.length) {
+        container.textContent = "Koi account request nahi hai.";
+        return;
+      }
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users.map(user => `
+              <tr>
+                <td>${escapeHTML(user.name)}</td>
+                <td>${escapeHTML(user.email)}</td>
+                <td>${escapeHTML(user.phone || "—")}</td>
+                <td class="status">${escapeHTML(user.accountStatus)}</td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    data-user-id="${escapeHTML(user._id)}"
+                    data-account-status="Approved"
+                  >Approve</button>
+                  <button
+                    class="red"
+                    type="button"
+                    data-user-id="${escapeHTML(user._id)}"
+                    data-account-status="Rejected"
+                  >Reject</button>
+                  <button
+                    class="gray"
+                    type="button"
+                    data-user-id="${escapeHTML(user._id)}"
+                    data-account-status="Disabled"
+                  >Disable</button>
+                  <button
+                    type="button"
+                    data-reset-user="${escapeHTML(user._id)}"
+                  >Reset password</button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function loadReports() {
+      const items = await apiRequest("/api/items/admin/all");
+      const container = document.getElementById("reports");
+
+      if (!items.length) {
+        container.textContent = "Koi report nahi hai.";
+        return;
+      }
+
+      container.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Type</th>
+              <th>Student</th>
+              <th>Course / Department</th>
+              <th>Location</th>
+              <th>Review</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(item => `
+              <tr>
+                <td>${escapeHTML(item.itemName)}</td>
+                <td>${escapeHTML(item.type)}</td>
+                <td>${escapeHTML(item.studentName)}</td>
+                <td>
+                  ${escapeHTML(item.course)} /
+                  ${escapeHTML(item.department)}<br>
+                  Batch: ${escapeHTML(item.batch)}<br>
+                  ${escapeHTML(item.semester)}
+                </td>
+                <td>${escapeHTML(item.location)}</td>
+                <td class="status">${escapeHTML(item.reviewStatus)}</td>
+                <td class="actions">
+                  <button
+                    type="button"
+                    data-item-id="${escapeHTML(item._id)}"
+                    data-review-status="Approved"
+                  >Approve</button>
+                  <button
+                    class="red"
+                    type="button"
+                    data-item-id="${escapeHTML(item._id)}"
+                    data-review-status="Rejected"
+                  >Reject</button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function openDashboard() {
+      loginPanel.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+      showMessage(dashboardMessage, "Admin data load ho raha hai…");
+
+      try {
+        await Promise.all([loadUsers(), loadReports()]);
+        showMessage(dashboardMessage, "Admin data load ho gaya.", "success");
+      } catch (error) {
+        showMessage(dashboardMessage, error.message, "error");
+      }
+    }
+
+    document.getElementById("loginForm").addEventListener(
+      "submit",
+      async event => {
+        event.preventDefault();
+
+        const button = document.getElementById("loginButton");
+        button.disabled = true;
+        showMessage(loginMessage, "Login ho raha hai…");
+
+        try {
+          await login(
+            document.getElementById("adminEmail").value.trim(),
+            document.getElementById("adminPassword").value
+          );
+        } catch (error) {
+          showMessage(loginMessage, error.message, "error");
+        } finally {
+          button.disabled = false;
+        }
+      }
+    );
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      localStorage.removeItem("campusFindToken");
+      localStorage.removeItem("campusFindUser");
+      dashboard.classList.add("hidden");
+      loginPanel.classList.remove("hidden");
+      document.getElementById("loginForm").reset();
+    });
+
+    document.getElementById("users").addEventListener("click", async event => {
+      const statusButton = event.target.closest("[data-account-status]");
+      const resetButton = event.target.closest("[data-reset-user]");
+
+      try {
+        if (statusButton) {
+          await apiRequest(
+            "/api/auth/admin/users/" +
+              encodeURIComponent(statusButton.dataset.userId) +
+              "/status",
+            {
+              method: "PATCH",
+              body: JSON.stringify({
+                accountStatus: statusButton.dataset.accountStatus
+              })
+            }
+          );
+
+          await loadUsers();
         }
 
-        function showMessage(message, isError = false) {
-            const element = document.getElementById("pageMessage");
-            element.textContent = message;
-            element.className = isError ? "message error" : "message";
+        if (resetButton) {
+          const newPassword = prompt(
+            "Naya password dalo (kam se kam 8 characters):"
+          );
+
+          if (newPassword === null) return;
+
+          if (newPassword.length < 8) {
+            alert("Password kam se kam 8 characters ka hona chahiye.");
+            return;
+          }
+
+          await apiRequest(
+            "/api/auth/admin/users/" +
+              encodeURIComponent(resetButton.dataset.resetUser) +
+              "/password",
+            {
+              method: "PATCH",
+              body: JSON.stringify({ newPassword })
+            }
+          );
+
+          alert("Password reset ho gaya. Student ko naya password privately batao.");
         }
+      } catch (error) {
+        alert(error.message);
+      }
+    });
 
-        async function apiRequest(path, options = {}) {
-            const token = localStorage.getItem("campusFindToken");
+    document.getElementById("reports").addEventListener("click", async event => {
+      const button = event.target.closest("[data-review-status]");
 
-            if (!token) {
-                throw new Error("Log into CampusFind with the admin account first.");
-            }
+      if (!button) return;
 
-            const headers = {
-                Authorization: `Bearer ${token}`,
-                ...(options.headers || {})
-            };
-
-            const response = await fetch(API_BASE + path, {
-                ...options,
-                headers
-            });
-
-            const text = await response.text();
-            let data = {};
-
-            try {
-                data = text ? JSON.parse(text) : {};
-            } catch {
-                data = { message: text || "Unexpected server response." };
-            }
-
-            if (!response.ok) {
-                throw new Error(data.message || "Request failed.");
-            }
-
-            return data;
-        }
-
-        function safeImageSource(value) {
-            if (typeof value !== "string") {
-                return "";
-            }
-
-            if (
-                /^data:image\/(jpeg|jpg|png|webp|gif);base64,/i.test(value) ||
-                /^https:\/\//i.test(value)
-            ) {
-                return value;
-            }
-
-            return "";
-        }
-
-        function updateStats(items) {
-            document.getElementById("totalCount").textContent = items.length;
-            document.getElementById("lostCount").textContent =
-                items.filter(item => item.type === "Lost").length;
-            document.getElementById("foundCount").textContent =
-                items.filter(item => item.type === "Found").length;
-            document.getElementById("pendingCount").textContent =
-                items.filter(item => item.reviewStatus === "Pending").length;
-            document.getElementById("expiredCount").textContent =
-                items.filter(item => item.isExpired).length;
-        }
-
-        async function loadAdminItems() {
-            const table = document.getElementById("itemsTable");
-            table.innerHTML =
-                '<tr><td colspan="9" class="empty">Loading...</td></tr>';
-
-            try {
-                const items = await apiRequest("/api/items/admin/all");
-                updateStats(items);
-
-                if (!items.length) {
-                    table.innerHTML =
-                        '<tr><td colspan="9" class="empty">No reports yet.</td></tr>';
-                    showMessage("Reports loaded.");
-                    return;
-                }
-
-                table.innerHTML = items.map(item => {
-                    const id = escapeHTML(item._id);
-                    const title = escapeHTML(item.itemName || "Untitled");
-                    const image = safeImageSource(item.image);
-                    const photo = image
-                        ? `<img class="item-image" src="${escapeHTML(image)}" alt="">`
-                        : "📦";
-
-                    const review = escapeHTML(item.reviewStatus || "Approved");
-                    const listing = item.isExpired ? "Expired" : "Active";
-
-                    return `
-                        <tr>
-                            <td>${photo}</td>
-                            <td>
-                                <strong>${title}</strong><br>
-                                ${escapeHTML(item.category || "Other")}
-                            </td>
-                            <td>${escapeHTML(item.type || "")}</td>
-                            <td>${escapeHTML(item.location || "")}</td>
-                            <td>${escapeHTML(item.studentName || "")}</td>
-                            <td>${escapeHTML(item.studentContact || "")}</td>
-                            <td>${review}</td>
-                            <td>${listing}</td>
-                            <td>
-                                <button class="approve" data-action="review"
-                                    data-id="${id}" data-status="Approved">Approve</button>
-                                <button class="reject" data-action="review"
-                                    data-id="${id}" data-status="Rejected">Reject</button>
-                                <button class="delete" data-action="delete"
-                                    data-id="${id}">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                }).join("");
-
-                showMessage("Reports loaded.");
-            } catch (error) {
-                table.innerHTML =
-                    '<tr><td colspan="9" class="empty">Unable to load reports.</td></tr>';
-                showMessage(error.message, true);
-            }
-        }
-
-        document.getElementById("itemsTable").addEventListener(
-            "click",
-            async event => {
-                const button = event.target.closest("button[data-action]");
-
-                if (!button) {
-                    return;
-                }
-
-                const id = button.dataset.id;
-
-                try {
-                    if (button.dataset.action === "review") {
-                        await apiRequest(
-                            `/api/items/admin/${encodeURIComponent(id)}/review`,
-                            {
-                                method: "PATCH",
-                                headers: {
-                                    "Content-Type": "application/json"
-                                },
-                                body: JSON.stringify({
-                                    reviewStatus: button.dataset.status
-                                })
-                            }
-                        );
-                    }
-
-                    if (button.dataset.action === "delete") {
-                        if (!confirm("Delete this report permanently?")) {
-                            return;
-                        }
-
-                        await apiRequest(
-                            `/api/items/admin/${encodeURIComponent(id)}`,
-                            { method: "DELETE" }
-                        );
-                    }
-
-                    await loadAdminItems();
-                } catch (error) {
-                    showMessage(error.message, true);
-                }
-            }
+      try {
+        await apiRequest(
+          "/api/items/admin/" +
+            encodeURIComponent(button.dataset.itemId) +
+            "/review",
+          {
+            method: "PATCH",
+            body: JSON.stringify({
+              reviewStatus: button.dataset.reviewStatus
+            })
+          }
         );
 
-        document.addEventListener("DOMContentLoaded", loadAdminItems);
-    </script>
+        await loadReports();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    if (getToken()) {
+      openDashboard();
+    }
+  </script>
 </body>
 </html>

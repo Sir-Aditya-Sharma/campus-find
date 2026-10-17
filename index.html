@@ -926,14 +926,10 @@
     </div>
   </header>
 
-  <button
-    class="urgent-banner"
-    type="button"
-    onclick="openReport('Lost')"
-  >
+  <div class="urgent-banner">
     <strong>⚠ URGENT ALERT</strong>
-    Lost something valuable? Click here to report it.
-  </button>
+    Lost something valuable? Sign in and use Report Item to list it.
+  </div>
 
   <main class="dashboard">
     <aside class="sidebar surface">
@@ -968,14 +964,6 @@
           <h1>CampusFind dashboard</h1>
           <p>Find it, report it, reunite with it.</p>
         </div>
-
-        <button
-          class="primary-btn"
-          type="button"
-          onclick="openReport('Lost')"
-        >
-          ＋ Report item
-        </button>
       </div>
 
       <div class="stats">
@@ -1056,18 +1044,10 @@
       <section class="rail-panel">
         <h2>ⓘ How CampusFind works</h2>
         <ul class="how-list">
-          <li>Post clear details and a photo of the item.</li>
+          <li>Post clear item details. A photo is optional.</li>
           <li>New reports are checked before others can see them.</li>
           <li>Contact the student to arrange a safe return.</li>
         </ul>
-
-        <button
-          class="rail-alert"
-          type="button"
-          onclick="openReport('Lost')"
-        >
-          ⚠ Report high-value item
-        </button>
       </section>
     </aside>
   </main>
@@ -1118,20 +1098,7 @@
         <div class="form-actions">
           <button id="authSubmit" class="primary-btn" type="submit">Login</button>
         </div>
-      </form>
-
-      <div class="auth-switch">
-        <span id="authSwitchText">New to CampusFind?</span>
-        <button
-          id="authSwitchButton"
-          class="text-button"
-          type="button"
-          onclick="switchAuthMode()"
-        >
-          Create account
-        </button>
-      </div>
-    </div>
+      </form></div>
   </div>
 
   <div class="modal-overlay" id="phoneModal">
@@ -1206,6 +1173,42 @@
 
         <div class="form-row">
           <div class="form-group">
+            <label for="studentName">Student name *</label>
+            <input id="studentName" type="text" placeholder="Your full name" required>
+          </div>
+          <div class="form-group">
+            <label for="studentCourse">Course *</label>
+            <input id="studentCourse" type="text" placeholder="e.g. BCA" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="studentDepartment">Department *</label>
+            <input id="studentDepartment" type="text" placeholder="e.g. Computer Applications" required>
+          </div>
+          <div class="form-group">
+            <label for="studentBatch">Batch *</label>
+            <input id="studentBatch" type="text" placeholder="e.g. 2024-2027" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="studentSemester">Semester *</label>
+          <select id="studentSemester" required>
+            <option value="">Select semester</option>
+            <option>Semester 1</option>
+            <option>Semester 2</option>
+            <option>Semester 3</option>
+            <option>Semester 4</option>
+            <option>Semester 5</option>
+            <option>Semester 6</option>
+            <option>Semester 7</option>
+            <option>Semester 8</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
             <label for="itemCategory">Category *</label>
             <select id="itemCategory" required>
               <option value="">Select category</option>
@@ -1245,7 +1248,7 @@
         </div>
 
         <div class="form-group">
-          <label for="itemImage">Photo (optional, max 2 MB)</label>
+          <label for="itemImage">Photo (optional, max 10 MB)</label>
           <input id="itemImage" type="file" accept="image/*">
           <img id="imagePreview" alt="Item photo preview">
         </div>
@@ -1945,6 +1948,7 @@
       document.getElementById("reportForm").reset();
       setReportType(status);
       document.getElementById("itemDate").value = localDateString();
+      document.getElementById("studentName").value = getCurrentUser()?.name || "";
 
       selectedImage = "";
 
@@ -1975,8 +1979,8 @@
         return;
       }
 
-      if (file.size > 2 * 1024 * 1024) {
-        showMessage("reportMessage", "Image must be smaller than 2 MB.");
+      if (file.size > 10 * 1024 * 1024) {
+        showMessage("reportMessage", "Image must be 10 MB or smaller.");
         event.target.value = "";
         return;
       }
@@ -2014,6 +2018,11 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               title: document.getElementById("itemTitle").value.trim(),
+              studentName: document.getElementById("studentName").value.trim(),
+              course: document.getElementById("studentCourse").value.trim(),
+              department: document.getElementById("studentDepartment").value.trim(),
+              batch: document.getElementById("studentBatch").value.trim(),
+              semester: document.getElementById("studentSemester").value,
               category: document.getElementById("itemCategory").value,
               status: document.getElementById("itemStatus").value,
               location: document.getElementById("itemLocation").value.trim(),
@@ -2049,3 +2058,6 @@
   </script>
 </body>
 </html>
+
+
+
