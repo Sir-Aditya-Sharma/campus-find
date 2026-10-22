@@ -1,11 +1,12 @@
+
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "CampusFind backend API",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "check": "node --check server.js && node --check routers/auth.js && node --check routers/items.js && node --check model/User.js && node --check model/Item.js"
   },
   "keywords": [],
   "author": "",

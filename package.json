@@ -1,4 +1,13 @@
+
 {
+  "name": "campus-find",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CampusFind lost and found platform",
+  "scripts": {
+    "start": "node backend/server.js",
+    "check": "node --check backend/server.js && node --check backend/routers/auth.js && node --check backend/routers/items.js && node --check backend/model/User.js && node --check backend/model/Item.js"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.11.0",
