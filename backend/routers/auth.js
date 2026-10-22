@@ -15,6 +15,7 @@ function isValidPhone(phone) {
   return !phone || /^[+0-9().\-\s]{7,30}$/.test(phone);
 }
 
+// Authenticate a logged-in user and identify the configured admin.
 async function authenticateUser(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
@@ -52,7 +53,8 @@ async function authenticateUser(req, res, next) {
     }
 
     const adminEmail = getAdminEmail();
-    const isAdmin = Boolean(adminEmail) &&
+    const isAdmin =
+      Boolean(adminEmail) &&
       user.email.toLowerCase() === adminEmail;
 
     if (!isAdmin && user.accountStatus !== "Approved") {
@@ -71,8 +73,10 @@ async function authenticateUser(req, res, next) {
 
     return next();
   } catch (error) {
-    if (error.name === "TokenExpiredError" ||
-        error.name === "JsonWebTokenError") {
+    if (
+      error.name === "TokenExpiredError" ||
+      error.name === "JsonWebTokenError"
+    ) {
       return res.status(401).json({
         message: "Invalid or expired login. Please login again."
       });
@@ -86,19 +90,12 @@ async function authenticateUser(req, res, next) {
   }
 }
 
+// Admin-only middleware.
 function authenticateAdmin(req, res, next) {
-  const adminEmail = getAdminEmail();
-
-  if (!adminEmail) {
-    return res.status(503).json({
-      message: "Admin access has not been configured."
-    });
-  }
-
   return authenticateUser(req, res, () => {
-    if (req.user.email.toLowerCase() !== adminEmail) {
+    if (!req.user || !req.user.isAdmin) {
       return res.status(403).json({
-        message: "This account does not have admin access."
+        message: "Administrator access required."
       });
     }
 
@@ -106,84 +103,15 @@ function authenticateAdmin(req, res, next) {
   });
 }
 
-// Register a student account. Admin approval is required before login.
-router.post("/register", async (req, res) => {
-  try {
-    const { name, email, password, phone } = req.body || {};
-
-    if (
-      typeof name !== "string" ||
-      !name.trim() ||
-      name.trim().length > 100 ||
-      typeof email !== "string" ||
-      !email.trim() ||
-      email.trim().length > 254 ||
-      typeof password !== "string" ||
-      password.length < 8 ||
-      password.length > 128
-    ) {
-      return res.status(400).json({
-        message:
-          "Enter your name, valid email, and a password of 8–128 characters."
-      });
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-
-    if (cleanEmail === getAdminEmail()) {
-      return res.status(403).json({
-        message:
-          "The admin account cannot be created through student signup."
-      });
-    }
-
-    const cleanPhone = typeof phone === "string" ? phone.trim() : "";
-
-    if (!isValidPhone(cleanPhone)) {
-      return res.status(400).json({
-        message: "Enter a valid phone number, or leave it blank."
-      });
-    }
-
-    const existingUser = await User.findOne({ email: cleanEmail });
-
-    if (existingUser) {
-      return res.status(409).json({
-        message: "An account with this email already exists."
-      });
-    }
-
-    const user = new User({
-      name: name.trim(),
-      email: cleanEmail,
-      password: await bcrypt.hash(password, 12),
-      phone: cleanPhone,
-      accountStatus: "Pending"
-    });
-
-    await user.save();
-
-    return res.status(201).json({
-      message:
-        "Account request sent. An admin must approve it before you can log in.",
-      accountStatus: user.accountStatus
-    });
-  } catch (error) {
-    if (error.code === 11000) {
-      return res.status(409).json({
-        message: "An account with this email already exists."
-      });
-    }
-
-    console.error("Registration error:", error.message);
-
-    return res.status(500).json({
-      message: "Could not submit the account request."
-    });
-  }
+// Public student registration is disabled.
+router.post("/register", (req, res) => {
+  return res.status(403).json({
+    message:
+      "Public registration is disabled. Please contact the administrator."
+  });
 });
 
-// Login approved students and the configured admin.
+// Login approved students and the configured administrator.
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body || {};
@@ -216,8 +144,8 @@ router.post("/login", async (req, res) => {
     }
 
     const adminEmail = getAdminEmail();
-    const isAdmin = Boolean(adminEmail) &&
-      cleanEmail === adminEmail;
+    const isAdmin =
+      Boolean(adminEmail) && cleanEmail === adminEmail;
 
     if (!isAdmin && user.accountStatus !== "Approved") {
       let message = "Your account is waiting for admin approval.";
@@ -257,6 +185,87 @@ router.post("/login", async (req, res) => {
 
     return res.status(500).json({
       message: "Could not log in."
+    });
+  }
+});
+
+// Admin: create an approved student account.
+router.post("/admin/users", authenticateAdmin, async (req, res) => {
+  try {
+    const { name, email, password, phone } = req.body || {};
+
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      name.trim().length > 100 ||
+      typeof email !== "string" ||
+      !email.trim() ||
+      email.trim().length > 254 ||
+      typeof password !== "string" ||
+      password.length < 8 ||
+      password.length > 128
+    ) {
+      return res.status(400).json({
+        message:
+          "Enter a name, valid email, and password of 8–128 characters."
+      });
+    }
+
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = typeof phone === "string" ? phone.trim() : "";
+
+    if (cleanEmail === getAdminEmail()) {
+      return res.status(400).json({
+        message: "Use a different email for the student account."
+      });
+    }
+
+    if (!isValidPhone(cleanPhone)) {
+      return res.status(400).json({
+        message: "Enter a valid phone number or leave it blank."
+      });
+    }
+
+    const existingUser = await User.findOne({ email: cleanEmail });
+
+    if (existingUser) {
+      return res.status(409).json({
+        message: "An account with this email already exists."
+      });
+    }
+
+    const user = new User({
+      name: cleanName,
+      email: cleanEmail,
+      password: await bcrypt.hash(password, 12),
+      phone: cleanPhone,
+      accountStatus: "Approved"
+    });
+
+    await user.save();
+
+    return res.status(201).json({
+      message: "Student account created successfully.",
+      user: {
+        id: String(user._id),
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
+        accountStatus: user.accountStatus
+      }
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: "An account with this email already exists."
+      });
+    }
+
+    console.error("Admin student creation failed:", error.message);
+
+    return res.status(500).json({
+      message: "Could not create the student account."
     });
   }
 });
