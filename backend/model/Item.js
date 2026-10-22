@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const itemSchema = new mongoose.Schema(
@@ -5,13 +6,15 @@ const itemSchema = new mongoose.Schema(
     itemName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: 120
     },
 
     category: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: 80
     },
 
     type: {
@@ -23,13 +26,15 @@ const itemSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: 3000
     },
 
     location: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: 200
     },
 
     date: {
@@ -45,31 +50,36 @@ const itemSchema = new mongoose.Schema(
     studentName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
+      maxlength: 100
     },
 
     course: {
       type: String,
       default: "",
-      trim: true
+      trim: true,
+      maxlength: 100
     },
 
     department: {
       type: String,
       default: "",
-      trim: true
+      trim: true,
+      maxlength: 100
     },
 
     batch: {
       type: String,
       default: "",
-      trim: true
+      trim: true,
+      maxlength: 30
     },
 
     semester: {
       type: String,
       default: "",
-      trim: true
+      trim: true,
+      maxlength: 30
     },
 
     studentContact: {

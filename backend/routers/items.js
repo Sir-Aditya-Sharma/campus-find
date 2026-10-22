@@ -1,3 +1,4 @@
+
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -25,7 +26,7 @@ async function authenticateUser(req, res, next) {
       });
     }
 
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.slice(7).trim();
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
@@ -34,7 +35,9 @@ async function authenticateUser(req, res, next) {
       });
     }
 
-    const user = await User.findById(decoded.id).select("email accountStatus");
+    const user = await User.findById(decoded.id).select(
+      "email accountStatus"
+    );
 
     if (!user) {
       return res.status(401).json({
@@ -46,7 +49,9 @@ async function authenticateUser(req, res, next) {
       .trim()
       .toLowerCase();
 
-    const isAdmin = Boolean(adminEmail) && user.email === adminEmail;
+    const isAdmin =
+      Boolean(adminEmail) &&
+      String(user.email).toLowerCase() === adminEmail;
 
     if (!isAdmin && user.accountStatus !== "Approved") {
       return res.status(403).json({
@@ -61,14 +66,23 @@ async function authenticateUser(req, res, next) {
 
     return next();
   } catch (error) {
-    return res.status(401).json({
-      message: "Invalid or expired login. Please login again."
+    if (error.name === "TokenExpiredError" ||
+        error.name === "JsonWebTokenError") {
+      return res.status(401).json({
+        message: "Invalid or expired login. Please login again."
+      });
+    }
+
+    console.error("Authentication error:", error.message);
+
+    return res.status(500).json({
+      message: "Could not authenticate your account."
     });
   }
 }
 
 function authenticateAdmin(req, res, next) {
-  authenticateUser(req, res, () => {
+  return authenticateUser(req, res, () => {
     const adminEmail = String(process.env.ADMIN_EMAIL || "")
       .trim()
       .toLowerCase();
@@ -79,11 +93,7 @@ function authenticateAdmin(req, res, next) {
       });
     }
 
-    const loggedInEmail = String(req.user.email || "")
-      .trim()
-      .toLowerCase();
-
-    if (loggedInEmail !== adminEmail) {
+    if (String(req.user.email || "").toLowerCase() !== adminEmail) {
       return res.status(403).json({
         message: "This account does not have admin access."
       });
@@ -94,7 +104,7 @@ function authenticateAdmin(req, res, next) {
 }
 
 function isAllowedImage(image) {
-  if (!image) {
+  if (image === undefined || image === null || image === "") {
     return true;
   }
 
@@ -107,7 +117,7 @@ function isAllowedImage(image) {
 
   return (
     /^data:image\/(jpeg|jpg|png|webp|gif);base64,/i.test(image) ||
-    /^https:\/\/res\.cloudinary\.com\//i.test(image)
+    /^https:\/\/res\.cloudinary\.com\/[^\s]+$/i.test(image)
   );
 }
 
@@ -124,14 +134,33 @@ function isExpired(item) {
   );
 }
 
-/* Admin routes */
+function isValidDateString(value) {
+  if (typeof value !== "string" ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
 
+  const date = new Date(`${value}T00:00:00.000Z`);
+
+  return (
+    Number.isFinite(date.getTime()) &&
+    date.toISOString().slice(0, 10) === value
+  );
+}
+
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+/* ---------------- ADMIN ROUTES ---------------- */
+
+// Get all reports for the admin panel.
 router.get("/admin/all", authenticateAdmin, async (req, res) => {
   try {
     const items = await Item.find().sort({ createdAt: -1 });
 
     return res.json(
-      items.map(document => {
+      items.map((document) => {
         const item = document.toObject();
 
         return {
@@ -143,53 +172,63 @@ router.get("/admin/all", authenticateAdmin, async (req, res) => {
       })
     );
   } catch (error) {
+    console.error("Admin report list error:", error.message);
+
     return res.status(500).json({
       message: "Could not load admin reports."
     });
   }
 });
 
-router.patch("/admin/:id/review", authenticateAdmin, async (req, res) => {
-  try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Invalid item ID."
+// Approve or reject a report.
+router.patch(
+  "/admin/:id/review",
+  authenticateAdmin,
+  async (req, res) => {
+    try {
+      if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({
+          message: "Invalid item ID."
+        });
+      }
+
+      const { reviewStatus } = req.body;
+
+      if (!["Approved", "Rejected"].includes(reviewStatus)) {
+        return res.status(400).json({
+          message: "Choose Approved or Rejected."
+        });
+      }
+
+      const item = await Item.findById(req.params.id);
+
+      if (!item) {
+        return res.status(404).json({
+          message: "Report not found."
+        });
+      }
+
+      item.reviewStatus = reviewStatus;
+      item.reviewedAt = new Date();
+      item.reviewedBy = req.user.id;
+
+      await item.save();
+
+      return res.json({
+        message: `Report ${reviewStatus.toLowerCase()}.`,
+        reviewStatus: item.reviewStatus
+      });
+    } catch (error) {
+      console.error("Report review error:", error.message);
+
+      return res.status(500).json({
+        message: "Could not update report review."
       });
     }
-
-    const { reviewStatus } = req.body;
-
-    if (!["Approved", "Rejected"].includes(reviewStatus)) {
-      return res.status(400).json({
-        message: "Choose Approved or Rejected."
-      });
-    }
-
-    const item = await Item.findById(req.params.id);
-
-    if (!item) {
-      return res.status(404).json({
-        message: "Report not found."
-      });
-    }
-
-    item.reviewStatus = reviewStatus;
-    item.reviewedAt = new Date();
-    item.reviewedBy = req.user.id;
-
-    await item.save();
-
-    return res.json({
-      message: `Report ${reviewStatus.toLowerCase()}.`,
-      reviewStatus: item.reviewStatus
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: "Could not update report review."
-    });
   }
-});
+);
 
+// Admin deletes any report.
 router.delete("/admin/:id", authenticateAdmin, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -210,14 +249,17 @@ router.delete("/admin/:id", authenticateAdmin, async (req, res) => {
       message: "Report deleted."
     });
   } catch (error) {
+    console.error("Admin delete error:", error.message);
+
     return res.status(500).json({
       message: "Could not delete report."
     });
   }
 });
 
-/* Student routes */
+/* ---------------- STUDENT ROUTES ---------------- */
 
+// Get recent approved reports and the current user's own reports.
 router.get("/", authenticateUser, async (req, res) => {
   try {
     const cutoff = new Date(Date.now() - REPORT_LIFETIME_MS);
@@ -232,7 +274,7 @@ router.get("/", authenticateUser, async (req, res) => {
       ]
     }).sort({ createdAt: -1 });
 
-    const safeItems = items.map(document => {
+    const safeItems = items.map((document) => {
       const item = document.toObject();
       const isOwner = String(item.userId) === String(req.user.id);
 
@@ -250,12 +292,15 @@ router.get("/", authenticateUser, async (req, res) => {
 
     return res.json(safeItems);
   } catch (error) {
+    console.error("Student report list error:", error.message);
+
     return res.status(500).json({
       message: "Failed to fetch items."
     });
   }
 });
 
+// Get contact details only for an approved, open report.
 router.get("/:id/contact", authenticateUser, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -305,12 +350,15 @@ router.get("/:id/contact", authenticateUser, async (req, res) => {
       studentPhone: poster.phone || ""
     });
   } catch (error) {
+    console.error("Contact lookup error:", error.message);
+
     return res.status(500).json({
       message: "Could not get poster contact."
     });
   }
 });
 
+// Create a lost/found report.
 router.post("/", authenticateUser, async (req, res) => {
   try {
     const {
@@ -329,46 +377,48 @@ router.post("/", authenticateUser, async (req, res) => {
       semester
     } = req.body;
 
-    const finalName = itemName ?? title;
+    const finalName = cleanString(itemName ?? title);
     const finalType = type ?? status;
-    const cleanDate = typeof date === "string" ? date.trim() : "";
+    const cleanCategory = cleanString(category);
+    const cleanLocation = cleanString(location);
+    const cleanDescription = cleanString(description);
+    const cleanCourse = cleanString(course);
+    const cleanDepartment = cleanString(department);
+    const cleanBatch = cleanString(batch);
+    const cleanSemester = cleanString(semester);
 
     if (
-      typeof finalName !== "string" ||
-      !finalName.trim() ||
-      typeof category !== "string" ||
-      !category.trim() ||
+      !finalName ||
+      finalName.length > 120 ||
+      !cleanCategory ||
+      cleanCategory.length > 80 ||
       !["Lost", "Found"].includes(finalType) ||
-      typeof location !== "string" ||
-      !location.trim() ||
-      typeof course !== "string" ||
-      !course.trim() ||
-      typeof department !== "string" ||
-      !department.trim() ||
-      typeof batch !== "string" ||
-      !batch.trim() ||
-      typeof semester !== "string" ||
-      !semester.trim() ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(cleanDate) ||
-      Number.isNaN(Date.parse(`${cleanDate}T00:00:00Z`))
+      !cleanLocation ||
+      cleanLocation.length > 200 ||
+      !cleanCourse ||
+      cleanCourse.length > 100 ||
+      !cleanDepartment ||
+      cleanDepartment.length > 100 ||
+      !cleanBatch ||
+      cleanBatch.length > 30 ||
+      !cleanSemester ||
+      cleanSemester.length > 30 ||
+      !isValidDateString(date)
     ) {
       return res.status(400).json({
-        message: "Please fill in all required fields."
+        message: "Please check all required fields and try again."
       });
     }
 
-    if (
-      typeof description !== "string" ||
-      !description.trim()
-    ) {
+    if (!cleanDescription || cleanDescription.length > 3000) {
       return res.status(400).json({
-        message: "Please enter an item description."
+        message: "Description is required and must be 3000 characters or fewer."
       });
     }
 
-    if (!isAllowedImage(image || "")) {
+    if (!isAllowedImage(image)) {
       return res.status(400).json({
-        message: "Use a valid image of 10 MB or smaller."
+        message: "Use a valid supported image of 10 MB or smaller."
       });
     }
 
@@ -381,18 +431,18 @@ router.post("/", authenticateUser, async (req, res) => {
     }
 
     const newItem = new Item({
-      itemName: finalName.trim(),
-      category: category.trim(),
+      itemName: finalName,
+      category: cleanCategory,
       type: finalType,
-      description: description.trim(),
-      location: location.trim(),
-      date: cleanDate,
+      description: cleanDescription,
+      location: cleanLocation,
+      date: date.trim(),
       image: image || "",
       studentName: user.name,
-      course: course.trim(),
-      department: department.trim(),
-      batch: batch.trim(),
-      semester: semester.trim(),
+      course: cleanCourse,
+      department: cleanDepartment,
+      batch: cleanBatch,
+      semester: cleanSemester,
       studentContact: user.email,
       userId: user._id,
       reviewStatus: "Pending",
@@ -409,12 +459,15 @@ router.post("/", authenticateUser, async (req, res) => {
       }
     });
   } catch (error) {
+    console.error("Create report error:", error.message);
+
     return res.status(500).json({
       message: "Failed to create item."
     });
   }
 });
 
+// Mark the current user's approved report as returned.
 router.patch("/:id/resolve", authenticateUser, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -443,6 +496,12 @@ router.patch("/:id/resolve", authenticateUser, async (req, res) => {
       });
     }
 
+    if ((item.resolutionStatus || "Open") === "Returned") {
+      return res.status(409).json({
+        message: "This report is already marked as returned."
+      });
+    }
+
     item.resolutionStatus = "Returned";
     await item.save();
 
@@ -451,12 +510,15 @@ router.patch("/:id/resolve", authenticateUser, async (req, res) => {
       resolutionStatus: item.resolutionStatus
     });
   } catch (error) {
+    console.error("Resolve report error:", error.message);
+
     return res.status(500).json({
       message: "Could not close report."
     });
   }
 });
 
+// A student can delete only their own report.
 router.delete("/:id", authenticateUser, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) {
@@ -485,6 +547,8 @@ router.delete("/:id", authenticateUser, async (req, res) => {
       message: "Item deleted."
     });
   } catch (error) {
+    console.error("Delete report error:", error.message);
+
     return res.status(500).json({
       message: "Failed to delete item."
     });

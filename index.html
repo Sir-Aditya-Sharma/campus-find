@@ -1098,7 +1098,11 @@
         <div class="form-actions">
           <button id="authSubmit" class="primary-btn" type="submit">Login</button>
         </div>
-      </form></div>
+      </form>
+      
+      </form>
+
+      
   </div>
 
   <div class="modal-overlay" id="phoneModal">
@@ -1270,10 +1274,13 @@
   </div>
 
   <script>
-  const API_BASE = "https://campus-find-hmyj.onrender.com";
+  const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
+    ? "http://localhost:5000"
+    : "https://campus-find-hmyj.onrender.com";
 
   let allItems = [];
   let selectedImage = "";
+  let authMode = "login";
 
   function isLoggedIn() {
     return Boolean(localStorage.getItem("campusFindToken"));
@@ -1417,6 +1424,35 @@
     document.getElementById("authModal")?.classList.add("active");
   }
 
+  function toggleAuthMode() {
+    authMode = authMode === "login" ? "register" : "login";
+    const registering = authMode === "register";
+
+    document.getElementById("authTitle").textContent = registering
+      ? "Create your CampusFind account"
+      : "Welcome to CampusFind";
+    document.getElementById("authSubtitle").textContent = registering
+      ? "Register to report and find campus items. Your account may need admin approval."
+      : "Login to access campus Lost & Found reports.";
+    document.getElementById("nameGroup").style.display = registering ? "block" : "none";
+    document.getElementById("phoneGroup").style.display = registering ? "block" : "none";
+    document.getElementById("authName").required = registering;
+    document.getElementById("authPassword").minLength = registering ? 8 : 6;
+    document.getElementById("authPassword").placeholder = registering
+      ? "At least 8 characters"
+      : "Minimum 6 characters";
+    document.getElementById("authSubmit").textContent = registering
+      ? "Create account"
+      : "Login";
+    document.getElementById("authSwitchText").textContent = registering
+      ? "Already have an account?"
+      : "New to CampusFind?";
+    document.getElementById("authSwitchButton").textContent = registering
+      ? "Login"
+      : "Create an account";
+    clearMessage("authMessage");
+  }
+
   function logout() {
     clearSession();
     updateLoginUI();
@@ -1448,21 +1484,32 @@
     clearMessage("authMessage");
 
     const button = document.getElementById("authSubmit");
+    const registering = authMode === "register";
     button.disabled = true;
 
     try {
-      const email = document.getElementById("authEmail").value.trim();
-      const password = document.getElementById("authPassword").value;
+      const payload = {
+        email: document.getElementById("authEmail").value.trim(),
+        password: document.getElementById("authPassword").value
+      };
 
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      if (registering) {
+        payload.name = document.getElementById("authName").value.trim();
+        payload.phone = document.getElementById("authPhone").value.trim();
+        if (payload.password.length < 8) {
+          throw new Error("Password must be at least 8 characters for registration.");
+        }
+      }
+
+      const endpoint = registering ? "/api/auth/register" : "/api/auth/login";
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(payload)
       });
 
       const text = await response.text();
       let data = {};
-
       try {
         data = text ? JSON.parse(text) : {};
       } catch {
@@ -1470,7 +1517,18 @@
       }
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed.");
+        throw new Error(data.message || (registering ? "Registration failed." : "Login failed."));
+      }
+
+      if (registering) {
+        document.getElementById("authForm").reset();
+        toggleAuthMode();
+        showMessage(
+          "authMessage",
+          data.message || "Account request submitted. You may need admin approval before logging in.",
+          "success"
+        );
+        return;
       }
 
       if (!data.token || !data.user) {
@@ -1479,7 +1537,6 @@
 
       localStorage.setItem("campusFindToken", data.token);
       localStorage.setItem("campusFindUser", JSON.stringify(data.user));
-
       updateLoginUI();
       closeModal("authModal");
       await loadItemsFromDatabase();
