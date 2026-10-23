@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -7,12 +8,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
-    accountType: {
-  type: String,
-  enum: ["Student", "Faculty"],
-  default: "Student",
-  trim: true
-},
 
     email: {
       type: String,
@@ -34,10 +29,17 @@ const userSchema = new mongoose.Schema(
       maxlength: 30
     },
 
+    // Account type: Student or Faculty
+    accountType: {
+      type: String,
+      enum: ["Student", "Faculty"],
+      default: "Student"
+    },
+
+    // Admin approval status
     accountStatus: {
       type: String,
       enum: ["Pending", "Approved", "Rejected", "Disabled"],
-      // Existing accounts stay usable; new registrations are set to Pending.
       default: "Approved"
     }
   },
