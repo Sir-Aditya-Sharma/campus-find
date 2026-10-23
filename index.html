@@ -113,6 +113,10 @@
     .theme-dots { display:flex; align-items:center; gap:6px; padding:5px 7px; border:1px solid var(--border); border-radius:999px; background:var(--surface-2); }
     .theme-dots button { width:17px; height:17px; min-width:17px; padding:0; border:2px solid transparent; border-radius:50%; }
     .theme-dots button.active { border-color:var(--text); box-shadow:0 0 0 1px var(--bg); }
+    .profile-theme-section { padding:9px 10px 10px; border-bottom:1px solid var(--border); margin-bottom:5px; }
+    .profile-theme-label { color:var(--muted); font-size:11px; font-weight:700; margin-bottom:7px; }
+    .profile-theme-section .theme-dots { justify-content:flex-start; width:max-content; max-width:100%; }
+    .profile-theme-section .theme-dots button { display:block; width:20px; height:20px; min-width:20px; padding:0; }
 
     .nav-actions {
       display: flex;
@@ -125,11 +129,14 @@
     #welcomeText { color: #c0c9df; font-size: 12px; }
     .profile-wrap { position: relative; display: none; }
     .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg,var(--accent-1),var(--accent-2)); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
-    .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: 210px; padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: var(--surface-2); box-shadow: 0 14px 36px #0008; display: none; }
-    .profile-menu.open { display: block; }
-    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; overflow-wrap: anywhere; }
+    .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: max-content; min-width: 250px; max-width: min(360px, calc(100vw - 20px)); padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: var(--surface-2); box-shadow: 0 14px 36px #0008; display: none; }
+    .listings-heading #listingsTitle[role="button"] { cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; transition: color .18s ease, transform .18s ease; }
+  .listings-heading #listingsTitle[role="button"]:hover { color: var(--purple-light); }
+  .title-switch-icon { font-size: .85em; opacity: .7; }
+  .profile-menu.open { display: block; }
+    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; overflow-wrap: normal; word-break: normal; }
     .profile-menu .profile-heading strong { display:block; color:#f3f4ff; font-size:13px; }
-    .profile-menu .profile-heading small { color:#9ca9c7; font-size:11px; }
+    .profile-menu .profile-heading small { display:block; color:#9ca9c7; font-size:11px; white-space:nowrap; }
     .profile-menu button { display:block; width:100%; text-align:left; padding:10px; border:0; background:transparent; color:#dce3f7; }
     .profile-menu button:hover { background:#202b45; }
     .profile-menu button.profile-logout { color:#ff9caf; }
@@ -197,11 +204,45 @@
 
     .dashboard {
       display: grid;
-      grid-template-columns: 205px minmax(0, 1fr) 220px;
-      gap: 14px;
-      width: min(1260px, calc(100% - 36px));
-      margin: 16px auto 38px;
-      align-items: start;
+      grid-template-columns: minmax(190px, 0.78fr) minmax(0, 2.8fr) minmax(220px, 0.9fr);
+      gap: clamp(12px, 1.2vw, 20px);
+      width: min(1880px, calc(100% - 32px));
+      margin: 14px auto 24px;
+      align-items: stretch;
+    }
+
+    .dashboard > .sidebar,
+    .dashboard > .feed-column,
+    .dashboard > .right-rail {
+      min-width: 0;
+    }
+
+    .dashboard > .sidebar,
+    .dashboard > .right-rail {
+      position: sticky;
+      top: 82px;
+    }
+
+    .feed-column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .dashboard-heading { margin-bottom: 0; }
+    .stats { margin-bottom: 0; }
+
+    .feed-column,
+    .listings,
+    .items-grid {
+      min-width: 0;
+    }
+
+    @media (min-width: 1400px) {
+      .items-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+        gap: 14px;
+      }
     }
 
     .surface {
@@ -414,8 +455,12 @@
 
     .items-grid {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
+      /* Responsive grid: fill available width without letting cards overflow. */
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: 12px;
+      align-items: stretch;
+      min-width: 0;
+      width: 100%;
     }
 
     .item-card {
@@ -814,14 +859,19 @@
       font-size: 10px;
     }
 
-    @media (max-width: 1000px) {
+    @media (max-width: 1250px) {
       .dashboard {
-        grid-template-columns: 180px minmax(0, 1fr);
+        grid-template-columns: minmax(165px, 0.7fr) minmax(0, 2fr);
+        width: calc(100% - 28px);
+        gap: 12px;
       }
+
+      .dashboard > .sidebar,
+      .dashboard > .right-rail { position: static; }
 
       .right-rail {
         grid-column: 2;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 
@@ -853,10 +903,12 @@
       }
 
       .dashboard {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 9px;
         margin-top: 10px;
       }
+
+      .feed-column { gap: 9px; }
 
       .sidebar {
         padding: 9px;
@@ -916,6 +968,7 @@
       }
     }
 
+
     @media (max-width: 430px) {
       .right-rail {
         grid-template-columns: 1fr;
@@ -934,32 +987,24 @@
     <div class="logo">🔎 Campus<span>Find</span></div>
 
     <div class="nav-actions">
-      <div class="theme-dots" role="group" aria-label="Choose theme">
-        <button type="button" class="active" data-theme-choice="aurora" style="background:linear-gradient(135deg,#8B5CF6,#22D3EE)" aria-label="Aurora theme" title="Aurora theme"></button>
-        <button type="button" data-theme-choice="sunset" style="background:linear-gradient(135deg,#FF7A59,#FF3D81)" aria-label="Sunset theme" title="Sunset theme"></button>
-        <button type="button" data-theme-choice="emerald" style="background:linear-gradient(135deg,#10B981,#38BDF8)" aria-label="Emerald theme" title="Emerald theme"></button>
-      </div>
       <span id="welcomeText"></span>
 
       <div class="profile-wrap" id="profileWrap">
         <button class="profile-avatar" id="profileAvatar" type="button" aria-label="Open profile menu" aria-expanded="false" onclick="toggleProfileMenu()">AS</button>
         <div class="profile-menu" id="profileMenu" role="menu">
           <div class="profile-heading"><strong id="profileMenuName">Student</strong><small id="profileMenuEmail"></small></div>
+          <div class="profile-theme-section">
+            <div class="profile-theme-label">Theme colors</div>
+            <div class="theme-dots" role="group" aria-label="Choose theme">
+              <button type="button" class="active" data-theme-choice="aurora" style="background:linear-gradient(135deg,#8B5CF6,#22D3EE)" aria-label="Aurora theme" title="Aurora theme"></button>
+              <button type="button" data-theme-choice="sunset" style="background:linear-gradient(135deg,#FF7A59,#FF3D81)" aria-label="Sunset theme" title="Sunset theme"></button>
+              <button type="button" data-theme-choice="emerald" style="background:linear-gradient(135deg,#10B981,#38BDF8)" aria-label="Emerald theme" title="Emerald theme"></button>
+            </div>
+          </div>
           <button type="button" role="menuitem" onclick="openPhoneFromProfile()">My phone / Profile settings</button>
-          <button type="button" role="menuitem" onclick="openMyReports()">My reports</button>
           <button type="button" role="menuitem" class="profile-logout" onclick="logout()">Logout</button>
         </div>
       </div>
-
-      <button
-        id="phoneButton"
-        class="secondary-btn"
-        type="button"
-        onclick="openPhoneModal()"
-        style="display:none"
-      >
-        My phone
-      </button>
 
       <button
         id="loginButton"
@@ -970,15 +1015,6 @@
         Login
       </button>
 
-      <button
-        id="logoutButton"
-        class="secondary-btn"
-        type="button"
-        onclick="logout()"
-        style="display:none"
-      >
-        Logout
-      </button>
     </div>
   </header>
 
@@ -1043,9 +1079,9 @@
 
       <section class="listings surface">
         <div class="listings-heading">
-          <h2>Campus item listings</h2>
+          <h2 id="listingsTitle" role="button" tabindex="0" aria-label="Switch between Campus item listings and My reports" title="Click to switch between Campus item listings and My reports" onclick="toggleReportsView()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReportsView()}">Campus item listings <span aria-hidden="true" class="title-switch-icon">↔</span></h2>
 
-          <div class="feed-tabs" aria-label="Filter listings">
+          <div class="feed-tabs" id="publicFeedTabs" aria-label="Filter listings">
             <button class="feed-tab active" type="button" data-status-filter="">
               All
             </button>
@@ -1055,6 +1091,11 @@
             <button class="feed-tab" type="button" data-status-filter="Found">
               Found
             </button>
+          </div>
+          <div class="feed-tabs" id="myReportTabs" aria-label="Filter my reports" style="display:none">
+            <button class="feed-tab active" type="button" data-my-report-filter="">All Reports</button>
+            <button class="feed-tab" type="button" data-my-report-filter="Lost">Lost Reports</button>
+            <button class="feed-tab" type="button" data-my-report-filter="Found">Found Reports</button>
           </div>
         </div>
 
@@ -1127,7 +1168,15 @@
         </div>
 
         <div class="form-group">
-          <label for="authEmail">Email *</label>
+          <label for="authRole">Login as *</label>
+          <select id="authRole" required>
+            <option value="Student">Student</option>
+            <option value="Faculty">Teacher / Faculty</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="authEmail">Username / Email *</label>
           <input
             id="authEmail"
             type="email"
@@ -1231,10 +1280,10 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="studentName">Student name *</label>
+            <label for="studentName" id="reporterNameLabel">Student name *</label>
             <input id="studentName" type="text" placeholder="Your full name" required>
           </div>
-          <div class="form-group">
+          <div class="form-group" id="courseGroup">
             <label for="studentCourse">Course *</label>
             <input id="studentCourse" type="text" placeholder="e.g. BCA" required>
           </div>
@@ -1245,13 +1294,27 @@
             <label for="studentDepartment">Department *</label>
             <input id="studentDepartment" type="text" placeholder="e.g. Computer Applications" required>
           </div>
-          <div class="form-group">
+          <div class="form-group" id="batchGroup">
             <label for="studentBatch">Batch *</label>
             <input id="studentBatch" type="text" placeholder="e.g. 2024-2027" required>
           </div>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" id="designationGroup" style="display:none">
+          <label for="facultyDesignation">Designation / Post *</label>
+          <select id="facultyDesignation">
+            <option value="">Select designation</option>
+            <option>HOD</option>
+            <option>Assistant Professor</option>
+            <option>Associate Professor</option>
+            <option>Professor</option>
+            <option>Lecturer</option>
+            <option>Dean</option>
+            <option>Other Faculty</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="semesterGroup">
           <label for="studentSemester">Semester *</label>
           <select id="studentSemester" required>
             <option value="">Select semester</option>
@@ -1333,6 +1396,8 @@
     : "https://campus-find-hmyj.onrender.com";
 
   let allItems = [];
+  let myReportsMode = false;
+  let myReportStatus = "";
   let selectedImage = "";
   let authMode = "login";
 
@@ -1515,11 +1580,50 @@
     openPhoneModal();
   }
 
+  function toggleReportsView() {
+    if (myReportsMode) {
+      showAllReports();
+    } else {
+      if (!isLoggedIn()) {
+        openAuth();
+        return;
+      }
+      openMyReports();
+    }
+  }
+
   function openMyReports() {
     closeProfileMenu();
-    const target = document.getElementById("myReports") || document.getElementById("itemsContainer");
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    myReportsMode = true;
+    myReportStatus = "";
+    document.getElementById("listingsTitle").innerHTML = 'My reports <span aria-hidden="true" class="title-switch-icon">↔</span>';
+    document.getElementById("publicFeedTabs").style.display = "none";
+    document.getElementById("myReportTabs").style.display = "flex";
+    document.querySelectorAll("[data-my-report-filter]").forEach(button => {
+      button.classList.toggle("active", button.dataset.myReportFilter === "");
+    });
+    renderItems();
+    document.getElementById("itemsContainer")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  function showAllReports() {
+    myReportsMode = false;
+    myReportStatus = "";
+    document.getElementById("listingsTitle").innerHTML = 'Campus item listings <span aria-hidden="true" class="title-switch-icon">↔</span>';
+    document.getElementById("publicFeedTabs").style.display = "flex";
+    document.getElementById("myReportTabs").style.display = "none";
+    renderItems();
+  }
+
+  document.querySelectorAll("[data-my-report-filter]").forEach(button => {
+    button.addEventListener("click", () => {
+      myReportStatus = button.dataset.myReportFilter;
+      document.querySelectorAll("[data-my-report-filter]").forEach(option => {
+        option.classList.toggle("active", option === button);
+      });
+      renderItems();
+    });
+  });
 
   function handleUrgentAlert() {
     if (isLoggedIn()) openReport("Lost");
@@ -1789,7 +1893,19 @@
     const category = document.getElementById("categoryFilter").value;
     const status = document.getElementById("statusFilter").value;
 
+    const user = getCurrentUser() || {};
+    const currentEmail = String(user.email || "").trim().toLowerCase();
+    const currentId = String(user._id || user.id || user.userId || "");
     const filtered = allItems.filter(item => {
+      if (myReportsMode) {
+        const ownerEmail = String(item.studentEmail || item.email || item.reporterEmail || item.createdBy?.email || item.user?.email || "").trim().toLowerCase();
+        const ownerId = String(item.studentId || item.userId || item.createdBy?._id || item.createdBy?.id || item.user?._id || item.user?.id || "");
+        const ownerName = String(item.studentName || item.reporterName || "").trim().toLowerCase();
+        const currentName = String(user.name || user.fullName || user.username || "").trim().toLowerCase();
+        const isMine = (currentEmail && ownerEmail === currentEmail) || (currentId && ownerId === currentId) || (currentName && ownerName === currentName);
+        if (!isMine) return false;
+        if (myReportStatus && getItemType(item) !== myReportStatus) return false;
+      }
       const searchable = [
         getItemName(item),
         item.category,
@@ -1911,7 +2027,7 @@
           option.dataset.statusFilter === selected
         );
       });
-
+      showAllReports();
       renderItems();
     });
   });
@@ -2179,6 +2295,22 @@
     reader.readAsDataURL(file);
   });
 
+  function syncReportRoleFields() {
+    const role = document.getElementById("authRole")?.value || "Student";
+    const faculty = role === "Faculty";
+    document.getElementById("reporterNameLabel").textContent = faculty ? "Faculty name *" : "Student name *";
+    document.getElementById("courseGroup").style.display = faculty ? "none" : "";
+    document.getElementById("studentCourse").required = !faculty;
+    document.getElementById("batchGroup").style.display = faculty ? "none" : "";
+    document.getElementById("studentBatch").required = !faculty;
+    document.getElementById("semesterGroup").style.display = faculty ? "none" : "";
+    document.getElementById("studentSemester").required = !faculty;
+    document.getElementById("designationGroup").style.display = faculty ? "" : "none";
+    document.getElementById("facultyDesignation").required = faculty;
+  }
+  document.getElementById("authRole")?.addEventListener("change", syncReportRoleFields);
+  syncReportRoleFields();
+
   document.getElementById("reportForm").addEventListener(
     "submit",
     async event => {
@@ -2195,6 +2327,8 @@
           body: JSON.stringify({
             title: document.getElementById("itemTitle").value.trim(),
             studentName: document.getElementById("studentName").value.trim(),
+            reporterRole: document.getElementById("authRole")?.value || "Student",
+            designation: document.getElementById("facultyDesignation").value,
             course: document.getElementById("studentCourse").value.trim(),
             department: document.getElementById("studentDepartment").value.trim(),
             batch: document.getElementById("studentBatch").value.trim(),
