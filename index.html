@@ -90,9 +90,9 @@
     .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg,#7968ff,#a35cff); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
     .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: 210px; padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: #111a2d; box-shadow: 0 14px 36px #0008; display: none; }
     .profile-menu.open { display: block; }
-    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; overflow-wrap: anywhere; }
+    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; min-width: 0; }
     .profile-menu .profile-heading strong { display:block; color:#f3f4ff; font-size:13px; }
-    .profile-menu .profile-heading small { color:#9ca9c7; font-size:11px; }
+    .profile-menu .profile-heading small { display:block; max-width:100%; color:#b4bfd8; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .profile-menu button { display:block; width:100%; text-align:left; padding:10px; border:0; background:transparent; color:#dce3f7; }
     .profile-menu button:hover { background:#202b45; }
     .profile-menu button.profile-logout { color:#ff9caf; }
@@ -236,6 +236,14 @@
     .zone-chip:hover {
       border-color: var(--purple);
     }
+
+    #statusFilter { min-width: 140px; width: 140px; }
+
+    .stat-label { display:flex !important; align-items:center; gap:7px; margin-bottom:4px; }
+    .stat-label svg { width:16px; height:16px; flex:0 0 16px; color:#a99dff; }
+    .stat strong { display:block; color:#fff; font-size:clamp(25px, 2.2vw, 30px); font-weight:850; line-height:1.15; font-variant-numeric:tabular-nums; }
+    .stat.lost .stat-label svg { color:#ff879d; }
+    .stat.found .stat-label svg { color:#55dfb1; }
 
     .dashboard-heading {
       display: flex;
@@ -982,15 +990,15 @@
 
       <div class="stats">
         <div class="stat">
-          <span>Total reports</span>
+          <span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>Total reports</span>
           <strong id="statTotal">0</strong>
         </div>
         <div class="stat lost">
-          <span>Active lost</span>
+          <span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Active lost</span>
           <strong id="statLost">0</strong>
         </div>
         <div class="stat found">
-          <span>Found items</span>
+          <span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7 10 17l-5-5"/><path d="M21 12a9 9 0 1 1-5.3-8.2"/></svg>Found items</span>
           <strong id="statFound">0</strong>
         </div>
         <div class="stat returned">
@@ -1732,18 +1740,35 @@
     }
 
     hotspotList.innerHTML = topLocations.map(([place, count]) => {
-      const percent = total ? Math.round((count / total) * 100) : 0;
+      // A single known location is a count, not a meaningful percentage comparison.
+      if (topLocations.length === 1) {
+        return `<div class="hotspot-row"><strong>${escapeHTML(place)}</strong><span style="float:right;color:#c4baff">${count} ${count === 1 ? "item" : "items"}</span></div>`;
+      }
 
+      const percent = total ? Math.round((count / total) * 100) : 0;
       return `
         <div class="hotspot-row">
           ${escapeHTML(place)}
-          <span style="float:right;color:#a99dff">${percent}%</span>
-          <div class="hotspot-track">
+          <span style="float:right;color:#c4baff">${count} · ${percent}%</span>
+          <div class="hotspot-track" role="progressbar" aria-label="${escapeHTML(place)} reports" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}">
             <span class="hotspot-fill" style="width:${percent}%"></span>
           </div>
         </div>
       `;
     }).join("");
+  }
+
+  function formatDisplayDate(value) {
+    if (!value) return "Not specified";
+    // Parse date-only values as local calendar dates to avoid UTC timezone shifts.
+    const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const date = match
+      ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+      : new Date(value);
+    if (Number.isNaN(date.getTime())) return String(value);
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short", day: "numeric", year: "numeric"
+    }).format(date);
   }
 
   function renderItems() {
@@ -1845,7 +1870,7 @@
             <p><strong>Category:</strong> ${escapeHTML(item.category || "Other")}</p>
             <p><strong>Course:</strong> ${course}</p>
             <p><strong>Campus location:</strong> ${escapeHTML(item.location || "Not specified")}</p>
-            <p><strong>Date:</strong> ${escapeHTML(item.date || "Not specified")}</p>
+            <p><strong>Date:</strong> ${escapeHTML(formatDisplayDate(item.date))}</p>
             <p>${escapeHTML(item.description || "No description provided.")}</p>
 
             ${workflowNote}
