@@ -1678,12 +1678,11 @@
     button.disabled = true;
 
     try {
-      const payload = {
-        email: document.getElementById("authEmail").value.trim(),
-        password: document.getElementById("authPassword").value,
-        // Send the selected role so the backend can enforce Student/Faculty separation.
-        accountType: document.getElementById("authRole").value
-      };
+    const payload = {
+  email: document.getElementById("authEmail").value.trim(),
+  password: document.getElementById("authPassword").value,
+  accountType: document.getElementById("authRole").value
+  };
 
       const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
