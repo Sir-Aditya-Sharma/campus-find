@@ -1,50 +1,446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>CampusFind — Admin Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CampusFind • Admin Console</title>
 <style>
-:root{--navy:#14213d;--blue:#2563eb;--bg:#f4f7fb;--text:#182230;--muted:#64748b;--border:#e2e8f0;--white:#fff;--red:#dc2626;--green:#15803d}*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}.topbar{background:var(--navy);color:white;padding:18px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{font-size:21px;font-weight:800}.brand span{color:#93c5fd}.topbar small{color:#cbd5e1}.wrap{max-width:1250px;margin:28px auto;padding:0 18px}.intro{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.intro h1{margin:0 0 5px;font-size:27px}.muted{color:var(--muted);font-size:14px}.status{font-size:13px;padding:8px 12px;border-radius:20px;background:#e2e8f0;color:#334155}.status.ok{background:#dcfce7;color:#166534}.status.bad{background:#fee2e2;color:#991b1b}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px}.stat,.panel{background:white;border:1px solid var(--border);border-radius:15px;box-shadow:0 4px 18px #0f172a08}.stat{padding:20px}.stat .label{font-size:13px;color:var(--muted)}.stat .value{font-size:28px;font-weight:800;margin-top:8px}.columns{display:grid;grid-template-columns:minmax(300px,.85fr) minmax(0,1.5fr);gap:18px;align-items:start}.panel{padding:21px;margin-bottom:18px}.panel h2{font-size:19px;margin:0 0 5px}.panel p.sub{font-size:13px;color:var(--muted);margin:0 0 18px}.field{margin:13px 0}.field label{display:block;font-weight:650;font-size:13px;margin-bottom:7px}.field input,.field select{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;outline:none}.field input:focus,.field select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #2563eb18}.btn{border:0;border-radius:9px;padding:10px 14px;background:var(--blue);color:white;font-weight:700;cursor:pointer}.btn:hover{filter:brightness(.95)}.btn:disabled{opacity:.6;cursor:wait}.btn.secondary{background:#e2e8f0;color:#1e293b}.btn.danger{background:#fee2e2;color:#991b1b}.btn.small{padding:7px 10px;font-size:12px}.actions{display:flex;gap:8px;flex-wrap:wrap}.notice{display:none;padding:11px 12px;border-radius:9px;margin:12px 0;font-size:13px;overflow-wrap:anywhere}.notice.show{display:block}.notice.success{background:#dcfce7;color:#166534}.notice.error{background:#fee2e2;color:#991b1b}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--border);vertical-align:top}th{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.04em;background:#f8fafc}tbody tr:hover{background:#f8fafc}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:750}.empty{text-align:center;padding:28px;color:var(--muted)}.tools{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:13px}.tools input,.tools select{padding:9px 10px;border:1px solid var(--border);border-radius:8px;min-width:130px;flex:1}.footer{font-size:12px;color:var(--muted);text-align:center;padding:15px}@media(max-width:850px){.columns{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.grid{grid-template-columns:1fr}.topbar{padding:15px}.intro h1{font-size:23px}.panel{padding:16px}}
-</style></head>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#17233b;--muted:#68758b;--line:#e5eaf2;--blue:#315efb;--blue2:#2449d8;--green:#12805c;--red:#c9364f;--amber:#a96308;--shadow:0 18px 45px rgba(25,45,90,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}.hidden{display:none!important}
+.login-wrap{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,470px);background:#fff}.login-art{padding:clamp(28px,6vw,84px);display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:radial-gradient(circle at 15% 10%,#5f82ff 0,transparent 30%),linear-gradient(140deg,#142c71,#315efb 58%,#7b8dff);overflow:hidden}.brand{display:flex;gap:12px;align-items:center;font-weight:800;font-size:19px;letter-spacing:.2px}.brand-mark{width:42px;height:42px;border-radius:14px;background:#ffffff24;display:grid;place-items:center;font-size:22px}.hero h1{font-size:clamp(34px,4vw,56px);line-height:1.08;letter-spacing:-1.5px;max-width:580px;margin:0 0 18px}.hero p{font-size:17px;color:#e0e7ff;max-width:490px}.hero-badge{display:inline-flex;padding:8px 12px;border:1px solid #ffffff48;border-radius:999px;color:#edf1ff;margin-bottom:22px}.art-foot{font-size:13px;color:#d8e1ff}.login-side{padding:28px;display:grid;place-items:center}.login-card{width:min(100%,390px)}.login-card h2{font-size:28px;margin:0 0 6px;letter-spacing:-.6px}.muted{color:var(--muted)}.login-card>p{margin:0 0 26px}.field{display:grid;gap:7px;margin:17px 0}.field label{font-weight:650;font-size:13px}.field input,.field select,.toolbar input,.toolbar select{width:100%;border:1px solid #dbe2ed;border-radius:11px;background:#fff;padding:12px 13px;outline:none;color:var(--ink)}input:focus,select:focus{border-color:#7893ff!important;box-shadow:0 0 0 3px #315efb16}.password-row{display:flex;gap:8px}.password-row input{flex:1;min-width:0}.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:#fff;font-weight:700;transition:.15s}.btn:hover{background:var(--blue2)}.btn.full{width:100%;padding:13px}.btn.secondary{background:#eef2ff;color:#294bc7}.btn.secondary:hover{background:#e1e8ff}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.danger{background:#fff0f2;color:var(--red);border:1px solid #ffd5dc}.btn.success{background:#e7f8f0;color:var(--green);border:1px solid #c5eedc}.btn.small{padding:7px 9px;border-radius:8px;font-size:12px;white-space:nowrap}.notice{display:none;padding:11px 13px;border-radius:10px;margin:14px 0;font-size:13px;overflow-wrap:anywhere}.notice.show{display:block}.notice.error{background:#fff0f1;color:#a62138;border:1px solid #ffd4da}.notice.success{background:#eaf8f1;color:#126d50;border:1px solid #c8eddd}.notice.info{background:#eef4ff;color:#294bc7;border:1px solid #d9e4ff}
+.app{min-height:100vh}.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,4vw,54px);gap:16px;position:sticky;top:0;z-index:5}.top-left{display:flex;align-items:center;gap:12px}.top-title{font-weight:800;font-size:17px}.top-sub{font-size:12px;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:10px}.connection{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#a5afc0}.dot.ok{background:#18a36e}.dot.bad{background:#d83e54}.main{max-width:1500px;margin:auto;padding:30px clamp(16px,4vw,54px) 50px}.welcome{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}.welcome h1{margin:0;font-size:clamp(26px,3vw,35px);letter-spacing:-1px}.welcome p{margin:5px 0 0;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:24px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:0 5px 18px #21365d05}.stat-label{color:var(--muted);font-size:12px;font-weight:650}.stat-num{font-size:30px;font-weight:800;letter-spacing:-1px;margin-top:6px}.stat-foot{font-size:12px;color:var(--muted)}.columns{display:grid;grid-template-columns:1fr;gap:20px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 18px #21365d05;margin-bottom:20px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:21px 22px 16px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:17px;margin:0}.panel-head p{font-size:12px;color:var(--muted);margin:4px 0 0}.count{font-size:12px;color:#344fc0;background:#eef2ff;border-radius:999px;padding:5px 9px;font-weight:750}.toolbar{display:flex;gap:10px;padding:15px 22px;align-items:center;flex-wrap:wrap}.toolbar input{max-width:330px;flex:1;min-width:180px;padding:10px 12px}.toolbar select{width:auto;min-width:150px;padding:10px 12px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:850px}th,td{text-align:left;padding:14px 16px;border-top:1px solid #edf0f5;vertical-align:middle}th{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#7b879a;background:#fafbfd;font-weight:800;white-space:nowrap}td{font-size:13px}td .person{font-weight:750;font-size:13px}td .subtext{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.pill{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:#eef2f7;color:#59667c;font-size:11px;font-weight:800;white-space:nowrap}.pill.approved,.pill.active{background:#e6f7ef;color:#13734f}.pill.rejected,.pill.disabled{background:#fff0f2;color:#b72b42}.pill.pending{background:#fff4df;color:#965b09}.actions{display:flex;gap:6px;flex-wrap:wrap;min-width:245px}.empty{padding:30px!important;text-align:center;color:var(--muted)}.table-note{padding:12px 22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}.footer{text-align:center;color:#8792a5;font-size:12px;padding:12px}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 22px}.settings-grid .field{margin:0}.settings-actions{padding:0 22px 20px;display:flex;gap:9px;flex-wrap:wrap}.inline-help{font-size:12px;color:var(--muted);margin-top:5px}
+@media(max-width:850px){.login-wrap{grid-template-columns:1fr}.login-art{min-height:270px;padding:28px}.hero h1{font-size:35px}.art-foot{margin-top:35px}.login-side{padding:30px 20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.welcome{align-items:flex-start;flex-direction:column}.topbar{padding:0 16px}.top-sub{display:none}.settings-grid{grid-template-columns:1fr}}
+@media(max-width:500px){.stats{gap:9px}.stat{padding:14px}.stat-num{font-size:25px}.top-title{font-size:14px}.connection{display:none}.main{padding-top:20px}.panel-head{padding:17px}.toolbar{padding:12px 15px}.settings-grid{padding:16px}.settings-actions{padding:0 16px 16px}}
+</style>
+</head>
 <body>
-<header class="topbar"><div class="brand">Campus<span>Find</span> <small> / Admin</small></div><div class="actions"><span id="connection" class="status">Not connected</span><button id="refreshBtn" class="btn secondary">Refresh data</button></div></header>
-<main class="wrap"><section class="intro"><div><h1>Admin Dashboard</h1><div class="muted">Manage accounts and review campus lost-and-found reports.</div></div><button id="logoutBtn" class="btn secondary">Clear saved session</button></section>
-<section class="grid"><div class="stat"><div class="label">Accounts loaded</div><div id="userCount" class="value">—</div></div><div class="stat"><div class="label">Reports loaded</div><div id="reportCount" class="value">—</div></div><div class="stat"><div class="label">API status</div><div id="apiValue" class="value" style="font-size:20px">Unknown</div></div></section>
-<div class="columns"><div>
-<section class="panel"><h2>Create Account</h2><p class="sub">Create a Student, Teacher, or Faculty account.</p><form id="createStudentForm">
-<div class="field"><label for="accountRole">Account type *</label><select id="accountRole" name="role" required><option value="Student">Student</option><option value="Teacher">Teacher</option><option value="Faculty">Faculty</option></select></div>
-<div class="field"><label for="fullName">Full name *</label><input id="fullName" name="name" required autocomplete="name" placeholder="Enter full name"></div>
-<div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" required autocomplete="email" placeholder="name@college.edu"></div>
-<div class="field"><label for="phone">Phone number</label><input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="Optional"></div>
-<div class="field"><label for="password">Temporary password *</label><input id="password" name="password" type="password" required minlength="6" autocomplete="new-password" placeholder="At least 6 characters"></div>
-<div class="notice" id="createNotice" role="status"></div><button class="btn" id="createBtn" type="submit">Create Account</button></form></section>
-<section class="panel"><h2>API Settings</h2><p class="sub">The dashboard uses your CampusFind backend API.</p><div class="field"><label for="apiBase">Backend base URL</label><input id="apiBase" type="url" value="https://campus-find-hmyj.onrender.com" placeholder="https://your-api.example.com"></div><div class="field"><label for="adminToken">Admin access token</label><input id="adminToken" type="password" placeholder="Paste admin token" autocomplete="off"></div><div class="actions"><button class="btn" id="saveSettingsBtn" type="button">Save settings</button><button class="btn secondary" id="testBtn" type="button">Test API</button></div><div id="settingsNotice" class="notice" role="status"></div></section>
-</div><div>
-<section class="panel"><h2>Account Management</h2><p class="sub">Accounts returned by the backend are listed here.</p><div class="tools"><input id="userSearch" placeholder="Search name or email" aria-label="Search accounts"><select id="roleFilter" aria-label="Filter by role"><option value="">All account types</option><option>Student</option><option>Teacher</option><option>Faculty</option><option>Admin</option></select><button class="btn secondary" id="loadUsersBtn">Load accounts</button></div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Phone</th></tr></thead><tbody id="usersBody"><tr><td colspan="4" class="empty">Click “Load accounts” to fetch accounts.</td></tr></tbody></table></div><div id="usersNotice" class="notice"></div></section>
-<section class="panel"><h2>Lost &amp; Found Reports</h2><p class="sub">Reports are loaded from the configured API.</p><div class="tools"><input id="reportSearch" placeholder="Search reports" aria-label="Search reports"><button class="btn secondary" id="loadReportsBtn">Load reports</button></div><div class="table-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Status</th><th>Details</th></tr></thead><tbody id="reportsBody"><tr><td colspan="4" class="empty">Click “Load reports” to fetch reports.</td></tr></tbody></table></div><div id="reportsNotice" class="notice"></div></section>
-</div></div><div class="footer">CampusFind Admin Dashboard · Account role must also be supported by the backend.</div></main>
+<section id="loginScreen" class="login-wrap">
+  <div class="login-art">
+    <div class="brand"><div class="brand-mark">⌕</div><span>CampusFind <span style="font-weight:500;opacity:.8">/ Admin</span></span></div>
+    <div class="hero"><div class="hero-badge">● Secure administration</div><h1>Keep your campus connected.</h1><p>Manage student accounts and review Lost &amp; Found reports from one clean, secure workspace.</p></div>
+    <div class="art-foot">CampusFind Admin Console · Authorized administrators only</div>
+  </div>
+  <div class="login-side">
+    <form id="loginForm" class="login-card">
+      <h2>Welcome back</h2><p class="muted">Sign in with your administrator account to continue.</p>
+      <div class="field"><label for="apiBaseLogin">Backend API URL</label><input id="apiBaseLogin" type="url" value="https://campus-find-hmyj.onrender.com" required><div class="inline-help">Usually leave this as the default URL.</div></div>
+      <div class="field"><label for="loginEmail">Admin email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="admin@campus.edu" required></div>
+      <div class="field"><label for="loginPassword">Password</label><div class="password-row"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="btn ghost" type="button" id="togglePassword">Show</button></div></div>
+      <div id="loginNotice" class="notice" role="status"></div>
+      <button id="loginButton" class="btn full" type="submit">Sign in to dashboard</button>
+      <p class="muted" style="font-size:12px;margin-top:17px">Your account must have administrator permissions on the backend.</p>
+    </form>
+  </div>
+</section>
+<section id="dashboard" class="app hidden">
+  <header class="topbar">
+    <div class="top-left"><div class="brand-mark" style="background:#eef2ff;color:#315efb">⌕</div><div><div class="top-title">CampusFind Admin</div><div class="top-sub">Administration workspace</div></div></div>
+    <div class="top-actions"><div class="connection"><span id="connectionDot" class="dot"></span><span id="connectionText">Not tested</span></div><button class="btn secondary small" id="refreshAll">↻ Refresh data</button><button class="btn ghost small" id="logoutButton">Log out</button></div>
+  </header>
+  <main class="main">
+    <div class="welcome"><div><h1>Dashboard overview</h1><p>Review accounts, manage access, and moderate campus reports.</p></div><span class="muted" id="adminEmailLabel"></span></div>
+    <div id="globalNotice" class="notice" role="status"></div>
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Total accounts</div><div id="statUsers" class="stat-num">—</div><div class="stat-foot">Loaded from backend</div></div>
+      <div class="stat"><div class="stat-label">Pending accounts</div><div id="statPending" class="stat-num">—</div><div class="stat-foot">Waiting for review</div></div>
+      <div class="stat"><div class="stat-label">Active accounts</div><div id="statActive" class="stat-num">—</div><div class="stat-foot">Currently enabled</div></div>
+      <div class="stat"><div class="stat-label">Lost &amp; Found reports</div><div id="statReports" class="stat-num">—</div><div class="stat-foot">Loaded from backend</div></div>
+    </div>
+    <section class="panel">
+      <div class="panel-head"><div><h2>Account management</h2><p>Activate, disable, approve, reject, or reset a user's password.</p></div><span class="count" id="userCount">0 accounts</span></div>
+      <div class="toolbar"><input id="userSearch" placeholder="Search name, email or phone" aria-label="Search accounts"><select id="roleFilter" aria-label="Filter account type"><option value="">All types</option><option>Student</option><option>Teacher</option><option>Faculty</option><option>Admin</option></select><select id="statusFilter" aria-label="Filter account status"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Disabled</option><option>Active</option></select><button class="btn secondary small" id="reloadUsers">Load accounts</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Phone</th><th>Account status</th><th>Account controls</th></tr></thead><tbody id="usersBody"><tr><td class="empty" colspan="6">Sign in to load accounts.</td></tr></tbody></table></div>
+      <div id="usersNotice" class="notice" style="margin:12px 22px" role="status"></div>
+      <div class="table-note">Buttons remain available for every account. If the backend rejects an action, the exact API error is shown below the table.</div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h2>Lost &amp; Found reports</h2><p>Review submitted items and update their review status.</p></div><span class="count" id="reportCount">0 reports</span></div>
+      <div class="toolbar"><input id="reportSearch" placeholder="Search item, category, location or details" aria-label="Search reports"><select id="reportStatusFilter" aria-label="Filter reports"><option value="">All report statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><button class="btn secondary small" id="reloadReports">Load reports</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Item</th><th>Category / Type</th><th>Location / Details</th><th>Review status</th><th>Actions</th></tr></thead><tbody id="reportsBody"><tr><td class="empty" colspan="5">Sign in to load reports.</td></tr></tbody></table></div>
+      <div id="reportsNotice" class="notice" style="margin:12px 22px" role="status"></div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><div><h2>Connection settings</h2><p>Configure the backend URL or inspect connection errors.</p></div></div>
+      <div class="settings-grid"><div class="field"><label for="apiBase">Backend API URL</label><input id="apiBase" type="url" placeholder="https://your-api.example.com"></div><div class="field"><label for="adminToken">Admin token</label><input id="adminToken" type="password" autocomplete="off" placeholder="Token is stored in this browser session"></div></div>
+      <div class="settings-actions"><button class="btn" id="saveSettings">Save settings</button><button class="btn secondary" id="testApi">Test admin API</button></div>
+      <div id="settingsNotice" class="notice" style="margin:0 22px 20px" role="status"></div>
+    </section>
+    <div class="footer">CampusFind Admin Console · Keep your administrator credentials private.</div>
+  </main>
+</section>
 <script>
-(()=>{'use strict';
-const $=id=>document.getElementById(id);
-const DEFAULT_API='https://campus-find-hmyj.onrender.com';
-let users=[],reports=[];
-function getApi(){return ($('apiBase').value.trim()||DEFAULT_API).replace(/\/+$/,'')}
-function token(){return $('adminToken').value.trim()||localStorage.getItem('campusFindToken')||''}
-function showNotice(id,message,type='error'){const el=$(id);el.textContent=message;el.className='notice show '+type}
-function hideNotice(id){$(id).className='notice'}
-function setConnection(message,type=''){const el=$('connection');el.textContent=message;el.className='status '+type;$('apiValue').textContent=type==='ok'?'Online':type==='bad'?'Error':'Unknown'}
-function headers(json=false){const h={};if(json)h['Content-Type']='application/json';const t=token();if(t){h.Authorization='Bearer '+t;h['x-access-token']=t}return h}
-async function api(path,options={}){const res=await fetch(getApi()+path,{...options,headers:{...headers(options.body!==undefined),...(options.headers||{})}});const raw=await res.text();let data={};try{data=raw?JSON.parse(raw):{}}catch{data={message:raw}}if(!res.ok)throw new Error(data.message||data.error||`Request failed (${res.status})`);return data}
-function arrayFrom(data,keys){if(Array.isArray(data))return data;for(const k of keys){if(Array.isArray(data?.[k]))return data[k]}return []}
-function safe(v){return v==null||v===''?'—':String(v)}
-function renderUsers(){const q=$('userSearch').value.trim().toLowerCase(),role=$('roleFilter').value;const filtered=users.filter(u=>{const name=String(u.name||u.fullName||'').toLowerCase(),email=String(u.email||'').toLowerCase(),r=String(u.role||u.accountType||u.userType||'Student');return(!q||name.includes(q)||email.includes(q))&&(!role||r.toLowerCase()===role.toLowerCase())});$('userCount').textContent=users.length;$('usersBody').innerHTML=filtered.length?filtered.map(u=>`<tr><td>${safe(u.name||u.fullName)}</td><td>${safe(u.email)}</td><td><span class="pill">${safe(u.role||u.accountType||u.userType||'Student')}</span></td><td>${safe(u.phone||u.phoneNumber)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No matching accounts found.</td></tr>'}
-function renderReports(){const q=$('reportSearch').value.trim().toLowerCase();const filtered=reports.filter(r=>JSON.stringify(r).toLowerCase().includes(q));$('reportCount').textContent=reports.length;$('reportsBody').innerHTML=filtered.length?filtered.map(r=>`<tr><td>${safe(r.title||r.itemName||r.name||r.item?.name)}</td><td>${safe(r.category||r.item?.category)}</td><td><span class="pill">${safe(r.status||r.claimStatus||'Reported')}</span></td><td>${safe(r.description||r.location||r.item?.description)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No matching reports found.</td></tr>'}
-async function loadUsers(){hideNotice('usersNotice');$('usersBody').innerHTML='<tr><td colspan="4" class="empty">Loading accounts…</td></tr>';try{const data=await api('/api/auth/admin/users');users=arrayFrom(data,['users','data','accounts']);renderUsers();showNotice('usersNotice',`Loaded ${users.length} account(s).`,'success');setConnection('Connected','ok')}catch(e){$('usersBody').innerHTML='<tr><td colspan="4" class="empty">Could not load accounts.</td></tr>';showNotice('usersNotice',e.message+' — confirm the admin token and backend route.');setConnection('API error','bad')}}
-async function loadReports(){hideNotice('reportsNotice');$('reportsBody').innerHTML='<tr><td colspan="4" class="empty">Loading reports…</td></tr>';const paths=['/api/admin/reports','/api/items'];let last;for(const path of paths){try{const data=await api(path);reports=arrayFrom(data,['reports','items','data']);renderReports();showNotice('reportsNotice',`Loaded ${reports.length} report(s) from ${path}.`,'success');setConnection('Connected','ok');return}catch(e){last=e}}$('reportsBody').innerHTML='<tr><td colspan="4" class="empty">Could not load reports.</td></tr>';showNotice('reportsNotice',(last?.message||'Request failed')+' — update the report endpoint to match your backend.');setConnection('API error','bad')}
-$('createStudentForm').addEventListener('submit',async e=>{e.preventDefault();hideNotice('createNotice');const btn=$('createBtn');btn.disabled=true;btn.textContent='Creating…';const payload={name:$('fullName').value.trim(),email:$('email').value.trim(),phone:$('phone').value.trim(),password:$('password').value,role:$('accountRole').value};try{const data=await api('/api/auth/admin/users',{method:'POST',body:JSON.stringify(payload)});showNotice('createNotice',data.message||`${payload.role} account created successfully.`,'success');$('createStudentForm').reset();$('accountRole').value=payload.role;await loadUsers()}catch(err){showNotice('createNotice',err.message+' — make sure POST /api/auth/admin/users accepts and saves the role field.')}finally{btn.disabled=false;btn.textContent='Create Account'}});
-$('saveSettingsBtn').addEventListener('click',()=>{const api=getApi();localStorage.setItem('campusFindAdminApi',api);const t=$('adminToken').value.trim();if(t){localStorage.setItem('campusFindToken',t)}showNotice('settingsNotice','Settings saved in this browser.','success')});
-$('testBtn').addEventListener('click',async()=>{hideNotice('settingsNotice');try{await api('/api/auth/admin/users');showNotice('settingsNotice','API and admin authorization are working.','success');setConnection('Connected','ok')}catch(e){showNotice('settingsNotice',e.message);setConnection('API error','bad')}});
-$('refreshBtn').addEventListener('click',()=>{loadUsers();loadReports()});$('loadUsersBtn').addEventListener('click',loadUsers);$('loadReportsBtn').addEventListener('click',loadReports);$('userSearch').addEventListener('input',renderUsers);$('roleFilter').addEventListener('change',renderUsers);$('reportSearch').addEventListener('input',renderReports);$('logoutBtn').addEventListener('click',()=>{localStorage.removeItem('campusFindToken');$('adminToken').value='';showNotice('settingsNotice','Saved token cleared from this browser.','success')});
-$('apiBase').value=localStorage.getItem('campusFindAdminApi')||DEFAULT_API;
+(() => {
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const DEFAULT_API = "https://campus-find-hmyj.onrender.com";
+  let users = [];
+  let reports = [];
+  let token = "";
+  let apiBase = DEFAULT_API;
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+  }
+
+  function notice(id, message, type = "error") {
+    const el = $(id);
+    el.textContent = message;
+    el.className = `notice show ${type}`;
+  }
+
+  function clearNotice(id) {
+    $(id).className = "notice";
+    $(id).textContent = "";
+  }
+
+  function setConnection(message, state = "") {
+    $("connectionText").textContent = message;
+    $("connectionDot").className = `dot ${state}`;
+  }
+
+  function readApiBase() {
+    return ($("apiBase")?.value || $("apiBaseLogin").value || DEFAULT_API).trim().replace(/\/+$/, "");
+  }
+
+  function normalizeArray(data, keys = []) {
+    if (Array.isArray(data)) return data;
+    for (const key of keys) {
+      if (Array.isArray(data?.[key])) return data[key];
+      if (Array.isArray(data?.data?.[key])) return data.data[key];
+    }
+    if (Array.isArray(data?.data)) return data.data;
+    return [];
+  }
+
+  async function api(path, options = {}) {
+    if (!apiBase) apiBase = DEFAULT_API;
+    const headers = { ...(options.headers || {}) };
+    if (options.body !== undefined) headers["Content-Type"] = "application/json";
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+      headers["x-access-token"] = token;
+    }
+    let response;
+    try {
+      response = await fetch(apiBase + path, { ...options, headers });
+    } catch (error) {
+      throw new Error(`Network/CORS error connecting to ${apiBase}. Check that the backend is online and allows this dashboard origin.`);
+    }
+    const raw = await response.text();
+    let data = {};
+    try { data = raw ? JSON.parse(raw) : {}; }
+    catch { data = { message: raw }; }
+
+    if (!response.ok) {
+      const detail = data.message || data.error || data.errors?.[0]?.message || `HTTP ${response.status}`;
+      throw new Error(`${detail} (${response.status}, ${options.method || "GET"} ${path})`);
+    }
+    return data;
+  }
+
+  function statusOf(user) {
+    return String(user.accountStatus || user.status || (user.isActive === false ? "Disabled" : "Active"));
+  }
+  function userId(user) { return user._id || user.id || user.userId || user.user_id || ""; }
+  function reportId(report) { return report._id || report.id || report.itemId || report.item_id || ""; }
+  function pill(status) {
+    const s = String(status || "Pending");
+    const cls = /approved/i.test(s) ? "approved" : /active/i.test(s) ? "active" : /reject/i.test(s) ? "rejected" : /disable|inactive|blocked/i.test(s) ? "disabled" : "pending";
+    return `<span class="pill ${cls}">${escapeHTML(s)}</span>`;
+  }
+
+  function renderUsers() {
+    const query = $("userSearch").value.trim().toLowerCase();
+    const role = $("roleFilter").value.toLowerCase();
+    const statusFilter = $("statusFilter").value.toLowerCase();
+    const filtered = users.filter(user => {
+      const name = String(user.name || user.fullName || "").toLowerCase();
+      const email = String(user.email || "").toLowerCase();
+      const phone = String(user.phone || user.phoneNumber || "").toLowerCase();
+      const userRole = String(user.role || user.accountType || user.userType || "Student").toLowerCase();
+      const status = statusOf(user).toLowerCase();
+      return (!query || `${name} ${email} ${phone}`.includes(query)) &&
+        (!role || role === userRole) &&
+        (!statusFilter || statusFilter === status);
+    });
+
+    $("userCount").textContent = `${filtered.length} of ${users.length} accounts`;
+    $("statUsers").textContent = users.length;
+    $("statPending").textContent = users.filter(u => /pending/i.test(statusOf(u))).length;
+    $("statActive").textContent = users.filter(u => /active|approved/i.test(statusOf(u)) && !/disabled|inactive/i.test(statusOf(u))).length;
+
+    $("usersBody").innerHTML = filtered.length ? filtered.map(user => {
+      const id = userId(user);
+      const status = statusOf(user);
+      const disabled = /disabled|inactive|blocked/i.test(status);
+      const safeId = escapeHTML(id);
+      const name = user.name || user.fullName || "Unnamed user";
+      const roleValue = user.role || user.accountType || user.userType || "Student";
+      return `<tr>
+        <td><div class="person">${escapeHTML(name)}</div><div class="subtext">${escapeHTML(user.studentId || user.rollNumber || "")}</div></td>
+        <td>${escapeHTML(user.email || "—")}</td>
+        <td>${pill(roleValue)}</td>
+        <td>${escapeHTML(user.phone || user.phoneNumber || "—")}</td>
+        <td>${pill(status)}</td>
+        <td><div class="actions">
+          <button class="btn small ${disabled ? "success" : "secondary"}" data-user-action="status" data-id="${safeId}" data-status="${disabled ? "Active" : "Disabled"}">${disabled ? "Activate" : "Disable"}</button>
+          <button class="btn small success" data-user-action="status" data-id="${safeId}" data-status="Approved">Approve</button>
+          <button class="btn small danger" data-user-action="status" data-id="${safeId}" data-status="Rejected">Reject</button>
+          <button class="btn small ghost" data-user-action="reset" data-id="${safeId}">Reset password</button>
+        </div></td>
+      </tr>`;
+    }).join("") : `<tr><td class="empty" colspan="6">${users.length ? "No accounts match your filters." : "No accounts loaded yet. Use Load accounts."}</td></tr>`;
+  }
+
+  function renderReports() {
+    const query = $("reportSearch").value.trim().toLowerCase();
+    const filter = $("reportStatusFilter").value.toLowerCase();
+    const filtered = reports.filter(report => {
+      const status = String(report.reviewStatus || report.status || "Pending");
+      return JSON.stringify(report).toLowerCase().includes(query) && (!filter || status.toLowerCase() === filter);
+    });
+    $("reportCount").textContent = `${filtered.length} of ${reports.length} reports`;
+    $("statReports").textContent = reports.length;
+    $("reportsBody").innerHTML = filtered.length ? filtered.map(report => {
+      const id = escapeHTML(reportId(report));
+      const title = report.title || report.itemName || report.name || report.item?.name || "Untitled report";
+      const category = report.category || report.item?.category || "—";
+      const type = report.type || report.itemType || report.item?.type || "";
+      const status = report.reviewStatus || report.status || "Pending";
+      const details = [report.location || report.item?.location, report.description || report.item?.description].filter(Boolean).join(" · ");
+      return `<tr>
+        <td><div class="person">${escapeHTML(title)}</div><div class="subtext">${escapeHTML(report.studentName || report.ownerName || report.user?.name || "")}</div></td>
+        <td>${escapeHTML(category)}<div class="subtext">${escapeHTML(type)}</div></td>
+        <td>${escapeHTML(details || "—")}</td><td>${pill(status)}</td>
+        <td><div class="actions">
+          <button class="btn small success" data-report-action="Approved" data-id="${id}">Approve</button>
+          <button class="btn small danger" data-report-action="Rejected" data-id="${id}">Reject</button>
+          <button class="btn small ghost" data-report-action="delete" data-id="${id}">Delete</button>
+        </div></td>
+      </tr>`;
+    }).join("") : `<tr><td class="empty" colspan="5">${reports.length ? "No reports match your search." : "No reports loaded yet. Use Load reports."}</td></tr>`;
+  }
+
+  async function loadUsers() {
+    clearNotice("usersNotice");
+    try {
+      const data = await api("/api/auth/admin/users");
+      users = normalizeArray(data, ["users", "accounts", "results"]);
+      renderUsers();
+      return true;
+    } catch (error) {
+      notice("usersNotice", `Could not load accounts: ${error.message}`);
+      return false;
+    }
+  }
+
+  async function loadReports() {
+    clearNotice("reportsNotice");
+    try {
+      const data = await api("/api/items/admin/all");
+      reports = normalizeArray(data, ["items", "reports", "results"]);
+      renderReports();
+      return true;
+    } catch (error) {
+      notice("reportsNotice", `Could not load reports: ${error.message}`);
+      return false;
+    }
+  }
+
+  async function refreshAll() {
+    $("refreshAll").disabled = true;
+    try {
+      const results = await Promise.all([loadUsers(), loadReports()]);
+      setConnection(results.every(Boolean) ? "Connected" : "Some API calls failed", results.every(Boolean) ? "ok" : "bad");
+      if (results.every(Boolean)) notice("globalNotice", "Dashboard data refreshed.", "success");
+      else notice("globalNotice", "Some dashboard data could not be loaded. Read the red message under the relevant table.", "error");
+    } finally {
+      $("refreshAll").disabled = false;
+    }
+  }
+
+  async function login(event) {
+    event.preventDefault();
+    clearNotice("loginNotice");
+    const button = $("loginButton");
+    button.disabled = true;
+    button.textContent = "Signing in…";
+    apiBase = readApiBase();
+    try {
+      const response = await fetch(apiBase + "/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: $("loginEmail").value.trim(), password: $("loginPassword").value })
+      });
+      const raw = await response.text();
+      let data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw }; }
+      if (!response.ok) throw new Error(`${data.message || data.error || "Login failed"} (HTTP ${response.status})`);
+      const foundToken = data.token || data.accessToken || data.access_token || data.data?.token;
+      const loggedInUser = data.user || data.data?.user || {};
+      if (!foundToken) throw new Error("Login response did not contain a token. Check the backend login response format.");
+      if (loggedInUser.isAdmin === false || (loggedInUser.role && !/admin/i.test(loggedInUser.role) && loggedInUser.isAdmin !== true)) {
+        throw new Error("This account does not appear to have admin permissions.");
+      }
+      token = foundToken;
+      $("adminToken").value = token;
+      $("apiBase").value = apiBase;
+      $("adminEmailLabel").textContent = loggedInUser.email || $("loginEmail").value.trim();
+      $("loginScreen").classList.add("hidden");
+      $("dashboard").classList.remove("hidden");
+      setConnection("Checking API…");
+      await refreshAll();
+      const verify = await api("/api/auth/admin/users");
+      users = normalizeArray(verify, ["users", "accounts", "results"]);
+      renderUsers();
+      setConnection("Admin connected", "ok");
+    } catch (error) {
+      $("dashboard").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+      notice("loginNotice", `${error.message}. Check credentials, API URL, CORS, and admin permissions.`);
+      setConnection("Login failed", "bad");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Sign in to dashboard";
+    }
+  }
+
+  async function runUserAction(button) {
+    const id = button.dataset.id;
+    const action = button.dataset.userAction;
+    if (!id) {
+      notice("usersNotice", "This account response has no ID. Backend user objects should include _id or id.");
+      return;
+    }
+    const label = button.textContent;
+    let path = "";
+    let body = {};
+    let method = "PATCH";
+
+    if (action === "status") {
+      const status = button.dataset.status;
+      if (!confirm(`Set this account status to "${status}"?`)) return;
+      path = `/api/auth/admin/users/${encodeURIComponent(id)}/status`;
+      body = { accountStatus: status, status };
+    } else if (action === "reset") {
+      const newPassword = prompt("Enter a new temporary password (at least 6 characters):");
+      if (newPassword === null) return;
+      if (newPassword.length < 6) {
+        notice("usersNotice", "Password must be at least 6 characters long.");
+        return;
+      }
+      path = `/api/auth/admin/users/${encodeURIComponent(id)}/reset-password`;
+      body = { newPassword, password: newPassword };
+    } else return;
+
+    button.disabled = true;
+    button.textContent = "Working…";
+    clearNotice("usersNotice");
+    try {
+      const result = await api(path, { method, body: JSON.stringify(body) });
+      notice("usersNotice", result.message || `Account action completed: ${action === "reset" ? "password reset" : body.accountStatus}.`, "success");
+      await loadUsers();
+    } catch (error) {
+      notice("usersNotice", `Action failed: ${error.message}. The backend must implement this route and allow admin access; a frontend button cannot create a missing server endpoint.`);
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  }
+
+  async function runReportAction(button) {
+    const id = button.dataset.id;
+    const action = button.dataset.reportAction;
+    if (!id) {
+      notice("reportsNotice", "This report response has no ID. Backend report objects should include _id or id.");
+      return;
+    }
+    let path = "";
+    let method = "PATCH";
+    let body = {};
+    if (action === "delete") {
+      if (!confirm("Delete this report permanently?")) return;
+      path = `/api/items/admin/${encodeURIComponent(id)}`;
+      method = "DELETE";
+    } else {
+      if (!confirm(`Set report review status to "${action}"?`)) return;
+      path = `/api/items/admin/${encodeURIComponent(id)}/review`;
+      body = { reviewStatus: action, status: action };
+    }
+    const label = button.textContent;
+    button.disabled = true;
+    button.textContent = "Working…";
+    clearNotice("reportsNotice");
+    try {
+      const result = await api(path, { method, ...(method === "PATCH" ? { body: JSON.stringify(body) } : {}) });
+      notice("reportsNotice", result.message || `Report action completed: ${action}.`, "success");
+      await loadReports();
+    } catch (error) {
+      notice("reportsNotice", `Action failed: ${error.message}. Check that the backend supports this report route.`);
+    } finally {
+      button.disabled = false;
+      button.textContent = label;
+    }
+  }
+
+  $("loginForm").addEventListener("submit", login);
+  $("togglePassword").addEventListener("click", () => {
+    const input = $("loginPassword");
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    $("togglePassword").textContent = show ? "Hide" : "Show";
+  });
+  $("logoutButton").addEventListener("click", () => {
+    token = "";
+    users = [];
+    reports = [];
+    $("loginPassword").value = "";
+    $("dashboard").classList.add("hidden");
+    $("loginScreen").classList.remove("hidden");
+    $("usersBody").innerHTML = '<tr><td class="empty" colspan="6">Sign in to load accounts.</td></tr>';
+    $("reportsBody").innerHTML = '<tr><td class="empty" colspan="5">Sign in to load reports.</td></tr>';
+    clearNotice("loginNotice");
+    setConnection("Logged out");
+  });
+  $("refreshAll").addEventListener("click", refreshAll);
+  $("reloadUsers").addEventListener("click", loadUsers);
+  $("reloadReports").addEventListener("click", loadReports);
+  $("userSearch").addEventListener("input", renderUsers);
+  $("roleFilter").addEventListener("change", renderUsers);
+  $("statusFilter").addEventListener("change", renderUsers);
+  $("reportSearch").addEventListener("input", renderReports);
+  $("reportStatusFilter").addEventListener("change", renderReports);
+  $("usersBody").addEventListener("click", event => {
+    const button = event.target.closest("button[data-user-action]");
+    if (button) runUserAction(button);
+  });
+  $("reportsBody").addEventListener("click", event => {
+    const button = event.target.closest("button[data-report-action]");
+    if (button) runReportAction(button);
+  });
+  $("saveSettings").addEventListener("click", () => {
+    apiBase = readApiBase();
+    token = $("adminToken").value.trim();
+    notice("settingsNotice", "Settings applied for this page session.", "success");
+  });
+  $("testApi").addEventListener("click", async () => {
+    apiBase = readApiBase();
+    token = $("adminToken").value.trim();
+    clearNotice("settingsNotice");
+    try {
+      await api("/api/auth/admin/users");
+      setConnection("Admin API connected", "ok");
+      notice("settingsNotice", "Admin API responded successfully and the token was accepted.", "success");
+    } catch (error) {
+      setConnection("API error", "bad");
+      notice("settingsNotice", `API test failed: ${error.message}`);
+    }
+  });
+  $("apiBaseLogin").value = DEFAULT_API;
 })();
-</script></body></html>
+</script>
+</body>
+</html>
