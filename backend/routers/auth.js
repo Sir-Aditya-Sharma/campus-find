@@ -304,11 +304,11 @@ router.patch(
 
       const { accountStatus } = req.body || {};
 
-      if (!["Approved", "Rejected", "Disabled"].includes(accountStatus)) {
-        return res.status(400).json({
-          message: "Choose Approved, Rejected, or Disabled."
-        });
-      }
+      if (!["Pending", "Approved", "Rejected", "Disabled"].includes(accountStatus)) {
+  return res.status(400).json({
+    message: "Choose Pending, Approved, Rejected, or Disabled."
+  });
+}
 
       const user = await User.findOne({
         _id: req.params.id,
