@@ -49,6 +49,7 @@
     <section class="panel">
       <div class="panel-head"><div><h2>Account management</h2><p>Activate, disable, approve, reject, or reset a user's password.</p></div><span class="count" id="userCount">0 accounts</span></div>
       <div class="toolbar"><input id="userSearch" placeholder="Search name, email or phone" aria-label="Search accounts"><select id="roleFilter" aria-label="Filter account type"><option value="">All types</option><option>Student</option><option>Teacher</option><option>Faculty</option><option>Admin</option></select><select id="statusFilter" aria-label="Filter account status"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Disabled</option><option>Active</option></select><button class="btn secondary small" id="reloadUsers">Load accounts</button></div>
+      <details style="margin:0 22px 18px;border:1px solid var(--line);border-radius:12px;padding:14px 16px"><summary style="cursor:pointer;font-weight:750;color:var(--ink)">＋ Create student / faculty account</summary><form id="createStudentForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px;align-items:end"><div class="field" style="margin:0"><label for="newStudentName">Student name</label><input id="newStudentName" required maxlength="100" placeholder="Full name"></div><div class="field" style="margin:0"><label for="newAccountType">Account type</label><select id="newAccountType" required><option value="Student">Student</option><option value="Faculty">Faculty</option></select><div class="inline-help">Faculty accounts start as Pending.</div></div><div class="field" style="margin:0"><label for="newStudentEmail">Email</label><input id="newStudentEmail" type="email" required maxlength="254" placeholder="student@example.com"></div><div class="field" style="margin:0"><label for="newStudentPhone">Phone (optional)</label><input id="newStudentPhone" maxlength="30" placeholder="Phone number"></div><div class="field" style="margin:0"><label for="newStudentPassword">Temporary password</label><input id="newStudentPassword" type="password" required minlength="8" maxlength="128" placeholder="At least 8 characters"></div><button class="btn" id="createStudentButton" type="submit">Create account</button></form><div id="createStudentNotice" class="notice" role="status"></div></details>
       <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Phone</th><th>Account status</th><th>Account controls</th></tr></thead><tbody id="usersBody"><tr><td class="empty" colspan="6">Sign in to load accounts.</td></tr></tbody></table></div>
       <div id="usersNotice" class="notice" style="margin:12px 22px" role="status"></div>
       <div class="table-note">Activate sets the account to Approved; Set Pending removes approval and blocks student login. If the backend rejects an action, the exact API error is shown below the table.</div>
@@ -309,6 +310,36 @@
     }
   }
 
+  async function createStudent(event) {
+    event.preventDefault();
+    clearNotice("createStudentNotice");
+    const button = $("createStudentButton");
+    const payload = {
+      name: $("newStudentName").value.trim(),
+      accountType: $("newAccountType").value,
+      email: $("newStudentEmail").value.trim(),
+      phone: $("newStudentPhone").value.trim(),
+      password: $("newStudentPassword").value
+    };
+    if (payload.password.length < 8 || payload.password.length > 128) {
+      notice("createStudentNotice", "Password must be 8–128 characters.");
+      return;
+    }
+    button.disabled = true;
+    button.textContent = "Creating…";
+    try {
+      const result = await api("/api/auth/admin/users", { method: "POST", body: JSON.stringify(payload) });
+      notice("createStudentNotice", result.message || `${payload.accountType} account created successfully.`, "success");
+      $("createStudentForm").reset();
+      await loadUsers();
+    } catch (error) {
+      notice("createStudentNotice", `Could not create account: ${error.message}`);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Create account";
+    }
+  }
+
   async function runUserAction(button) {
     const id = button.dataset.id;
     const action = button.dataset.userAction;
@@ -388,6 +419,7 @@
   }
 
   $("loginForm").addEventListener("submit", login);
+  $("createStudentForm").addEventListener("submit", createStudent);
   $("togglePassword").addEventListener("click", () => {
     const input = $("loginPassword");
     const show = input.type === "password";
