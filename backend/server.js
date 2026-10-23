@@ -24,9 +24,12 @@ if (missingSettings.length > 0) {
   process.exit(1);
 }
 
+app.disable("x-powered-by");
+
 // CORS is kept compatible with the current frontend.
 // Restrict allowed origins after confirming the exact deployed
-// frontend URL and any local development URLs.
+// frontend URL and any local development URLs, for example:
+// app.use(cors({ origin: ["https://campus-find-frontend.onrender.com"] }));
 app.use(cors());
 
 // The frontend sends item images as Base64 JSON data.
@@ -42,6 +45,21 @@ app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
     message: "CampusFind Backend is Running",
+  });
+});
+
+// Friendly response when someone opens the backend URL directly
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "CampusFind API is live. Use the CampusFind website to continue.",
+  });
+});
+
+// Unknown API routes return JSON instead of an HTML error page
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    message: "API route not found.",
   });
 });
 
