@@ -1,479 +1,736 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CampusFind • Admin Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusFind | Admin Dashboard</title>
+
 <style>
-:root{--bg:#f4f7fb;--panel:#fff;--ink:#17233b;--muted:#68758b;--line:#e5eaf2;--blue:#315efb;--blue2:#2449d8;--green:#12805c;--red:#c9364f;--amber:#a96308;--shadow:0 18px 45px rgba(25,45,90,.08)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}.hidden{display:none!important}
-.login-wrap{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,470px);background:#fff}.login-art{padding:clamp(28px,6vw,84px);display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:radial-gradient(circle at 15% 10%,#5f82ff 0,transparent 30%),linear-gradient(140deg,#142c71,#315efb 58%,#7b8dff);overflow:hidden}.brand{display:flex;gap:12px;align-items:center;font-weight:800;font-size:19px;letter-spacing:.2px}.brand-mark{width:42px;height:42px;border-radius:14px;background:#ffffff24;display:grid;place-items:center;font-size:22px}.hero h1{font-size:clamp(34px,4vw,56px);line-height:1.08;letter-spacing:-1.5px;max-width:580px;margin:0 0 18px}.hero p{font-size:17px;color:#e0e7ff;max-width:490px}.hero-badge{display:inline-flex;padding:8px 12px;border:1px solid #ffffff48;border-radius:999px;color:#edf1ff;margin-bottom:22px}.art-foot{font-size:13px;color:#d8e1ff}.login-side{padding:28px;display:grid;place-items:center}.login-card{width:min(100%,390px)}.login-card h2{font-size:28px;margin:0 0 6px;letter-spacing:-.6px}.muted{color:var(--muted)}.login-card>p{margin:0 0 26px}.field{display:grid;gap:7px;margin:17px 0}.field label{font-weight:650;font-size:13px}.field input,.field select,.toolbar input,.toolbar select{width:100%;border:1px solid #dbe2ed;border-radius:11px;background:#fff;padding:12px 13px;outline:none;color:var(--ink)}input:focus,select:focus{border-color:#7893ff!important;box-shadow:0 0 0 3px #315efb16}.password-row{display:flex;gap:8px}.password-row input{flex:1;min-width:0}.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:#fff;font-weight:700;transition:.15s}.btn:hover{background:var(--blue2)}.btn.full{width:100%;padding:13px}.btn.secondary{background:#eef2ff;color:#294bc7}.btn.secondary:hover{background:#e1e8ff}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.danger{background:#fff0f2;color:var(--red);border:1px solid #ffd5dc}.btn.success{background:#e7f8f0;color:var(--green);border:1px solid #c5eedc}.btn.small{padding:7px 9px;border-radius:8px;font-size:12px;white-space:nowrap}.notice{display:none;padding:11px 13px;border-radius:10px;margin:14px 0;font-size:13px;overflow-wrap:anywhere}.notice.show{display:block}.notice.error{background:#fff0f1;color:#a62138;border:1px solid #ffd4da}.notice.success{background:#eaf8f1;color:#126d50;border:1px solid #c8eddd}.notice.info{background:#eef4ff;color:#294bc7;border:1px solid #d9e4ff}
-.app{min-height:100vh}.topbar{height:76px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(18px,4vw,54px);gap:16px;position:sticky;top:0;z-index:5}.top-left{display:flex;align-items:center;gap:12px}.top-title{font-weight:800;font-size:17px}.top-sub{font-size:12px;color:var(--muted)}.top-actions{display:flex;align-items:center;gap:10px}.connection{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#a5afc0}.dot.ok{background:#18a36e}.dot.bad{background:#d83e54}.main{max-width:1500px;margin:auto;padding:30px clamp(16px,4vw,54px) 50px}.welcome{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}.welcome h1{margin:0;font-size:clamp(26px,3vw,35px);letter-spacing:-1px}.welcome p{margin:5px 0 0;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:24px}.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:19px;box-shadow:0 5px 18px #21365d05}.stat-label{color:var(--muted);font-size:12px;font-weight:650}.stat-num{font-size:30px;font-weight:800;letter-spacing:-1px;margin-top:6px}.stat-foot{font-size:12px;color:var(--muted)}.columns{display:grid;grid-template-columns:1fr;gap:20px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 5px 18px #21365d05;margin-bottom:20px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding:21px 22px 16px;border-bottom:1px solid var(--line)}.panel-head h2{font-size:17px;margin:0}.panel-head p{font-size:12px;color:var(--muted);margin:4px 0 0}.count{font-size:12px;color:#344fc0;background:#eef2ff;border-radius:999px;padding:5px 9px;font-weight:750}.toolbar{display:flex;gap:10px;padding:15px 22px;align-items:center;flex-wrap:wrap}.toolbar input{max-width:330px;flex:1;min-width:180px;padding:10px 12px}.toolbar select{width:auto;min-width:150px;padding:10px 12px}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:850px}th,td{text-align:left;padding:14px 16px;border-top:1px solid #edf0f5;vertical-align:middle}th{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:#7b879a;background:#fafbfd;font-weight:800;white-space:nowrap}td{font-size:13px}td .person{font-weight:750;font-size:13px}td .subtext{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.pill{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:#eef2f7;color:#59667c;font-size:11px;font-weight:800;white-space:nowrap}.pill.approved,.pill.active{background:#e6f7ef;color:#13734f}.pill.rejected,.pill.disabled{background:#fff0f2;color:#b72b42}.pill.pending{background:#fff4df;color:#965b09}.actions{display:flex;gap:6px;flex-wrap:wrap;min-width:245px}.empty{padding:30px!important;text-align:center;color:var(--muted)}.table-note{padding:12px 22px;color:var(--muted);font-size:12px;border-top:1px solid var(--line)}.footer{text-align:center;color:#8792a5;font-size:12px;padding:12px}.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 22px}.settings-grid .field{margin:0}.settings-actions{padding:0 22px 20px;display:flex;gap:9px;flex-wrap:wrap}.inline-help{font-size:12px;color:var(--muted);margin-top:5px}
-@media(max-width:850px){.login-wrap{grid-template-columns:1fr}.login-art{min-height:270px;padding:28px}.hero h1{font-size:35px}.art-foot{margin-top:35px}.login-side{padding:30px 20px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.welcome{align-items:flex-start;flex-direction:column}.topbar{padding:0 16px}.top-sub{display:none}.settings-grid{grid-template-columns:1fr}}
-@media(max-width:500px){.stats{gap:9px}.stat{padding:14px}.stat-num{font-size:25px}.top-title{font-size:14px}.connection{display:none}.main{padding-top:20px}.panel-head{padding:17px}.toolbar{padding:12px 15px}.settings-grid{padding:16px}.settings-actions{padding:0 16px 16px}}
+:root {
+  --bg:#0b1020;
+  --panel:#121a2d;
+  --panel2:#182239;
+  --border:#26334c;
+  --text:#f1f5ff;
+  --muted:#93a1bb;
+  --purple:#8b7cff;
+  --blue:#55a6ff;
+  --green:#39d9a0;
+  --orange:#ffb454;
+  --red:#ff6b81;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,Segoe UI,Arial,sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.layout{display:flex;min-height:100vh}
+.sidebar{
+  width:245px;flex-shrink:0;padding:25px 17px;
+  background:#0e1527;border-right:1px solid var(--border);
+  display:flex;flex-direction:column;gap:25px;
+}
+.brand{display:flex;align-items:center;gap:12px;font-size:19px;font-weight:800}
+.brand-icon{
+  width:42px;height:42px;display:grid;place-items:center;
+  border-radius:13px;background:linear-gradient(135deg,#8b7cff,#55a6ff);
+}
+.brand small{display:block;color:var(--muted);font-size:11px;font-weight:500}
+.nav-label{font-size:10px;color:#6e7c98;letter-spacing:1.5px;margin:4px 10px}
+.nav{display:grid;gap:7px}
+.nav button{
+  width:100%;text-align:left;padding:12px 13px;border-radius:11px;
+  background:transparent;border:1px solid transparent;color:var(--muted);
+}
+.nav button:hover,.nav button.active{
+  background:#222b49;border-color:#3b4671;color:white;
+}
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding-top:18px}
+.admin-label{font-size:12px;color:var(--muted);margin-top:5px}
+.main{flex:1;min-width:0;padding:28px clamp(16px,3vw,38px)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:28px}
+.topbar h1{margin:0;font-size:clamp(23px,3vw,31px);letter-spacing:-.7px}
+.topbar p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pill{font-size:12px;color:var(--green);background:#123a34;padding:9px 12px;border-radius:20px}
+.btn{
+  border:0;border-radius:10px;padding:10px 14px;
+  color:white;background:var(--purple);font-weight:700;
+}
+.btn:hover{filter:brightness(1.12)}
+.btn.secondary{background:#263451}
+.btn.danger{background:#492534;color:#ffb8c3}
+.btn.success{background:#173e36;color:#8cf2ca}
+.btn.small{font-size:12px;padding:7px 9px}
+.section{display:none}
+.section.active{display:block}
+.section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:22px 0 15px}
+.section-heading h2{font-size:18px;margin:0}
+.section-heading p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.stat,.card{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:16px;padding:19px;min-width:0;
+}
+.stat-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.stat-label{color:var(--muted);font-size:12px}
+.stat-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;background:#292447}
+.stat-value{font-size:30px;font-weight:800;margin:17px 0 6px;letter-spacing:-1px}
+.stat-note{font-size:11px;color:var(--muted)}
+.purple{color:var(--purple)}.blue{color:var(--blue)}
+.green{color:var(--green)}.orange{color:var(--orange)}.red{color:var(--red)}
+.analytics{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:16px}
+.card h3{font-size:15px;margin:0 0 5px}
+.card .sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.chart-row{display:grid;grid-template-columns:75px 1fr 32px;align-items:center;gap:10px;margin:17px 0;font-size:12px}
+.track{height:9px;background:#253149;border-radius:10px;overflow:hidden}
+.bar{height:100%;width:0;border-radius:10px;transition:width .35s}
+.bar.purplebar{background:var(--purple)}
+.bar.bluebar{background:var(--blue)}
+.bar.greenbar{background:var(--green)}
+.bar.orangebar{background:var(--orange)}
+.donut-wrap{display:flex;align-items:center;justify-content:center;gap:24px;min-height:155px}
+.donut{
+  width:135px;height:135px;border-radius:50%;
+  display:grid;place-items:center;
+  background:conic-gradient(var(--purple) 0 25%,#263149 25% 100%);
+  position:relative;flex-shrink:0;
+}
+.donut:before{content:"";position:absolute;width:91px;height:91px;border-radius:50%;background:var(--panel)}
+.donut-inner{z-index:1;text-align:center}
+.donut-inner strong{display:block;font-size:24px}
+.donut-inner span{font-size:10px;color:var(--muted)}
+.legend{display:grid;gap:12px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:8px}
+.dot{width:9px;height:9px;border-radius:3px;display:inline-block}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px}
+.toolbar input,.toolbar select,.field input,.field select{
+  background:#0d1528;border:1px solid var(--border);color:var(--text);
+  border-radius:10px;padding:11px 12px;min-width:0;
+}
+.toolbar input{flex:1;min-width:160px}
+.toolbar select{min-width:145px}
+.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:720px;background:var(--panel)}
+th,td{text-align:left;padding:13px 15px;border-bottom:1px solid var(--border);font-size:12px}
+th{background:#172138;color:var(--muted);font-weight:600}
+td{overflow-wrap:anywhere}
+tbody tr:last-child td{border-bottom:0}
+.badge{display:inline-block;border-radius:20px;padding:5px 9px;font-size:10px;font-weight:700;background:#263149;color:#b8c5dd}
+.badge.Approved,.badge.Found,.badge.Returned{background:#143b33;color:#7ff0c2}
+.badge.Pending,.badge.Lost{background:#45351e;color:#ffd08b}
+.badge.Rejected,.badge.Disabled{background:#472431;color:#ffacba}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.field{display:grid;gap:7px;margin-bottom:13px}
+.field label{font-size:12px;color:var(--muted)}
+.field input,.field select{width:100%}
+.form-card{max-width:700px}
+.notice{display:none;padding:12px 14px;border-radius:10px;font-size:13px;margin:12px 0;overflow-wrap:anywhere}
+.notice.show{display:block}
+.notice.error{display:block;background:#46232c;color:#ffb9c4}
+.notice.success{display:block;background:#173d34;color:#9bf0d0}
+.notice.info{display:block;background:#1b2e4c;color:#b9d5ff}
+.empty{text-align:center;padding:30px;color:var(--muted);font-size:13px}
+.login-screen{
+  min-height:100vh;display:grid;place-items:center;padding:20px;
+  background:radial-gradient(ellipse at top left,#25204c,transparent 55%),var(--bg);
+}
+.login-card{width:min(100%,420px);padding:30px;background:var(--panel);border:1px solid var(--border);border-radius:20px}
+.login-card h1{font-size:25px;margin:17px 0 5px}
+.login-card p{color:var(--muted);font-size:13px;margin:0 0 22px}
+.login-card .field{margin:15px 0}
+.login-card .btn{width:100%;padding:13px}
+.loading{color:var(--muted);font-size:12px}
+@media(max-width:1050px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sidebar{width:210px}
+}
+@media(max-width:720px){
+  .layout{display:block}
+  .sidebar{width:100%;padding:14px;gap:12px;border-right:0;border-bottom:1px solid var(--border)}
+  .brand{font-size:16px}
+  .nav{display:flex;overflow-x:auto;padding-bottom:3px}
+  .nav-label,.sidebar-bottom{display:none}
+  .nav button{white-space:nowrap;width:auto;padding:10px 12px;font-size:12px}
+  .main{padding:20px 13px}
+  .topbar{align-items:flex-start}
+  .topbar h1{font-size:23px}
+  .top-actions{justify-content:flex-end}
+  .pill{display:none}
+  .analytics{grid-template-columns:1fr}
+  .stats{gap:9px}
+  .stat{padding:13px}
+  .stat-value{font-size:25px}
+  .stat-icon{width:30px;height:30px}
+  .form-grid{grid-template-columns:1fr}
+}
 </style>
 </head>
+
 <body>
-<section id="loginScreen" class="login-wrap">
-  <div class="login-art">
-    <div class="brand"><div class="brand-mark">⌕</div><span>CampusFind <span style="font-weight:500;opacity:.8">/ Admin</span></span></div>
-    <div class="hero"><div class="hero-badge">● Secure administration</div><h1>Keep your campus connected.</h1><p>Manage student accounts and review Lost &amp; Found reports from one clean, secure workspace.</p></div>
-    <div class="art-foot">CampusFind Admin Console · Authorized administrators only</div>
-  </div>
-  <div class="login-side">
-    <form id="loginForm" class="login-card">
-      <h2>Welcome back</h2><p class="muted">Sign in with your administrator account to continue.</p>
-      <div class="field"><label for="apiBaseLogin">Backend API URL</label><input id="apiBaseLogin" type="url" value="https://campus-find-hmyj.onrender.com" required><div class="inline-help">Usually leave this as the default URL.</div></div>
-      <div class="field"><label for="loginEmail">Admin email</label><input id="loginEmail" type="email" autocomplete="username" placeholder="admin@campus.edu" required></div>
-      <div class="field"><label for="loginPassword">Password</label><div class="password-row"><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required><button class="btn ghost" type="button" id="togglePassword">Show</button></div></div>
-      <div id="loginNotice" class="notice" role="status"></div>
-      <button id="loginButton" class="btn full" type="submit">Sign in to dashboard</button>
-      <p class="muted" style="font-size:12px;margin-top:17px">Your account must have administrator permissions on the backend.</p>
-    </form>
-  </div>
-</section>
-<section id="dashboard" class="app hidden">
-  <header class="topbar">
-    <div class="top-left"><div class="brand-mark" style="background:#eef2ff;color:#315efb">⌕</div><div><div class="top-title">CampusFind Admin</div><div class="top-sub">Administration workspace</div></div></div>
-    <div class="top-actions"><div class="connection"><span id="connectionDot" class="dot"></span><span id="connectionText">Not tested</span></div><button class="btn secondary small" id="refreshAll">↻ Refresh data</button><button class="btn ghost small" id="logoutButton">Log out</button></div>
-  </header>
-  <main class="main">
-    <div class="welcome"><div><h1>Dashboard overview</h1><p>Review accounts, manage access, and moderate campus reports.</p></div><span class="muted" id="adminEmailLabel"></span></div>
-    <div id="globalNotice" class="notice" role="status"></div>
-    <div class="stats">
-      <div class="stat"><div class="stat-label">Total accounts</div><div id="statUsers" class="stat-num">—</div><div class="stat-foot">Loaded from backend</div></div>
-      <div class="stat"><div class="stat-label">Pending accounts</div><div id="statPending" class="stat-num">—</div><div class="stat-foot">Waiting for review</div></div>
-      <div class="stat"><div class="stat-label">Active accounts</div><div id="statActive" class="stat-num">—</div><div class="stat-foot">Currently enabled</div></div>
-      <div class="stat"><div class="stat-label">Lost &amp; Found reports</div><div id="statReports" class="stat-num">—</div><div class="stat-foot">Loaded from backend</div></div>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <form class="login-card" id="loginForm">
+    <div class="brand">
+      <div class="brand-icon">⌂</div>
+      <div>CampusFind<small>ADMIN CONSOLE</small></div>
     </div>
-    <section class="panel">
-      <div class="panel-head"><div><h2>Account management</h2><p>Activate, disable, approve, reject, or reset a user's password.</p></div><span class="count" id="userCount">0 accounts</span></div>
-      <div class="toolbar"><input id="userSearch" placeholder="Search name, email or phone" aria-label="Search accounts"><select id="roleFilter" aria-label="Filter account type"><option value="">All types</option><option>Student</option><option>Teacher</option><option>Faculty</option><option>Admin</option></select><select id="statusFilter" aria-label="Filter account status"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Disabled</option><option>Active</option></select><button class="btn secondary small" id="reloadUsers">Load accounts</button></div>
-      <details style="margin:0 22px 18px;border:1px solid var(--line);border-radius:12px;padding:14px 16px"><summary style="cursor:pointer;font-weight:750;color:var(--ink)">＋ Create student / faculty account</summary><form id="createStudentForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:14px;align-items:end"><div class="field" style="margin:0"><label for="newStudentName">Student name</label><input id="newStudentName" required maxlength="100" placeholder="Full name"></div><div class="field" style="margin:0"><label for="newAccountType">Account type</label><select id="newAccountType" required><option value="Student">Student</option><option value="Faculty">Faculty</option></select><div class="inline-help">Faculty accounts start as Pending.</div></div><div class="field" style="margin:0"><label for="newStudentEmail">Email</label><input id="newStudentEmail" type="email" required maxlength="254" placeholder="student@example.com"></div><div class="field" style="margin:0"><label for="newStudentPhone">Phone (optional)</label><input id="newStudentPhone" maxlength="30" placeholder="Phone number"></div><div class="field" style="margin:0"><label for="newStudentPassword">Temporary password</label><input id="newStudentPassword" type="password" required minlength="8" maxlength="128" placeholder="At least 8 characters"></div><button class="btn" id="createStudentButton" type="submit">Create account</button></form><div id="createStudentNotice" class="notice" role="status"></div></details>
-      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Phone</th><th>Account status</th><th>Account controls</th></tr></thead><tbody id="usersBody"><tr><td class="empty" colspan="6">Sign in to load accounts.</td></tr></tbody></table></div>
-      <div id="usersNotice" class="notice" style="margin:12px 22px" role="status"></div>
-      <div class="table-note">Activate sets the account to Approved; Set Pending removes approval and blocks student login. If the backend rejects an action, the exact API error is shown below the table.</div>
+    <h1>Welcome back</h1>
+    <p>Sign in to manage campus lost and found.</p>
+    <div id="loginNotice" class="notice"></div>
+    <div class="field">
+      <label>Email address</label>
+      <input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Enter password">
+    </div>
+    <button class="btn" type="submit" id="loginBtn">Sign in to dashboard</button>
+  </form>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp" class="layout hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">⌂</div>
+      <div>CampusFind<small>ADMIN WORKSPACE</small></div>
+    </div>
+
+    <div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav">
+        <button class="active" data-section="dashboard">▦ &nbsp; Dashboard</button>
+        <button data-section="users">♙ &nbsp; User management</button>
+        <button data-section="create">＋ &nbsp; Create account</button>
+        <button data-section="reports">▤ &nbsp; Lost & Found reports</button>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div style="font-weight:700">Administrator</div>
+      <div class="admin-label" id="adminEmailLabel">Signed in</div>
+      <button class="btn secondary" style="width:100%;margin-top:14px" id="logoutBtn">Log out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard overview</h1>
+        <p id="pageSubtitle">Monitor your campus community at a glance.</p>
+      </div>
+      <div class="top-actions">
+        <span class="pill">● System connected</span>
+        <button class="btn" id="refreshBtn">↻ Refresh</button>
+      </div>
+    </header>
+
+    <div id="globalNotice" class="notice"></div>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+      <div class="stats">
+        <article class="stat">
+          <div class="stat-top"><span class="stat-label">Total users</span><span class="stat-icon">♙</span></div>
+          <div class="stat-value" id="totalUsers">—</div>
+          <div class="stat-note">Registered accounts</div>
+        </article>
+        <article class="stat">
+          <div class="stat-top"><span class="stat-label">Students</span><span class="stat-icon">🎓</span></div>
+          <div class="stat-value blue" id="totalStudents">—</div>
+          <div class="stat-note">Student accounts</div>
+        </article>
+        <article class="stat">
+          <div class="stat-top"><span class="stat-label">Faculty</span><span class="stat-icon">▣</span></div>
+          <div class="stat-value purple" id="totalFaculty">—</div>
+          <div class="stat-note">Faculty accounts</div>
+        </article>
+        <article class="stat">
+          <div class="stat-top"><span class="stat-label">Pending approvals</span><span class="stat-icon">◷</span></div>
+          <div class="stat-value orange" id="totalPending">—</div>
+          <div class="stat-note">Accounts awaiting review</div>
+        </article>
+      </div>
+
+      <div class="section-heading">
+        <div><h2>Analytics & statistics</h2><p>Calculated from the data returned by your backend.</p></div>
+      </div>
+
+      <div class="analytics">
+        <article class="card">
+          <h3>Lost & Found reports</h3>
+          <div class="sub">Reports by item type</div>
+          <div class="chart-row"><span>Lost</span><div class="track"><div class="bar purplebar" id="lostBar"></div></div><strong id="lostCount">0</strong></div>
+          <div class="chart-row"><span>Found</span><div class="track"><div class="bar bluebar" id="foundBar"></div></div><strong id="foundCount">0</strong></div>
+          <div class="chart-row"><span>Returned</span><div class="track"><div class="bar greenbar" id="returnedBar"></div></div><strong id="returnedCount">0</strong></div>
+          <div class="chart-row"><span>Other</span><div class="track"><div class="bar orangebar" id="otherBar"></div></div><strong id="otherCount">0</strong></div>
+        </article>
+
+        <article class="card">
+          <h3>Account status</h3>
+          <div class="sub">Approval overview</div>
+          <div class="donut-wrap">
+            <div class="donut" id="statusDonut">
+              <div class="donut-inner"><strong id="approvedPercent">0%</strong><span>Approved</span></div>
+            </div>
+            <div class="legend">
+              <span><i class="dot" style="background:var(--green)"></i>Approved <b id="approvedCount">0</b></span>
+              <span><i class="dot" style="background:var(--orange)"></i>Pending <b id="pendingCount">0</b></span>
+              <span><i class="dot" style="background:var(--red)"></i>Rejected/Disabled <b id="inactiveCount">0</b></span>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="analytics">
+        <article class="card">
+          <h3>Recent users</h3>
+          <div class="sub">Latest accounts returned by the API</div>
+          <div class="table-wrap">
+            <table style="min-width:420px">
+              <thead><tr><th>Name</th><th>Type</th><th>Status</th></tr></thead>
+              <tbody id="recentUsers"><tr><td colspan="3">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card">
+          <h3>Recent reports</h3>
+          <div class="sub">Latest reports returned by the API</div>
+          <div class="table-wrap">
+            <table style="min-width:420px">
+              <thead><tr><th>Report</th><th>Type</th><th>Status</th></tr></thead>
+              <tbody id="recentReports"><tr><td colspan="3">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </article>
+      </div>
     </section>
-    <section class="panel">
-      <div class="panel-head"><div><h2>Lost &amp; Found reports</h2><p>Review submitted items and update their review status.</p></div><span class="count" id="reportCount">0 reports</span></div>
-      <div class="toolbar"><input id="reportSearch" placeholder="Search item, category, location or details" aria-label="Search reports"><select id="reportStatusFilter" aria-label="Filter reports"><option value="">All report statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><button class="btn secondary small" id="reloadReports">Load reports</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Item</th><th>Category / Type</th><th>Location / Details</th><th>Review status</th><th>Actions</th></tr></thead><tbody id="reportsBody"><tr><td class="empty" colspan="5">Sign in to load reports.</td></tr></tbody></table></div>
-      <div id="reportsNotice" class="notice" style="margin:12px 22px" role="status"></div>
+
+    <!-- USERS -->
+    <section id="users" class="section">
+      <div class="section-heading"><div><h2>User management</h2><p>Review and manage student and faculty accounts.</p></div></div>
+      <div class="toolbar">
+        <input id="userSearch" placeholder="Search name, email or phone…">
+        <select id="userStatusFilter">
+          <option value="">All statuses</option>
+          <option>Pending</option><option>Approved</option><option>Rejected</option><option>Disabled</option>
+        </select>
+        <select id="userTypeFilter">
+          <option value="">All account types</option><option>Student</option><option>Faculty</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Contact</th><th>Account type</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="usersList"><tr><td colspan="6" class="empty">Loading users…</td></tr></tbody>
+        </table>
+      </div>
     </section>
-    <section class="panel">
-      <div class="panel-head"><div><h2>Connection settings</h2><p>Configure the backend URL or inspect connection errors.</p></div></div>
-      <div class="settings-grid"><div class="field"><label for="apiBase">Backend API URL</label><input id="apiBase" type="url" placeholder="https://your-api.example.com"></div><div class="field"><label for="adminToken">Admin token</label><input id="adminToken" type="password" autocomplete="off" placeholder="Token is stored in this browser session"></div></div>
-      <div class="settings-actions"><button class="btn" id="saveSettings">Save settings</button><button class="btn secondary" id="testApi">Test admin API</button></div>
-      <div id="settingsNotice" class="notice" style="margin:0 22px 20px" role="status"></div>
+
+    <!-- CREATE ACCOUNT -->
+    <section id="create" class="section">
+      <div class="section-heading"><div><h2>Create account</h2><p>Create a Student or Faculty account from the admin panel.</p></div></div>
+      <div class="card form-card">
+        <form id="createAccountForm">
+          <div id="createNotice" class="notice"></div>
+          <div class="form-grid">
+            <div class="field"><label>Full name</label><input name="name" required maxlength="100" placeholder="Enter full name"></div>
+            <div class="field"><label>Email address</label><input name="email" type="email" required placeholder="name@college.edu"></div>
+            <div class="field"><label>Phone number</label><input name="phone" maxlength="30" placeholder="Optional phone"></div>
+            <div class="field"><label>Temporary password</label><input name="password" type="password" required minlength="6" autocomplete="new-password" placeholder="Create password"></div>
+            <div class="field"><label>Account type</label>
+              <select name="accountType" required><option value="Student">Student</option><option value="Faculty">Faculty</option></select>
+            </div>
+          </div>
+          <button class="btn" type="submit" id="createBtn">＋ Create account</button>
+        </form>
+      </div>
     </section>
-    <div class="footer">CampusFind Admin Console · Keep your administrator credentials private.</div>
+
+    <!-- REPORTS -->
+    <section id="reports" class="section">
+      <div class="section-heading"><div><h2>Lost & Found reports</h2><p>Review, approve, reject or remove reports.</p></div></div>
+      <div class="toolbar">
+        <input id="itemSearch" placeholder="Search title, category or location…">
+        <select id="itemStatusFilter">
+          <option value="">All review statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option>
+        </select>
+        <select id="itemTypeFilter">
+          <option value="">All report types</option><option>Lost</option><option>Found</option><option>Returned</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Report</th><th>Type</th><th>Category / Location</th><th>Date</th><th>Review status</th><th>Actions</th></tr></thead>
+          <tbody id="itemsList"><tr><td colspan="6" class="empty">Loading reports…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
   </main>
-</section>
+</div>
+
 <script>
-(() => {
-  "use strict";
+/*
+  If your backend is hosted at a different URL, change API_BASE below.
+*/
+const API_BASE = "https://campus-find-hmyj.onrender.com";
 
-  const $ = id => document.getElementById(id);
-  const DEFAULT_API = "https://campus-find-hmyj.onrender.com";
-  let users = [];
-  let reports = [];
-  let token = "";
-  let apiBase = DEFAULT_API;
+const $ = id => document.getElementById(id);
+let token = localStorage.getItem("campusFindAdminToken") || "";
+let adminUser = null;
+try {
+  adminUser = JSON.parse(localStorage.getItem("campusFindAdminUser") || "null");
+} catch (_) {}
 
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, char => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    })[char]);
-  }
+let users = [];
+let items = [];
 
-  function notice(id, message, type = "error") {
-    const el = $(id);
-    el.textContent = message;
-    el.className = `notice show ${type}`;
-  }
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function dateText(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
+}
+function statusBadge(status) {
+  const safe = escapeHTML(status || "Unknown");
+  return `<span class="badge ${safe}">${safe}</span>`;
+}
+function notice(id, message, type="info") {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = "notice show " + type;
+}
+function clearNotice(id) {
+  const el = $(id);
+  if (el) el.className = "notice";
+}
+async function api(path, options={}) {
+  const headers = { ...(options.headers || {}) };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
 
-  function clearNotice(id) {
-    $(id).className = "notice";
-    $(id).textContent = "";
-  }
+  const response = await fetch(API_BASE + path, {...options, headers});
+  const text = await response.text();
+  let data = {};
+  try { data = text ? JSON.parse(text) : {}; }
+  catch (_) { data = {message:text}; }
 
-  function setConnection(message, state = "") {
-    $("connectionText").textContent = message;
-    $("connectionDot").className = `dot ${state}`;
-  }
-
-  function readApiBase() {
-    return ($("apiBase")?.value || $("apiBaseLogin").value || DEFAULT_API).trim().replace(/\/+$/, "");
-  }
-
-  function normalizeArray(data, keys = []) {
-    if (Array.isArray(data)) return data;
-    for (const key of keys) {
-      if (Array.isArray(data?.[key])) return data[key];
-      if (Array.isArray(data?.data?.[key])) return data.data[key];
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      // Do not silently log out on every permission error.
+      throw new Error(data.message || data.error || `Request failed (${response.status})`);
     }
-    if (Array.isArray(data?.data)) return data.data;
-    return [];
+    throw new Error(data.message || data.error || `Request failed (${response.status})`);
   }
+  return data;
+}
+function showApp() {
+  $("loginScreen").classList.add("hidden");
+  $("adminApp").classList.remove("hidden");
+  $("adminEmailLabel").textContent = adminUser?.email || "Administrator";
+}
+function showLogin() {
+  $("adminApp").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+}
+function logout() {
+  token = "";
+  adminUser = null;
+  localStorage.removeItem("campusFindAdminToken");
+  localStorage.removeItem("campusFindAdminUser");
+  showLogin();
+}
+function goTo(section) {
+  document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
+  $(section)?.classList.add("active");
+  document.querySelectorAll("[data-section]").forEach(btn =>
+    btn.classList.toggle("active", btn.dataset.section === section)
+  );
+  const titles = {
+    dashboard:["Dashboard overview","Monitor your campus community at a glance."],
+    users:["User management","Manage Student and Faculty accounts."],
+    create:["Create account","Create an account using the admin API."],
+    reports:["Lost & Found reports","Review campus lost and found reports."]
+  };
+  $("pageTitle").textContent = titles[section]?.[0] || "CampusFind";
+  $("pageSubtitle").textContent = titles[section]?.[1] || "";
+}
+document.querySelectorAll("[data-section]").forEach(btn => {
+  btn.addEventListener("click", () => goTo(btn.dataset.section));
+});
 
-  async function api(path, options = {}) {
-    if (!apiBase) apiBase = DEFAULT_API;
-    const headers = { ...(options.headers || {}) };
-    if (options.body !== undefined) headers["Content-Type"] = "application/json";
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-      headers["x-access-token"] = token;
-    }
-    let response;
-    try {
-      response = await fetch(apiBase + path, { ...options, headers });
-    } catch (error) {
-      throw new Error(`Network/CORS error connecting to ${apiBase}. Check that the backend is online and allows this dashboard origin.`);
-    }
-    const raw = await response.text();
-    let data = {};
-    try { data = raw ? JSON.parse(raw) : {}; }
-    catch { data = { message: raw }; }
-
-    if (!response.ok) {
-      const detail = data.message || data.error || data.errors?.[0]?.message || `HTTP ${response.status}`;
-      throw new Error(`${detail} (${response.status}, ${options.method || "GET"} ${path})`);
-    }
-    return data;
-  }
-
-  function statusOf(user) {
-    return String(user.accountStatus || user.status || (user.isActive === false ? "Disabled" : "Approved"));
-  }
-  function userId(user) { return user._id || user.id || user.userId || user.user_id || ""; }
-  function reportId(report) { return report._id || report.id || report.itemId || report.item_id || ""; }
-  function pill(status) {
-    const s = String(status || "Pending");
-    const cls = /approved/i.test(s) ? "approved" : /active/i.test(s) ? "active" : /reject/i.test(s) ? "rejected" : /disable|inactive|blocked/i.test(s) ? "disabled" : "pending";
-    return `<span class="pill ${cls}">${escapeHTML(s)}</span>`;
-  }
-
-  function renderUsers() {
-    const query = $("userSearch").value.trim().toLowerCase();
-    const role = $("roleFilter").value.toLowerCase();
-    const statusFilter = $("statusFilter").value.toLowerCase();
-    const filtered = users.filter(user => {
-      const name = String(user.name || user.fullName || "").toLowerCase();
-      const email = String(user.email || "").toLowerCase();
-      const phone = String(user.phone || user.phoneNumber || "").toLowerCase();
-      const userRole = String(user.role || user.accountType || user.userType || "Student").toLowerCase();
-      const status = statusOf(user).toLowerCase();
-      return (!query || `${name} ${email} ${phone}`.includes(query)) &&
-        (!role || role === userRole) &&
-        (!statusFilter || statusFilter === status);
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearNotice("loginNotice");
+  const btn = $("loginBtn");
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+  try {
+    const data = await api("/api/auth/login", {
+      method:"POST",
+      body:JSON.stringify({
+        email:$("loginEmail").value.trim(),
+        password:$("loginPassword").value
+      })
     });
-
-    $("userCount").textContent = `${filtered.length} of ${users.length} accounts`;
-    $("statUsers").textContent = users.length;
-    $("statPending").textContent = users.filter(u => /pending/i.test(statusOf(u))).length;
-    $("statActive").textContent = users.filter(u => /active|approved/i.test(statusOf(u)) && !/disabled|inactive/i.test(statusOf(u))).length;
-
-    $("usersBody").innerHTML = filtered.length ? filtered.map(user => {
-      const id = userId(user);
-      const status = statusOf(user);
-      const disabled = /disabled|inactive|blocked/i.test(status);
-      const safeId = escapeHTML(id);
-      const name = user.name || user.fullName || "Unnamed user";
-      const roleValue = user.role || user.accountType || user.userType || "Student";
-      return `<tr>
-        <td><div class="person">${escapeHTML(name)}</div><div class="subtext">${escapeHTML(user.studentId || user.rollNumber || "")}</div></td>
-        <td>${escapeHTML(user.email || "—")}</td>
-        <td>${pill(roleValue)}</td>
-        <td>${escapeHTML(user.phone || user.phoneNumber || "—")}</td>
-        <td>${pill(status)}</td>
-        <td><div class="actions">
-          <button class="btn small ${disabled ? "success" : "secondary"}" data-user-action="status" data-id="${safeId}" data-status="${disabled ? "Approved" : "Disabled"}">${disabled ? "Activate" : "Disable"}</button>
-          <button class="btn small success" data-user-action="status" data-id="${safeId}" data-status="Approved">Approve</button>
-          <button class="btn small ghost" data-user-action="status" data-id="${safeId}" data-status="Pending">Set Pending</button>
-          <button class="btn small danger" data-user-action="status" data-id="${safeId}" data-status="Rejected">Reject</button>
-          <button class="btn small ghost" data-user-action="reset" data-id="${safeId}">Reset password</button>
-        </div></td>
-      </tr>`;
-    }).join("") : `<tr><td class="empty" colspan="6">${users.length ? "No accounts match your filters." : "No accounts loaded yet. Use Load accounts."}</td></tr>`;
+    if (!data.token || !data.user?.isAdmin) {
+      throw new Error("This account does not have administrator access.");
+    }
+    token = data.token;
+    adminUser = data.user;
+    localStorage.setItem("campusFindAdminToken", token);
+    localStorage.setItem("campusFindAdminUser", JSON.stringify(adminUser));
+    showApp();
+    await refreshAll();
+  } catch (err) {
+    notice("loginNotice", err.message || "Unable to log in.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Sign in to dashboard";
   }
+});
 
-  function renderReports() {
-    const query = $("reportSearch").value.trim().toLowerCase();
-    const filter = $("reportStatusFilter").value.toLowerCase();
-    const filtered = reports.filter(report => {
-      const status = String(report.reviewStatus || report.status || "Pending");
-      return JSON.stringify(report).toLowerCase().includes(query) && (!filter || status.toLowerCase() === filter);
+$("logoutBtn").addEventListener("click", logout);
+$("refreshBtn").addEventListener("click", refreshAll);
+
+async function refreshAll() {
+  clearNotice("globalNotice");
+  $("refreshBtn").disabled = true;
+  $("refreshBtn").textContent = "Refreshing…";
+  try {
+    const results = await Promise.all([
+      api("/api/auth/admin/users"),
+      api("/api/items/admin/all")
+    ]);
+    users = normalizeArray(results[0], ["users","data","results"]);
+    items = normalizeArray(results[1], ["items","data","reports","results"]);
+    renderUsers();
+    renderItems();
+    renderAnalytics();
+  } catch (err) {
+    notice("globalNotice", "Could not refresh data: " + err.message, "error");
+  } finally {
+    $("refreshBtn").disabled = false;
+    $("refreshBtn").textContent = "↻ Refresh";
+  }
+}
+function normalizeArray(data, keys) {
+  if (Array.isArray(data)) return data;
+  for (const key of keys) if (Array.isArray(data?.[key])) return data[key];
+  return [];
+}
+function accountType(user) {
+  return user.accountType || "Student";
+}
+function itemType(item) {
+  return String(item.type || item.itemType || item.reportType || "").toLowerCase();
+}
+function reviewStatus(item) {
+  return item.reviewStatus || item.status || "Pending";
+}
+function renderAnalytics() {
+  const total = users.length;
+  const students = users.filter(u => accountType(u).toLowerCase() === "student").length;
+  const faculty = users.filter(u => accountType(u).toLowerCase() === "faculty").length;
+  const pending = users.filter(u => (u.accountStatus || "Approved") === "Pending").length;
+
+  $("totalUsers").textContent = total;
+  $("totalStudents").textContent = students;
+  $("totalFaculty").textContent = faculty;
+  $("totalPending").textContent = pending;
+
+  const lost = items.filter(i => itemType(i) === "lost").length;
+  const found = items.filter(i => itemType(i) === "found").length;
+  const returned = items.filter(i => itemType(i) === "returned" || /returned/i.test(i.status || "")).length;
+  const other = Math.max(0, items.length - lost - found - returned);
+  const max = Math.max(1, lost, found, returned, other);
+
+  [["lost",lost],["found",found],["returned",returned],["other",other]].forEach(([key,count]) => {
+    $(key + "Count").textContent = count;
+    $(key + "Bar").style.width = (count / max * 100) + "%";
+  });
+
+  const approved = users.filter(u => (u.accountStatus || "Approved") === "Approved").length;
+  const rejectedDisabled = users.filter(u => ["Rejected","Disabled"].includes(u.accountStatus)).length;
+  const totalStatuses = Math.max(1, approved + pending + rejectedDisabled);
+  const approvedP = Math.round(approved / totalStatuses * 100);
+  const pendingP = pending / totalStatuses * 100;
+  const inactiveP = rejectedDisabled / totalStatuses * 100;
+
+  $("approvedCount").textContent = approved;
+  $("pendingCount").textContent = pending;
+  $("inactiveCount").textContent = rejectedDisabled;
+  $("approvedPercent").textContent = approvedP + "%";
+  $("statusDonut").style.background =
+    `conic-gradient(var(--green) 0 ${approvedP}%, var(--orange) ${approvedP}% ${approvedP + pendingP}%, var(--red) ${approvedP + pendingP}% 100%)`;
+
+  const latestUsers = [...users].sort((a,b) =>
+    new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+  ).slice(0,5);
+  $("recentUsers").innerHTML = latestUsers.length ? latestUsers.map(u => `
+    <tr><td>${escapeHTML(u.name || "Unnamed")}<br><span class="admin-label">${escapeHTML(u.email || "")}</span></td>
+    <td>${escapeHTML(accountType(u))}</td><td>${statusBadge(u.accountStatus || "Approved")}</td></tr>
+  `).join("") : `<tr><td colspan="3" class="empty">No users found.</td></tr>`;
+
+  const latestItems = [...items].sort((a,b) =>
+    new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0)
+  ).slice(0,5);
+  $("recentReports").innerHTML = latestItems.length ? latestItems.map(i => `
+    <tr><td>${escapeHTML(i.title || i.itemName || "Untitled")}</td>
+    <td>${escapeHTML(i.type || i.itemType || "—")}</td><td>${statusBadge(reviewStatus(i))}</td></tr>
+  `).join("") : `<tr><td colspan="3" class="empty">No reports found.</td></tr>`;
+}
+
+function renderUsers() {
+  const q = $("userSearch").value.trim().toLowerCase();
+  const status = $("userStatusFilter").value;
+  const type = $("userTypeFilter").value;
+  const filtered = users.filter(u => {
+    const searchable = [u.name,u.email,u.phone].join(" ").toLowerCase();
+    return searchable.includes(q) &&
+      (!status || (u.accountStatus || "Approved") === status) &&
+      (!type || accountType(u) === type);
+  });
+  $("usersList").innerHTML = filtered.length ? filtered.map(u => {
+    const currentStatus = u.accountStatus || "Approved";
+    return `<tr>
+      <td><strong>${escapeHTML(u.name || "Unnamed")}</strong></td>
+      <td>${escapeHTML(u.email || "—")}<br>${escapeHTML(u.phone || "")}</td>
+      <td>${escapeHTML(accountType(u))}</td>
+      <td>${dateText(u.createdAt)}</td>
+      <td>${statusBadge(currentStatus)}</td>
+      <td><div class="actions">
+        ${currentStatus !== "Approved" ? `<button class="btn success small" data-user-status="Approved" data-id="${escapeHTML(u._id)}">Approve</button>` : ""}
+        ${currentStatus !== "Rejected" ? `<button class="btn danger small" data-user-status="Rejected" data-id="${escapeHTML(u._id)}">Reject</button>` : ""}
+        ${currentStatus !== "Disabled" ? `<button class="btn secondary small" data-user-status="Disabled" data-id="${escapeHTML(u._id)}">Disable</button>` : ""}
+      </div></td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="6" class="empty">No matching users.</td></tr>`;
+}
+["userSearch","userStatusFilter","userTypeFilter"].forEach(id => $(id).addEventListener("input", renderUsers));
+
+$("usersList").addEventListener("click", async e => {
+  const btn = e.target.closest("[data-user-status]");
+  if (!btn) return;
+  const {id,status} = {id:btn.dataset.id,status:btn.dataset.userStatus};
+  if (!id || !confirm(`Change this account status to ${status}?`)) return;
+  btn.disabled = true;
+  try {
+    await api(`/api/auth/admin/users/${encodeURIComponent(id)}/status`, {
+      method:"PATCH", body:JSON.stringify({accountStatus:status})
     });
-    $("reportCount").textContent = `${filtered.length} of ${reports.length} reports`;
-    $("statReports").textContent = reports.length;
-    $("reportsBody").innerHTML = filtered.length ? filtered.map(report => {
-      const id = escapeHTML(reportId(report));
-      const title = report.title || report.itemName || report.name || report.item?.name || "Untitled report";
-      const category = report.category || report.item?.category || "—";
-      const type = report.type || report.itemType || report.item?.type || "";
-      const status = report.reviewStatus || report.status || "Pending";
-      const details = [report.location || report.item?.location, report.description || report.item?.description].filter(Boolean).join(" · ");
-      return `<tr>
-        <td><div class="person">${escapeHTML(title)}</div><div class="subtext">${escapeHTML(report.studentName || report.ownerName || report.user?.name || "")}</div></td>
-        <td>${escapeHTML(category)}<div class="subtext">${escapeHTML(type)}</div></td>
-        <td>${escapeHTML(details || "—")}</td><td>${pill(status)}</td>
-        <td><div class="actions">
-          <button class="btn small success" data-report-action="Approved" data-id="${id}">Approve</button>
-          <button class="btn small danger" data-report-action="Rejected" data-id="${id}">Reject</button>
-          <button class="btn small ghost" data-report-action="delete" data-id="${id}">Delete</button>
-        </div></td>
-      </tr>`;
-    }).join("") : `<tr><td class="empty" colspan="5">${reports.length ? "No reports match your search." : "No reports loaded yet. Use Load reports."}</td></tr>`;
+    notice("globalNotice", "Account status updated.", "success");
+    await refreshAll();
+  } catch (err) {
+    notice("globalNotice", "Unable to update account: " + err.message, "error");
+  } finally {
+    btn.disabled = false;
   }
+});
 
-  async function loadUsers() {
-    clearNotice("usersNotice");
-    try {
-      const data = await api("/api/auth/admin/users");
-      users = normalizeArray(data, ["users", "accounts", "results"]);
-      renderUsers();
-      return true;
-    } catch (error) {
-      notice("usersNotice", `Could not load accounts: ${error.message}`);
-      return false;
-    }
+$("createAccountForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  clearNotice("createNotice");
+  const form = new FormData(e.currentTarget);
+  const payload = Object.fromEntries(form.entries());
+  const btn = $("createBtn");
+  btn.disabled = true;
+  btn.textContent = "Creating…";
+  try {
+    await api("/api/auth/admin/users", {
+      method:"POST", body:JSON.stringify(payload)
+    });
+    notice("createNotice", "Account created successfully.", "success");
+    e.currentTarget.reset();
+    await refreshAll();
+  } catch (err) {
+    notice("createNotice", "Account creation failed: " + err.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "＋ Create account";
   }
+});
 
-  async function loadReports() {
-    clearNotice("reportsNotice");
-    try {
-      const data = await api("/api/items/admin/all");
-      reports = normalizeArray(data, ["items", "reports", "results"]);
-      renderReports();
-      return true;
-    } catch (error) {
-      notice("reportsNotice", `Could not load reports: ${error.message}`);
-      return false;
-    }
-  }
+function renderItems() {
+  const q = $("itemSearch").value.trim().toLowerCase();
+  const status = $("itemStatusFilter").value;
+  const type = $("itemTypeFilter").value.toLowerCase();
 
-  async function refreshAll() {
-    $("refreshAll").disabled = true;
-    try {
-      const results = await Promise.all([loadUsers(), loadReports()]);
-      setConnection(results.every(Boolean) ? "Connected" : "Some API calls failed", results.every(Boolean) ? "ok" : "bad");
-      if (results.every(Boolean)) notice("globalNotice", "Dashboard data refreshed.", "success");
-      else notice("globalNotice", "Some dashboard data could not be loaded. Read the red message under the relevant table.", "error");
-    } finally {
-      $("refreshAll").disabled = false;
-    }
-  }
+  const filtered = items.filter(i => {
+    const searchable = [i.title,i.itemName,i.category,i.location,i.description].join(" ").toLowerCase();
+    return searchable.includes(q) &&
+      (!status || reviewStatus(i) === status) &&
+      (!type || itemType(i) === type);
+  });
 
-  async function login(event) {
-    event.preventDefault();
-    clearNotice("loginNotice");
-    const button = $("loginButton");
-    button.disabled = true;
-    button.textContent = "Signing in…";
-    apiBase = readApiBase();
-    try {
-      const response = await fetch(apiBase + "/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: $("loginEmail").value.trim(), password: $("loginPassword").value })
+  $("itemsList").innerHTML = filtered.length ? filtered.map(i => `
+    <tr>
+      <td><strong>${escapeHTML(i.title || i.itemName || "Untitled report")}</strong>
+        <br><span class="admin-label">${escapeHTML(i.description || "")}</span></td>
+      <td>${escapeHTML(i.type || i.itemType || "—")}</td>
+      <td>${escapeHTML(i.category || "—")}<br>${escapeHTML(i.location || "—")}</td>
+      <td>${dateText(i.createdAt || i.date)}</td>
+      <td>${statusBadge(reviewStatus(i))}</td>
+      <td><div class="actions">
+        ${reviewStatus(i) !== "Approved" ? `<button class="btn success small" data-review="Approved" data-id="${escapeHTML(i._id)}">Approve</button>` : ""}
+        ${reviewStatus(i) !== "Rejected" ? `<button class="btn danger small" data-review="Rejected" data-id="${escapeHTML(i._id)}">Reject</button>` : ""}
+        <button class="btn secondary small" data-delete-item="${escapeHTML(i._id)}">Delete</button>
+      </div></td>
+    </tr>
+  `).join("") : `<tr><td colspan="6" class="empty">No matching reports.</td></tr>`;
+}
+["itemSearch","itemStatusFilter","itemTypeFilter"].forEach(id => $(id).addEventListener("input", renderItems));
+
+$("itemsList").addEventListener("click", async e => {
+  const reviewBtn = e.target.closest("[data-review]");
+  const deleteBtn = e.target.closest("[data-delete-item]");
+  if (!reviewBtn && !deleteBtn) return;
+
+  try {
+    if (reviewBtn) {
+      const id = reviewBtn.dataset.id;
+      const status = reviewBtn.dataset.review;
+      if (!id || !confirm(`Set report review status to ${status}?`)) return;
+      reviewBtn.disabled = true;
+      await api(`/api/items/admin/${encodeURIComponent(id)}/review`, {
+        method:"PATCH", body:JSON.stringify({reviewStatus:status})
       });
-      const raw = await response.text();
-      let data = {};
-      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw }; }
-      if (!response.ok) throw new Error(`${data.message || data.error || "Login failed"} (HTTP ${response.status})`);
-      const foundToken = data.token || data.accessToken || data.access_token || data.data?.token;
-      const loggedInUser = data.user || data.data?.user || {};
-      if (!foundToken) throw new Error("Login response did not contain a token. Check the backend login response format.");
-      if (loggedInUser.isAdmin === false || (loggedInUser.role && !/admin/i.test(loggedInUser.role) && loggedInUser.isAdmin !== true)) {
-        throw new Error("This account does not appear to have admin permissions.");
-      }
-      token = foundToken;
-      $("adminToken").value = token;
-      $("apiBase").value = apiBase;
-      $("adminEmailLabel").textContent = loggedInUser.email || $("loginEmail").value.trim();
-      $("loginScreen").classList.add("hidden");
-      $("dashboard").classList.remove("hidden");
-      setConnection("Checking API…");
-      await refreshAll();
-      const verify = await api("/api/auth/admin/users");
-      users = normalizeArray(verify, ["users", "accounts", "results"]);
-      renderUsers();
-      setConnection("Admin connected", "ok");
-    } catch (error) {
-      $("dashboard").classList.add("hidden");
-      $("loginScreen").classList.remove("hidden");
-      notice("loginNotice", `${error.message}. Check credentials, API URL, CORS, and admin permissions.`);
-      setConnection("Login failed", "bad");
-    } finally {
-      button.disabled = false;
-      button.textContent = "Sign in to dashboard";
-    }
-  }
-
-  async function createStudent(event) {
-    event.preventDefault();
-    clearNotice("createStudentNotice");
-    const button = $("createStudentButton");
-    const payload = {
-      name: $("newStudentName").value.trim(),
-      accountType: $("newAccountType").value,
-      email: $("newStudentEmail").value.trim(),
-      phone: $("newStudentPhone").value.trim(),
-      password: $("newStudentPassword").value
-    };
-    if (payload.password.length < 8 || payload.password.length > 128) {
-      notice("createStudentNotice", "Password must be 8–128 characters.");
-      return;
-    }
-    button.disabled = true;
-    button.textContent = "Creating…";
-    try {
-      const result = await api("/api/auth/admin/users", { method: "POST", body: JSON.stringify(payload) });
-      notice("createStudentNotice", result.message || `${payload.accountType} account created successfully.`, "success");
-      $("createStudentForm").reset();
-      await loadUsers();
-    } catch (error) {
-      notice("createStudentNotice", `Could not create account: ${error.message}`);
-    } finally {
-      button.disabled = false;
-      button.textContent = "Create account";
-    }
-  }
-
-  async function runUserAction(button) {
-    const id = button.dataset.id;
-    const action = button.dataset.userAction;
-    if (!id) {
-      notice("usersNotice", "This account response has no ID. Backend user objects should include _id or id.");
-      return;
-    }
-    const label = button.textContent;
-    let path = "";
-    let body = {};
-    let method = "PATCH";
-
-    if (action === "status") {
-      const status = button.dataset.status;
-      if (!confirm(`Set this account status to "${status}"?`)) return;
-      path = `/api/auth/admin/users/${encodeURIComponent(id)}/status`;
-      body = { accountStatus: status };
-    } else if (action === "reset") {
-      const newPassword = prompt("Enter a new temporary password (at least 8 characters):");
-      if (newPassword === null) return;
-      if (newPassword.length < 8) {
-        notice("usersNotice", "Password must be at least 8 characters long.");
-        return;
-      }
-      path = `/api/auth/admin/users/${encodeURIComponent(id)}/password`;
-      body = { newPassword };
-    } else return;
-
-    button.disabled = true;
-    button.textContent = "Working…";
-    clearNotice("usersNotice");
-    try {
-      const result = await api(path, { method, body: JSON.stringify(body) });
-      notice("usersNotice", result.message || `Account action completed: ${action === "reset" ? "password reset" : body.accountStatus}.`, "success");
-      await loadUsers();
-    } catch (error) {
-      notice("usersNotice", `Action failed: ${error.message}. The backend must implement this route and allow admin access; a frontend button cannot create a missing server endpoint.`);
-    } finally {
-      button.disabled = false;
-      button.textContent = label;
-    }
-  }
-
-  async function runReportAction(button) {
-    const id = button.dataset.id;
-    const action = button.dataset.reportAction;
-    if (!id) {
-      notice("reportsNotice", "This report response has no ID. Backend report objects should include _id or id.");
-      return;
-    }
-    let path = "";
-    let method = "PATCH";
-    let body = {};
-    if (action === "delete") {
-      if (!confirm("Delete this report permanently?")) return;
-      path = `/api/items/admin/${encodeURIComponent(id)}`;
-      method = "DELETE";
+      notice("globalNotice", "Report status updated.", "success");
     } else {
-      if (!confirm(`Set report review status to "${action}"?`)) return;
-      path = `/api/items/admin/${encodeURIComponent(id)}/review`;
-      body = { reviewStatus: action, status: action };
+      const id = deleteBtn.dataset.deleteItem;
+      if (!id || !confirm("Delete this report permanently? This cannot be undone.")) return;
+      deleteBtn.disabled = true;
+      await api(`/api/items/admin/${encodeURIComponent(id)}`, {method:"DELETE"});
+      notice("globalNotice", "Report deleted.", "success");
     }
-    const label = button.textContent;
-    button.disabled = true;
-    button.textContent = "Working…";
-    clearNotice("reportsNotice");
-    try {
-      const result = await api(path, { method, ...(method === "PATCH" ? { body: JSON.stringify(body) } : {}) });
-      notice("reportsNotice", result.message || `Report action completed: ${action}.`, "success");
-      await loadReports();
-    } catch (error) {
-      notice("reportsNotice", `Action failed: ${error.message}. Check that the backend supports this report route.`);
-    } finally {
-      button.disabled = false;
-      button.textContent = label;
-    }
+    await refreshAll();
+  } catch (err) {
+    notice("globalNotice", "Report action failed: " + err.message, "error");
   }
+});
 
-  $("loginForm").addEventListener("submit", login);
-  $("createStudentForm").addEventListener("submit", createStudent);
-  $("togglePassword").addEventListener("click", () => {
-    const input = $("loginPassword");
-    const show = input.type === "password";
-    input.type = show ? "text" : "password";
-    $("togglePassword").textContent = show ? "Hide" : "Show";
-  });
-  $("logoutButton").addEventListener("click", () => {
-    token = "";
-    users = [];
-    reports = [];
-    $("loginPassword").value = "";
-    $("dashboard").classList.add("hidden");
-    $("loginScreen").classList.remove("hidden");
-    $("usersBody").innerHTML = '<tr><td class="empty" colspan="6">Sign in to load accounts.</td></tr>';
-    $("reportsBody").innerHTML = '<tr><td class="empty" colspan="5">Sign in to load reports.</td></tr>';
-    clearNotice("loginNotice");
-    setConnection("Logged out");
-  });
-  $("refreshAll").addEventListener("click", refreshAll);
-  $("reloadUsers").addEventListener("click", loadUsers);
-  $("reloadReports").addEventListener("click", loadReports);
-  $("userSearch").addEventListener("input", renderUsers);
-  $("roleFilter").addEventListener("change", renderUsers);
-  $("statusFilter").addEventListener("change", renderUsers);
-  $("reportSearch").addEventListener("input", renderReports);
-  $("reportStatusFilter").addEventListener("change", renderReports);
-  $("usersBody").addEventListener("click", event => {
-    const button = event.target.closest("button[data-user-action]");
-    if (button) runUserAction(button);
-  });
-  $("reportsBody").addEventListener("click", event => {
-    const button = event.target.closest("button[data-report-action]");
-    if (button) runReportAction(button);
-  });
-  $("saveSettings").addEventListener("click", () => {
-    apiBase = readApiBase();
-    token = $("adminToken").value.trim();
-    notice("settingsNotice", "Settings applied for this page session.", "success");
-  });
-  $("testApi").addEventListener("click", async () => {
-    apiBase = readApiBase();
-    token = $("adminToken").value.trim();
-    clearNotice("settingsNotice");
-    try {
-      await api("/api/auth/admin/users");
-      setConnection("Admin API connected", "ok");
-      notice("settingsNotice", "Admin API responded successfully and the token was accepted.", "success");
-    } catch (error) {
-      setConnection("API error", "bad");
-      notice("settingsNotice", `API test failed: ${error.message}`);
-    }
-  });
-  $("apiBaseLogin").value = DEFAULT_API;
-})();
+function startApp() {
+  if (!token || !adminUser?.isAdmin) {
+    showLogin();
+    return;
+  }
+  showApp();
+  refreshAll();
+}
+startApp();
 </script>
 </body>
 </html>
