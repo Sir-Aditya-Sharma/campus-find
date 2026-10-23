@@ -114,15 +114,17 @@ router.post("/register", (req, res) => {
 // Login approved users and the configured administrator.
 router.post("/login", async (req, res) => {
   try {
-    const { email, password, accountType: requestedAccountType } =
-      req.body || {};
+    const {
+      email,
+      password,
+      accountType: requestedAccountType
+    } = req.body || {};
 
     if (
       typeof email !== "string" ||
       !email.trim() ||
       typeof password !== "string" ||
-      !password ||
-      password.length > 128
+      !password
     ) {
       return res.status(400).json({
         message: "Please enter email and password."
@@ -133,6 +135,83 @@ router.post("/login", async (req, res) => {
       return res.status(503).json({
         message: "Login is not configured on the server."
       });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({
+        message: "Invalid email or password."
+      });
+    }
+
+    const isAdmin =
+      Boolean(getAdminEmail()) &&
+      cleanEmail === getAdminEmail();
+
+    if (!isAdmin) {
+      if (!["Student", "Faculty"].includes(requestedAccountType)) {
+        return res.status(400).json({
+          message: "Choose Student or Faculty login."
+        });
+      }
+
+      const savedAccountType = user.accountType || "Student";
+
+      if (savedAccountType !== requestedAccountType) {
+        return res.status(403).json({
+          message: `This account is registered as ${savedAccountType}, not ${requestedAccountType}.`
+        });
+      }
+
+      if (user.accountStatus !== "Approved") {
+        let message = "Your account is waiting for admin approval.";
+
+        if (user.accountStatus === "Rejected") {
+          message =
+            "Your account request was rejected. Contact the campus admin.";
+        } else if (user.accountStatus === "Disabled") {
+          message =
+            "This account is disabled. Contact the campus admin.";
+        }
+
+        return res.status(403).json({ message });
+      }
+    }
+
+    const token = jwt.sign(
+      {
+        id: String(user._id),
+        email: user.email,
+        accountType: user.accountType || (isAdmin ? "Admin" : "Student"),
+        isAdmin
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      message: "Login successful.",
+      token,
+      user: {
+        id: String(user._id),
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
+        accountType: user.accountType || (isAdmin ? "Admin" : "Student"),
+        isAdmin
+      }
+    });
+  } catch (error) {
+    console.error("Login error:", error.message);
+
+    return res.status(500).json({
+      message: "Could not log in."
+    });
+  }
+});
+
     }
 
     const cleanEmail = email.trim().toLowerCase();
