@@ -85,10 +85,17 @@
       flex-wrap: wrap;
     }
 
-    #welcomeText {
-      color: #c0c9df;
-      font-size: 12px;
-    }
+    #welcomeText { color: #c0c9df; font-size: 12px; }
+    .profile-wrap { position: relative; display: none; }
+    .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg,#7968ff,#a35cff); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
+    .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: 210px; padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: #111a2d; box-shadow: 0 14px 36px #0008; display: none; }
+    .profile-menu.open { display: block; }
+    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; overflow-wrap: anywhere; }
+    .profile-menu .profile-heading strong { display:block; color:#f3f4ff; font-size:13px; }
+    .profile-menu .profile-heading small { color:#9ca9c7; font-size:11px; }
+    .profile-menu button { display:block; width:100%; text-align:left; padding:10px; border:0; background:transparent; color:#dce3f7; }
+    .profile-menu button:hover { background:#202b45; }
+    .profile-menu button.profile-logout { color:#ff9caf; }
 
     button {
       padding: 9px 13px;
@@ -799,9 +806,9 @@
         font-size: 11px;
       }
 
-      #welcomeText {
-        display: none;
-      }
+      #welcomeText { display: none; }
+      .profile-avatar { width: 36px; height: 36px; }
+      .profile-menu { right: 0; }
 
       .urgent-banner,
       .dashboard {
@@ -881,9 +888,6 @@
         gap: 5px;
       }
 
-      #phoneButton {
-        display: none !important;
-      }
     }
   </style>
 </head>
@@ -894,6 +898,16 @@
 
     <div class="nav-actions">
       <span id="welcomeText"></span>
+
+      <div class="profile-wrap" id="profileWrap">
+        <button class="profile-avatar" id="profileAvatar" type="button" aria-label="Open profile menu" aria-expanded="false" onclick="toggleProfileMenu()">AS</button>
+        <div class="profile-menu" id="profileMenu" role="menu">
+          <div class="profile-heading"><strong id="profileMenuName">Student</strong><small id="profileMenuEmail"></small></div>
+          <button type="button" role="menuitem" onclick="openPhoneFromProfile()">My phone / Profile settings</button>
+          <button type="button" role="menuitem" onclick="openMyReports()">My reports</button>
+          <button type="button" role="menuitem" class="profile-logout" onclick="logout()">Logout</button>
+        </div>
+      </div>
 
       <button
         id="phoneButton"
@@ -926,10 +940,10 @@
     </div>
   </header>
 
-  <div class="urgent-banner">
+  <button class="urgent-banner" type="button" onclick="handleUrgentAlert()" aria-label="Urgent alert: report a lost item">
     <strong>⚠ URGENT ALERT</strong>
-    Lost something valuable? Sign in and use Report Item to list it.
-  </div>
+    Lost something valuable? Click here to report it.
+  </button>
 
   <main class="dashboard">
     <aside class="sidebar surface">
@@ -1099,10 +1113,12 @@
           <button id="authSubmit" class="primary-btn" type="submit">Login</button>
         </div>
       </form>
-      
-    </div>
 
-      
+      <p class="auth-switch">
+        <span id="authSwitchText">New to CampusFind?</span>
+        <button id="authSwitchButton" class="text-button" type="button" onclick="toggleAuthMode()">Create an account</button>
+      </p>
+    </div>
   </div>
 
   <div class="modal-overlay" id="phoneModal">
@@ -1379,6 +1395,10 @@
     const logoutButton = document.getElementById("logoutButton");
     const phoneButton = document.getElementById("phoneButton");
     const welcomeText = document.getElementById("welcomeText");
+    const profileWrap = document.getElementById("profileWrap");
+    const profileMenuName = document.getElementById("profileMenuName");
+    const profileMenuEmail = document.getElementById("profileMenuEmail");
+    const profileAvatar = document.getElementById("profileAvatar");
     const authModal = document.getElementById("authModal");
 
     if (loginButton) {
@@ -1393,9 +1413,14 @@
       phoneButton.style.display = loggedIn ? "inline-block" : "none";
     }
 
-    if (welcomeText) {
-      welcomeText.textContent =
-        loggedIn ? `Welcome, ${user?.name || "Student"}` : "";
+    if (welcomeText) welcomeText.textContent = "";
+    if (profileWrap) profileWrap.style.display = loggedIn ? "block" : "none";
+    if (profileMenuName) profileMenuName.textContent = user?.name || "Student";
+    if (profileMenuEmail) profileMenuEmail.textContent = user?.email || "";
+    if (profileAvatar) {
+      const name = String(user?.name || "Aditya Sharma").trim();
+      const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
+      profileAvatar.textContent = initials || "AS";
     }
 
     if (authModal) {
@@ -1409,6 +1434,38 @@
           '<div class="empty-state">Login to view campus reports.</div>';
       }
     }
+  }
+
+  function toggleProfileMenu() {
+    const menu = document.getElementById("profileMenu");
+    const avatar = document.getElementById("profileAvatar");
+    const isOpen = menu?.classList.toggle("open");
+    avatar?.setAttribute("aria-expanded", String(Boolean(isOpen)));
+  }
+
+  function closeProfileMenu() {
+    document.getElementById("profileMenu")?.classList.remove("open");
+    document.getElementById("profileAvatar")?.setAttribute("aria-expanded", "false");
+  }
+
+  document.addEventListener("click", event => {
+    if (!event.target.closest("#profileWrap")) closeProfileMenu();
+  });
+
+  function openPhoneFromProfile() {
+    closeProfileMenu();
+    openPhoneModal();
+  }
+
+  function openMyReports() {
+    closeProfileMenu();
+    const target = document.getElementById("myReports") || document.getElementById("itemsContainer");
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function handleUrgentAlert() {
+    if (isLoggedIn()) openReport("Lost");
+    else openAuth();
   }
 
   function handlePrimaryAction() {
