@@ -3,76 +3,105 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CampusFind | Admin Dashboard</title>
+
 <style>
-:root {
-  --navy:#101a34;--ink:#101d48;--muted:#60749c;--line:#e2eaf7;
-  --purple:#7155f5;--blue:#3688ff;--green:#10b981;--orange:#ffa52d;
-  --red:#ff5261;--page:#f7faff;
+:root{
+  --navy:#101a34;--ink:#12204b;--muted:#62759d;--line:#e2eaf7;
+  --purple:#6957f5;--blue:#258bf0;--green:#11b981;--orange:#ff9d27;
+  --red:#ff5261;--bg:#f7faff;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--page);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
-button,input,select{font:inherit}button{cursor:pointer}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
 .hidden{display:none!important}
-button:disabled{opacity:.55;cursor:wait}
-.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#101a34,#33427f)}
-.login-card{width:min(410px,100%);padding:32px;background:#fff;border-radius:19px;box-shadow:0 20px 70px #080f2944}
-.brand{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:850;letter-spacing:-.7px}
-.cap{color:#7162ff;font-size:34px;line-height:1}
-.login-card h1{margin:28px 0 6px;font-size:25px}
 .muted{color:var(--muted)}
+
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#101a34,#33427e)}
+.login-card{width:min(420px,100%);padding:32px;background:white;border-radius:19px;box-shadow:0 20px 60px #07122e38}
+.brand{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:850;letter-spacing:-.7px}
+.cap{font-size:35px;color:#7868ff}
+.login-card h1{margin:28px 0 6px;font-size:26px}
 .field{display:grid;gap:7px;margin:15px 0}
-.field label{font-size:12px;font-weight:650;color:#465981}
-.field input,.field select{width:100%;padding:12px;border:1px solid #dce5f3;border-radius:9px;background:#fbfdff;color:#1a2a50;outline:none}
-.field input:focus,.field select:focus{border-color:#8474ff;box-shadow:0 0 0 3px #8474ff20}
-.btn{border:0;border-radius:8px;padding:10px 13px;background:var(--purple);color:white;font-weight:700}
+.field label{font-size:12px;font-weight:650;color:#465a82}
+.field input,.field select{width:100%;border:1px solid #dce5f3;background:#fbfdff;border-radius:9px;padding:12px;color:#17264d;outline:none}
+.field input:focus,.field select:focus{border-color:#8175ff;box-shadow:0 0 0 3px #8175ff22}
+.btn{border:0;border-radius:8px;padding:10px 13px;color:white;background:var(--purple);font-weight:700}
+.btn:hover{filter:brightness(1.04)}
 .btn.full{width:100%;padding:13px}
-.btn.secondary{background:#edf2fb;color:#33476e}
-.btn.good{background:#dff8ec;color:#08794f}
-.btn.bad{background:#ffe6e9;color:#c32d45}
+.btn.secondary{background:#eaf0fb;color:#34486e}
+.btn.good{background:#ddf8eb;color:#078858}
+.btn.bad{background:#ffe7eb;color:#c73348}
+.btn.small{font-size:10px;padding:7px 9px}
 .notice{display:none;padding:11px 13px;border-radius:9px;margin:12px 0;font-size:12px;overflow-wrap:anywhere}
 .notice.show{display:block}
 .notice.error{background:#ffeaed;color:#b5263b}
-.notice.success{background:#def8eb;color:#08784f}
+.notice.success{background:#e0f8ee;color:#08794f}
+.notice.info{background:#eaf2ff;color:#244d8a}
+
 .app{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr)}
-.sidebar{position:sticky;top:0;height:100vh;min-height:600px;background:linear-gradient(180deg,#111b35,#0c162d);color:#d9e2f8;padding:20px 12px;display:flex;flex-direction:column;z-index:10}
+.sidebar{background:linear-gradient(180deg,#111b35,#0c162d);color:#d9e2f8;padding:20px 12px;display:flex;flex-direction:column;min-height:100vh;height:100vh;position:sticky;top:0;z-index:10}
 .brand-block{padding:2px 11px 27px}
-.brand-block .brand{color:#fff;font-size:22px}
+.brand-block .brand{color:white;font-size:22px}
 .brand-block .cap{color:#887cff}
-.brand small{display:block;color:#9dadd0;font-size:11px;font-weight:450;letter-spacing:0;margin-top:5px}
-.nav-label{font-size:10px;letter-spacing:1.4px;color:#6f81a8;margin:4px 11px 9px}
+.brand-block small{display:block;color:#9eadd0;font-size:11px;font-weight:450;letter-spacing:0;margin-top:5px}
+.nav-label{font-size:10px;color:#7889ae;letter-spacing:1.5px;margin:5px 10px 10px}
 .nav{display:grid;gap:5px}
-.nav button{border:0;background:transparent;color:#c5d1eb;text-align:left;padding:13px 15px;border-radius:9px;font-size:13px;display:flex;align-items:center;gap:13px;white-space:nowrap}
+.nav button{width:100%;border:0;background:transparent;color:#c5d1eb;text-align:left;padding:13px 15px;border-radius:9px;font-size:13px;display:flex;align-items:center;gap:13px;white-space:nowrap}
 .nav button:hover{background:#ffffff12}
-.nav button.active{background:linear-gradient(110deg,#454da0,#343f87);color:#fff;box-shadow:0 6px 18px #050c2335}
+.nav button.active{background:linear-gradient(110deg,#454da0,#343f87);color:white;box-shadow:0 6px 18px #050c2340}
 .nav .ico{width:18px;text-align:center;font-size:17px}
-.nav .count{margin-left:auto;background:#ff4e60;color:white;border-radius:20px;font-size:10px;padding:3px 7px}
+.nav .count{margin-left:auto;background:#ff4f60;color:white;border-radius:20px;font-size:10px;padding:3px 7px}
 .side-bottom{margin-top:auto;border-top:1px solid #ffffff19;padding:18px 9px 0}
 .profile{display:flex;align-items:center;gap:11px;padding:0 3px 17px}
-.avatar{width:42px;height:42px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#dedbff,#9a8bff);color:#483cba;font-size:17px;font-weight:800}
+.avatar{width:40px;height:40px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#dedbff,#9a8bff);color:#483cba;font-size:17px;font-weight:800}
 .profile strong{display:block;color:white;font-size:12px}
 .profile small{display:block;color:#96a6ca;font-size:10px;margin-top:4px}
 .logout{width:100%;text-align:left;padding:10px 4px;border:0;background:transparent;color:#bbc8e0}
+
 .workspace{min-width:0}
-.topbar{height:72px;background:#fff;border-bottom:1px solid #e5edf8;display:flex;align-items:center;gap:22px;padding:0 27px;position:sticky;top:0;z-index:5}
+.topbar{height:72px;background:white;border-bottom:1px solid #e5edf8;display:flex;align-items:center;gap:20px;padding:0 27px;position:sticky;top:0;z-index:20}
 .hamb{border:0;background:transparent;color:#506b9e;font-size:22px}
-.search{position:relative;width:min(540px,60%);flex:1}
+.search{position:relative;flex:1;max-width:540px}
 .search span{position:absolute;left:14px;top:8px;font-size:20px;color:#64799e}
 .search input{width:100%;padding:12px 15px 12px 43px;border:1px solid #e1eaf7;border-radius:10px;background:#f8faff;outline:none;color:#21365f}
-.top-right{display:flex;align-items:center;gap:18px;margin-left:auto}
-.bell{position:relative;font-size:21px;color:#405782}
-.bell b{position:absolute;top:-7px;right:-8px;background:#ff4f60;color:white;border-radius:50%;font-size:9px;padding:3px 5px}
-.top-profile{display:flex;align-items:center;gap:10px;border-left:1px solid #edf1f8;padding-left:17px;white-space:nowrap}
+.top-right{display:flex;align-items:center;gap:17px;margin-left:auto}
+.admin-menu-wrap,.notification-wrap{position:relative}
+.notification-button{position:relative;border:0;background:white;color:#405782;border-radius:9px;padding:8px;font-size:22px}
+.notification-button:hover{background:#f1f5ff}
+.notification-button .count{position:absolute;top:0;right:0;background:#ff4f60;color:white;font-size:9px;border-radius:20px;padding:3px 5px}
+.top-profile{display:flex;align-items:center;gap:10px;border:0;background:white;color:var(--ink);border-radius:10px;padding:5px 8px}
+.top-profile:hover{background:#f2f6ff}
 .top-profile .avatar{width:37px;height:37px}
-.top-profile strong{font-size:12px}
+.top-profile .details{text-align:left}
+.top-profile strong{font-size:12px;display:block}
 .top-profile small{display:block;color:var(--muted);margin-top:3px}
+.menu-caret{font-size:14px;margin-left:3px}
+
+.dropdown{
+  position:absolute;z-index:100;top:calc(100% + 10px);right:0;
+  width:255px;padding:8px;background:white;border:1px solid #e1e9f6;
+  border-radius:12px;box-shadow:0 15px 40px #17284b24;
+}
+.dropdown.hidden{display:none}
+.dropdown-heading{padding:12px;border-bottom:1px solid #edf1f8;margin-bottom:5px}
+.dropdown-heading strong{display:block;font-size:12px}
+.dropdown-heading small{display:block;margin-top:6px;color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.dropdown button{display:block;width:100%;text-align:left;background:white;border:0;color:#24395f;border-radius:8px;padding:11px 12px;font-size:12px}
+.dropdown button:hover{background:#f0f4ff}
+.dropdown .dropdown-meta{color:var(--muted);font-size:10px;padding:10px 12px}
+
 .content{max-width:1700px;margin:auto;padding:26px 28px 30px}
-.section{display:none}.section.active{display:block}
+.section{display:none}
+.section.active{display:block}
 .page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:24px}
 .page-head h1{font-size:25px;letter-spacing:-.7px;margin:0 0 5px}
 .page-head p{margin:0;color:var(--muted);font-size:13px}
-.date-select{background:#fff;border:1px solid #e0e8f5;border-radius:9px;padding:11px 12px;color:#2b426e;min-width:155px}
+.date-select{background:white;border:1px solid #e0e8f5;border-radius:9px;padding:11px 12px;color:#2b426e;min-width:155px}
+
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .stat{border:1px solid;border-radius:9px;padding:17px 19px 15px;min-height:176px;min-width:0}
 .stat.p{background:linear-gradient(130deg,#f6f3ff,#fff);border-color:#ded7ff}
@@ -80,39 +109,41 @@ button:disabled{opacity:.55;cursor:wait}
 .stat.g{background:linear-gradient(130deg,#effbf5,#fff);border-color:#c7f0dc}
 .stat.o{background:linear-gradient(130deg,#fffaf0,#fff);border-color:#ffe6b9}
 .stat-top{display:flex;align-items:center;gap:13px}
-.stat-icon{width:60px;height:60px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:26px;background:#e7e0ff;color:#6248ee}
+.stat-icon{width:55px;height:55px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:25px;background:#e7e0ff;color:#6248ee}
 .stat.b .stat-icon{background:#d9efff;color:#0877d4}
 .stat.g .stat-icon{background:#d8f6e8;color:#07885a}
 .stat.o .stat-icon{background:#fff0cc;color:#c87800}
 .stat-label{font-size:12px;font-weight:650}
 .stat-value{font-size:29px;font-weight:800;line-height:1.25;margin-top:6px;letter-spacing:-.6px}
 .stat-sub{font-size:11px;color:var(--muted);margin-top:7px}
-.stat-foot{margin-top:22px;font-size:12px;color:#07985e}
-.stat-foot span{color:#8193b5;margin-left:10px;font-size:11px}
+.stat-foot{margin-top:22px;font-size:11px;color:#07985e}
+.stat-foot span{color:#8193b5;margin-left:10px}
+
 .analytics{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,.95fr);gap:14px;margin-top:16px}
-.card{background:#fff;border:1px solid #e1eaf7;border-radius:9px;padding:17px 20px;min-width:0}
+.card{background:white;border:1px solid #e1eaf7;border-radius:9px;padding:17px 20px;min-width:0}
 .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .card h2{font-size:15px;margin:0 0 6px;letter-spacing:-.2px}
 .card p{font-size:11px;color:var(--muted);margin:0}
 .legend-inline{display:flex;gap:14px;flex-wrap:wrap;font-size:10px}
 .legend-inline span{display:flex;align-items:center;gap:6px}
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
-.chart-svg{width:100%;height:auto;display:block;margin-top:15px;overflow:visible}
+.chart-svg{width:100%;height:auto;display:block;margin-top:15px}
 .category-layout{display:flex;align-items:center;justify-content:center;gap:22px;min-height:205px}
-.donut{width:176px;height:176px;flex-shrink:0;border-radius:50%;position:relative;display:grid;place-items:center}
-.donut:after{content:"";position:absolute;width:94px;height:94px;background:#fff;border-radius:50%}
+.donut{width:170px;height:170px;flex-shrink:0;border-radius:50%;position:relative;display:grid;place-items:center}
+.donut:after{content:"";position:absolute;width:92px;height:92px;background:white;border-radius:50%}
 .donut-label{z-index:1;text-align:center}
 .donut-label strong{font-size:20px;display:block}
 .donut-label small{font-size:11px;color:#52668e}
-.category-legend{flex:1;min-width:0;display:grid;gap:14px}
+.category-legend{flex:1;min-width:0;display:grid;gap:13px}
 .category-line{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;font-size:11px}
 .category-line .value{color:#52668e;white-space:nowrap}
+
 .bottom-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,1fr) minmax(230px,.72fr);gap:14px;margin-top:15px}
 .small-link{color:#356cff;font-size:11px;border:0;background:transparent;white-space:nowrap}
 .table-wrap{overflow:auto;margin-top:16px}
 table{border-collapse:collapse;width:100%;min-width:490px}
 th{text-align:left;background:#f6f9ff;color:#24385f;font-size:10px;font-weight:650;padding:11px 10px}
-td{padding:11px 10px;border-bottom:1px solid #edf1f8;font-size:10px;color:#2b406b}
+td{padding:11px 10px;border-bottom:1px solid #edf1f8;font-size:10px;color:#2b406b;vertical-align:middle}
 tr:last-child td{border-bottom:0}
 .user-cell{display:flex;align-items:center;gap:8px;white-space:nowrap}
 .mini-avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:white;font-weight:800;font-size:11px;flex-shrink:0}
@@ -136,130 +167,80 @@ tr:last-child td{border-bottom:0}
 .quick-actions button:nth-child(4){background:linear-gradient(100deg,#ff8b27,#ff7417)}
 .system{margin-top:13px;padding:14px}
 .system strong{font-size:11px}.system p{margin-top:10px;color:#0aa36d;font-size:10px}
+
 .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
-.toolbar input,.toolbar select{border:1px solid #dce5f3;border-radius:8px;padding:10px 12px;background:#fff;color:#23395f}
+.toolbar input,.toolbar select{border:1px solid #dce5f3;border-radius:8px;padding:10px 12px;background:white;color:#23395f}
 .toolbar input{flex:1;min-width:180px}
-.table-card{background:#fff;border:1px solid #e1eaf7;border-radius:10px;padding:15px;overflow:hidden}
-.table-card table{min-width:760px}.table-card th,.table-card td{font-size:11px}
-.actions{display:flex;gap:5px;flex-wrap:wrap}.actions .btn{font-size:10px;padding:7px 8px}
-.form-card{max-width:760px;background:#fff;border:1px solid #e1eaf7;border-radius:12px;padding:22px}
+.table-card{background:white;border:1px solid #e1eaf7;border-radius:10px;padding:15px;overflow:hidden}
+.table-card table{min-width:760px}
+.table-card th,.table-card td{font-size:11px}
+.actions{display:flex;gap:5px;flex-wrap:wrap}
+.actions .btn{font-size:10px;padding:7px 8px}
+.form-card{max-width:760px;background:white;border:1px solid #e1eaf7;border-radius:12px;padding:22px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 .empty{text-align:center;padding:25px;color:var(--muted)}
+.approval-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.approval-heading h2{margin:0}
+.approval-number{background:#fff1d1;color:#af6500;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:750}
+
 @media(max-width:1200px){
- .app{grid-template-columns:225px minmax(0,1fr)}.content{padding:22px 18px}.topbar{padding:0 18px}
- .stats{gap:9px}.stat{padding:14px}.stat-icon{width:47px;height:47px}
+ .app{grid-template-columns:225px minmax(0,1fr)}
+ .content{padding:22px 18px}.topbar{padding:0 18px}
+ .stats{gap:9px}.stat{padding:14px}.stat-icon{width:45px;height:45px}
  .analytics{grid-template-columns:minmax(0,1.2fr) minmax(300px,1fr)}
  .bottom-grid{grid-template-columns:minmax(0,1.2fr) minmax(260px,1fr)}
  .quick-col{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
  .quick-col .card{margin:0}.quick-actions{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:850px){
- .app{grid-template-columns:1fr}.sidebar{position:relative;top:auto;height:auto;min-height:0;padding:12px}
+ .app{grid-template-columns:1fr}
+ .sidebar{position:relative;top:auto;height:auto;min-height:0;padding:12px}
  .brand-block{padding:2px 7px 12px}.brand-block .brand{font-size:18px}
  .nav{display:flex;overflow-x:auto}.nav button{white-space:nowrap;padding:10px}
- .side-bottom,.nav-label{display:none}.topbar{height:60px}.top-profile .details{display:none}
+ .side-bottom,.nav-label{display:none}
+ .topbar{height:60px}.top-profile .details{display:none}
  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
- .analytics,.bottom-grid{grid-template-columns:1fr}.quick-col{grid-column:auto;display:block}
- .quick-col .card{margin-top:12px}.category-layout{justify-content:flex-start}.page-head h1{font-size:22px}
+ .analytics,.bottom-grid{grid-template-columns:1fr}
+ .quick-col{grid-column:auto;display:block}.quick-col .card{margin-top:12px}
+ .category-layout{justify-content:flex-start}.page-head h1{font-size:22px}
 }
 @media(max-width:520px){
  .content{padding:18px 11px}.topbar{padding:0 12px;gap:10px}
  .search input{font-size:11px;padding-left:35px}.search span{left:11px}
- .top-right{gap:10px}.top-profile{padding-left:10px}.top-profile .avatar{width:31px;height:31px}
+ .top-right{gap:7px}.top-profile{padding:4px}
+ .top-profile .avatar{width:31px;height:31px}.top-profile .menu-caret{display:none}
  .stats{gap:8px}.stat{padding:11px;min-height:150px}.stat-top{gap:8px}
- .stat-icon{width:38px;height:38px;font-size:19px}.stat-label{font-size:10px}
+ .stat-icon{width:37px;height:37px;font-size:19px}.stat-label{font-size:10px}
  .stat-value{font-size:25px}.stat-sub{font-size:10px}.stat-foot{margin-top:16px;font-size:10px}
- .card{padding:14px}.category-layout{gap:14px}.donut{width:125px;height:125px}
- .donut:after{width:70px;height:70px}.category-legend{gap:10px}.category-line{font-size:10px}
+ .card{padding:14px}.category-layout{gap:13px}.donut{width:120px;height:120px}
+ .donut:after{width:67px;height:67px}.category-legend{gap:10px}.category-line{font-size:10px}
  .legend-inline{gap:8px}.page-head{align-items:flex-start}
- .date-select{min-width:0;padding:9px;font-size:10px}.form-grid{grid-template-columns:1fr}
- .quick-actions{grid-template-columns:1fr}
-  .admin-menu-wrap {
-  position: relative;
-}
-
-.top-profile {
-  border: 0;
-  background: white;
-  cursor: pointer;
-  font: inherit;
-  color: var(--ink);
-  border-radius: 10px;
-  padding: 5px 7px;
-}
-
-.top-profile:hover {
-  background: #f2f6ff;
-}
-
-.admin-dropdown {
-  position: absolute;
-  z-index: 100;
-  top: calc(100% + 12px);
-  right: 0;
-  width: 235px;
-  padding: 8px;
-  background: white;
-  border: 1px solid #e2eaf7;
-  border-radius: 12px;
-  box-shadow: 0 12px 35px #17284b20;
-}
-
-.admin-dropdown.hidden {
-  display: none;
-}
-
-.dropdown-heading {
-  padding: 12px;
-  border-bottom: 1px solid #edf1f8;
-  margin-bottom: 5px;
-}
-
-.dropdown-heading strong,
-.dropdown-heading small {
-  display: block;
-}
-
-.dropdown-heading small {
-  margin-top: 5px;
-  color: var(--muted);
-  font-size: 11px;
-  overflow-wrap: anywhere;
-}
-
-.admin-dropdown > button {
-  display: block;
-  width: 100%;
-  border: 0;
-  border-radius: 8px;
-  background: white;
-  color: var(--ink);
-  padding: 12px;
-  text-align: left;
-}
-
-.admin-dropdown > button:hover {
-  background: #f0f4ff;
-}
+ .date-select{min-width:0;padding:9px;font-size:10px}
+ .form-grid{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr}
+ .dropdown{width:min(270px,85vw)}
 }
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="loginScreen" class="login-screen">
  <form class="login-card" id="loginForm">
   <div class="brand"><span class="cap">◆</span><span>CampusFind</span></div>
-  <h1>Admin sign in</h1><p class="muted">Manage your campus lost & found community.</p>
+  <h1>Admin sign in</h1>
+  <p class="muted">Manage campus Lost & Found and community accounts.</p>
   <div id="loginNotice" class="notice"></div>
   <div class="field"><label>Email address</label><input id="loginEmail" type="email" required autocomplete="username" placeholder="admin@campusfind.com"></div>
   <div class="field"><label>Password</label><input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Enter password"></div>
-  <button class="btn full" id="loginBtn">Sign in to dashboard</button>
+  <button class="btn full" id="loginBtn" type="submit">Sign in to dashboard</button>
  </form>
 </div>
 
 <div id="adminApp" class="app hidden">
  <aside class="sidebar">
-  <div class="brand-block"><div class="brand"><span class="cap">◆</span><span>CampusFind<small>Lost & Found • Campus Community</small></span></div></div>
+  <div class="brand-block">
+   <div class="brand"><span class="cap">◆</span><span>CampusFind<small>Lost & Found • Campus Community</small></span></div>
+  </div>
   <div class="nav-label">MAIN MENU</div>
   <nav class="nav">
    <button class="active" data-section="dashboard"><span class="ico">▦</span>Dashboard</button>
@@ -271,37 +252,46 @@ tr:last-child td{border-bottom:0}
    <button data-section="settings"><span class="ico">⚙</span>Settings</button>
   </nav>
   <div class="side-bottom">
-   <div class="profile"><div class="avatar">A</div><div><strong>Admin</strong><small> Admin Panel</small></div></div>
+   <div class="profile"><div class="avatar">A</div><div><strong>Admin</strong><small>Admin Panel</small></div></div>
    <button id="logoutBtn" class="logout">⇥ &nbsp; Logout</button>
   </div>
  </aside>
 
  <div class="workspace">
   <header class="topbar">
-   <button class="hamb" id="menuBtn" aria-label="Toggle menu">☰</button>
+   <button class="hamb" id="menuBtn" type="button" aria-label="Toggle sidebar">☰</button>
    <div class="search"><span>⌕</span><input id="globalSearch" placeholder="Search users, items, or by email..."></div>
-   <div class="top-right"><div class="bell">♧<b id="bellCount">0</b></div>
-    <div class="admin-menu-wrap">
-  <button type="button" class="top-profile" id="adminMenuBtn"
-          aria-expanded="false">
-    <div class="avatar">A</div>
-    <div class="details">
-      <strong>Admin</strong>
-      <small>Administrator</small>
-    </div>
-    <span>⌄</span>
-  </button>
 
-  <div class="admin-dropdown hidden" id="adminDropdown">
-    <div class="dropdown-heading">
-      <strong>Admin Account</strong>
-      <small id="dropdownEmail">Administrator</small>
+   <div class="top-right">
+    <!-- CLICKABLE NOTIFICATIONS -->
+    <div class="notification-wrap">
+     <button id="notificationBtn" class="notification-button" type="button" aria-label="Notifications" aria-expanded="false">
+      ♧<span id="notificationCount" class="count">0</span>
+     </button>
+     <div id="notificationDropdown" class="dropdown hidden">
+      <div class="dropdown-heading"><strong>Notifications</strong><small id="notificationSummary">Loading pending requests...</small></div>
+      <button type="button" data-go="approvals">♟ &nbsp; Pending student approvals <span id="pendingStudentNotice">0</span></button>
+      <button type="button" data-go="approvals">▣ &nbsp; Pending faculty approvals <span id="pendingFacultyNotice">0</span></button>
+      <button type="button" data-go="approvals">◷ &nbsp; Pending report reviews <span id="pendingItemNotice">0</span></button>
+      <button type="button" id="notificationRefresh">↻ &nbsp; Refresh notifications</button>
+      <div class="dropdown-meta">Counts come from the existing backend data.</div>
+     </div>
     </div>
-    <button type="button" data-admin-action="settings">⚙ Settings</button>
-    <button type="button" data-admin-action="refresh">↻ Refresh Dashboard</button>
-    <button type="button" data-admin-action="logout">⇥ Log out</button>
-  </div>
-</div>
+
+    <!-- CLICKABLE ADMIN PROFILE -->
+    <div class="admin-menu-wrap">
+     <button class="top-profile" id="adminMenuBtn" type="button" aria-expanded="false">
+      <div class="avatar">A</div>
+      <div class="details"><strong>Admin</strong><small>Administrator</small></div>
+      <span class="menu-caret">⌄</span>
+     </button>
+     <div id="adminDropdown" class="dropdown hidden">
+      <div class="dropdown-heading"><strong>Admin Account</strong><small id="dropdownEmail">Administrator</small></div>
+      <button type="button" data-admin-action="settings">⚙ &nbsp; Settings</button>
+      <button type="button" data-admin-action="refresh">↻ &nbsp; Refresh Dashboard</button>
+      <button type="button" data-admin-action="logout">⇥ &nbsp; Log out</button>
+     </div>
+    </div>
    </div>
   </header>
 
@@ -316,22 +306,10 @@ tr:last-child td{border-bottom:0}
     </div>
 
     <div class="stats">
-     <article class="stat p">
-      <div class="stat-top"><div class="stat-icon">♟</div><div><div class="stat-label">Total Users</div><div class="stat-value" id="totalUsers">—</div><div class="stat-sub" id="userSplit">Students: — &nbsp; | &nbsp; Faculty: —</div></div></div>
-      <div class="stat-foot">● <b>Live data</b><span>from your database</span></div>
-     </article>
-     <article class="stat b">
-      <div class="stat-top"><div class="stat-icon">▣</div><div><div class="stat-label">Lost Items</div><div class="stat-value" id="lostCount">—</div><div class="stat-sub">Items reported lost</div></div></div>
-      <div class="stat-foot">● <b>Live data</b><span>from reports</span></div>
-     </article>
-     <article class="stat g">
-      <div class="stat-top"><div class="stat-icon">✓</div><div><div class="stat-label">Found Items</div><div class="stat-value" id="foundCount">—</div><div class="stat-sub">Items reported found</div></div></div>
-      <div class="stat-foot">● <b>Live data</b><span>from reports</span></div>
-     </article>
-     <article class="stat o">
-      <div class="stat-top"><div class="stat-icon">◷</div><div><div class="stat-label">Pending Faculty</div><div class="stat-value" id="pendingFaculty">—</div><div class="stat-sub">Need approval</div></div></div>
-      <div class="stat-foot" style="color:#d98200">◷ <b>Needs review</b><span>faculty accounts</span></div>
-     </article>
+     <article class="stat p"><div class="stat-top"><div class="stat-icon">♟</div><div><div class="stat-label">Total Users</div><div class="stat-value" id="totalUsers">—</div><div class="stat-sub" id="userSplit">Students: — | Faculty: —</div></div></div><div class="stat-foot">● <b>Live data</b><span>from your database</span></div></article>
+     <article class="stat b"><div class="stat-top"><div class="stat-icon">▣</div><div><div class="stat-label">Lost Items</div><div class="stat-value" id="lostCount">—</div><div class="stat-sub">Items reported lost</div></div></div><div class="stat-foot">● <b>Live data</b><span>from reports</span></div></article>
+     <article class="stat g"><div class="stat-top"><div class="stat-icon">✓</div><div><div class="stat-label">Found Items</div><div class="stat-value" id="foundCount">—</div><div class="stat-sub">Items reported found</div></div></div><div class="stat-foot">● <b>Live data</b><span>from reports</span></div></article>
+     <article class="stat o"><div class="stat-top"><div class="stat-icon">◷</div><div><div class="stat-label">Pending Faculty</div><div class="stat-value" id="pendingFaculty">—</div><div class="stat-sub">Need approval</div></div></div><div class="stat-foot" style="color:#d98200">◷ <b>Needs review</b><span>faculty accounts</span></div></article>
     </div>
 
     <div class="analytics">
@@ -340,82 +318,96 @@ tr:last-child td{border-bottom:0}
        <div class="legend-inline"><span><i class="dot" style="background:#3987ff"></i>Lost</span><span><i class="dot" style="background:#11b981"></i>Found</span><span><i class="dot" style="background:#8b55ff"></i>Returned</span></div>
       </div>
       <svg id="activityChart" class="chart-svg" viewBox="0 0 650 205" role="img" aria-label="Item activity chart">
-       <g stroke="#e8eef8" stroke-width="1" id="chartGrid"></g>
-       <g fill="#63769b" font-size="10" id="chartYLabels"></g>
+       <g id="chartGrid" stroke="#e8eef8" stroke-width="1"></g><g id="chartYLabels" fill="#63769b" font-size="10"></g>
        <path id="lostArea" fill="#3987ff" opacity=".08"></path><path id="foundArea" fill="#11b981" opacity=".08"></path><path id="returnedArea" fill="#8b55ff" opacity=".08"></path>
-       <path id="lostLine" fill="none" stroke="#3987ff" stroke-width="2.5"></path><path id="foundLine" fill="none" stroke="#11b981" stroke-width="2.5"></path><path id="returnedLine" fill="none" stroke="#8b55ff" stroke-width="2.5"></path>
+       <path id="lostLine" fill="none" stroke="#3987ff" stroke-width="2.5" stroke-linecap="round"></path><path id="foundLine" fill="none" stroke="#11b981" stroke-width="2.5" stroke-linecap="round"></path><path id="returnedLine" fill="none" stroke="#8b55ff" stroke-width="2.5" stroke-linecap="round"></path>
        <g id="chartDots"></g><g id="chartLabels" fill="#63769b" font-size="10"></g>
       </svg>
-      <p id="chartCaption">Showing counts calculated from report dates returned by your backend.</p>
+      <p id="chartCaption">Counts are grouped using report dates returned by your backend.</p>
      </article>
 
      <article class="card">
       <div class="card-head"><div><h2>Item Categories</h2><p>Total items by category</p></div></div>
       <div class="category-layout">
-       <div id="categoryDonut" class="donut"><div class="donut-label"><strong id="categoryTotal">0</strong><small>Total Items</small></div></div>
-       <div id="categoryLegend" class="category-legend"><span class="muted">Loading categories…</span></div>
+       <div id="categoryDonut" class="donut" style="background:conic-gradient(#dfe6f2 0 100%)"><div class="donut-label"><strong id="categoryTotal">0</strong><small>Total Items</small></div></div>
+       <div id="categoryLegend" class="category-legend"><span class="muted">Loading categories...</span></div>
       </div>
      </article>
     </div>
 
     <div class="bottom-grid">
-     <article class="card">
-      <div class="card-head"><div><h2>Recent Users</h2></div><button class="small-link" data-go="users">View all →</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Status</th><th>Joined</th></tr></thead><tbody id="recentUsers"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+     <article class="card"><div class="card-head"><div><h2>Recent Users</h2></div><button class="small-link" data-go="users">View all →</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Status</th><th>Joined</th></tr></thead><tbody id="recentUsers"><tr><td colspan="5">Loading...</td></tr></tbody></table></div>
      </article>
-
-     <article class="card">
-      <div class="card-head"><div><h2>Recent Activity</h2></div><button class="small-link" data-go="reports">View all →</button></div>
-      <div id="recentActivity" class="activity-list"><span class="muted">Loading activity…</span></div>
-     </article>
-
+     <article class="card"><div class="card-head"><div><h2>Recent Activity</h2></div><button class="small-link" data-go="reports">View all →</button></div><div id="recentActivity" class="activity-list"><span class="muted">Loading activity...</span></div></article>
      <div class="quick-col">
-      <article class="card"><h2>Quick Actions</h2>
-       <div class="quick-actions">
-        <button data-go="create" data-account="Student"><span>♟＋</span>Create Student Account</button>
-        <button data-go="create" data-account="Faculty"><span>♟＋</span>Create Faculty Account</button>
-        <button data-go="items"><span>⬡</span>Manage Lost & Found</button>
-        <button data-go="approvals"><span>✓</span>View Pending Approvals</button>
-       </div>
-      </article>
-      <article class="card system"><strong>System Status</strong><p id="systemStatus">● &nbsp; Waiting for backend connection</p></article>
+      <article class="card"><h2>Quick Actions</h2><div class="quick-actions">
+       <button data-go="create" data-account="Student"><span>♟＋</span>Create Student Account</button>
+       <button data-go="create" data-account="Faculty"><span>♟＋</span>Create Faculty Account</button>
+       <button data-go="items"><span>⬡</span>Manage Lost & Found</button>
+       <button data-go="approvals"><span>✓</span>View Pending Approvals</button>
+      </div></article>
+      <article class="card system"><strong>System Status</strong><p id="systemStatus">● Waiting for backend connection</p></article>
      </div>
     </div>
    </section>
 
    <!-- USERS -->
    <section id="users" class="section">
-    <div class="page-head"><div><h1>Users</h1><p>Manage Student and Faculty accounts.</p></div><button class="btn" data-go="create">＋ Create Account</button></div>
-    <div class="toolbar"><input id="userSearch" placeholder="Search name, email, phone..."><select id="userStatusFilter"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Disabled</option></select><select id="userTypeFilter"><option value="">All account types</option><option>Student</option><option>Faculty</option></select></div>
-    <div class="table-card"><table><thead><tr><th>User</th><th>Contact</th><th>Type</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersList"><tr><td colspan="6">Loading users…</td></tr></tbody></table></div>
+    <div class="page-head"><div><h1>Users</h1><p>Manage, approve and reset accounts.</p></div><button class="btn" data-go="create">＋ Create Account</button></div>
+    <div class="toolbar">
+     <input id="userSearch" placeholder="Search name, email or phone...">
+     <select id="userStatusFilter" aria-label="Filter by status">
+      <option value="">All statuses</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option><option value="Disabled">Disabled</option>
+     </select>
+     <select id="userTypeFilter" aria-label="Filter by account type"><option value="">All account types</option><option value="Student">Student</option><option value="Faculty">Faculty</option></select>
+     <button class="btn secondary" id="reloadUsers">↻ Refresh users</button>
+    </div>
+    <div id="usersNotice" class="notice"></div>
+    <div class="table-card"><table><thead><tr><th>User</th><th>Contact</th><th>Type</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersList"><tr><td colspan="6">Loading users...</td></tr></tbody></table></div>
    </section>
 
    <!-- CREATE ACCOUNT -->
    <section id="create" class="section">
-    <div class="page-head"><div><h1>Create Account</h1><p>Create Student and Faculty accounts from the admin panel.</p></div></div>
+    <div class="page-head"><div><h1>Create Account</h1><p>Create Student or Faculty accounts.</p></div></div>
     <div class="form-card"><form id="createForm"><div id="createNotice" class="notice"></div>
      <div class="form-grid">
       <div class="field"><label>Full name</label><input name="name" required maxlength="100" placeholder="Full name"></div>
       <div class="field"><label>Email address</label><input name="email" type="email" required placeholder="name@college.edu"></div>
       <div class="field"><label>Phone</label><input name="phone" maxlength="30" placeholder="Optional phone"></div>
       <div class="field"><label>Temporary password</label><input name="password" type="password" required minlength="6" autocomplete="new-password" placeholder="Create password"></div>
-      <div class="field"><label>Account type</label><select name="accountType" id="accountType"><option>Student</option><option>Faculty</option></select></div>
-     </div><button class="btn" id="createBtn">＋ Create Account</button>
+      <div class="field"><label>Account type</label><select name="accountType" id="accountType"><option value="Student">Student</option><option value="Faculty">Faculty</option></select></div>
+     </div>
+     <button class="btn" id="createBtn" type="submit">＋ Create Account</button>
     </form></div>
    </section>
 
-   <!-- LOST AND FOUND -->
+   <!-- LOST & FOUND -->
    <section id="items" class="section">
-    <div class="page-head"><div><h1>Lost & Found</h1><p>Review and manage item reports.</p></div></div>
-    <div class="toolbar"><input id="itemSearch" placeholder="Search title, category or location..."><select id="itemTypeFilter"><option value="">All types</option><option>Lost</option><option>Found</option><option>Returned</option></select><select id="itemStatusFilter"><option value="">All review statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select></div>
-    <div class="table-card"><table><thead><tr><th>Report</th><th>Type</th><th>Category / Location</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="itemsList"><tr><td colspan="6">Loading reports…</td></tr></tbody></table></div>
+    <div class="page-head"><div><h1>Lost & Found</h1><p>Review and manage campus item reports.</p></div></div>
+    <div class="toolbar"><input id="itemSearch" placeholder="Search title, category or location..."><select id="itemTypeFilter"><option value="">All types</option><option value="lost">Lost</option><option value="found">Found</option><option value="returned">Returned</option></select><select id="itemStatusFilter"><option value="">All review statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><button class="btn secondary" id="reloadItems">↻ Refresh reports</button></div>
+    <div id="itemsNotice" class="notice"></div>
+    <div class="table-card"><table><thead><tr><th>Report</th><th>Type</th><th>Category / Location</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="itemsList"><tr><td colspan="6">Loading reports...</td></tr></tbody></table></div>
    </section>
 
-   <!-- APPROVALS -->
+   <!-- APPROVALS: STUDENTS + FACULTY -->
    <section id="approvals" class="section">
-    <div class="page-head"><div><h1>Approvals</h1><p>Faculty accounts and reports awaiting review.</p></div></div>
-    <article class="card"><h2>Pending Faculty</h2><div class="table-card" style="margin-top:14px"><table><thead><tr><th>Name</th><th>Email</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="pendingFacultyList"></tbody></table></div></article>
-    <article class="card" style="margin-top:14px"><h2>Pending Reports</h2><div class="table-card" style="margin-top:14px"><table><thead><tr><th>Report</th><th>Type</th><th>Actions</th></tr></thead><tbody id="pendingItemsList"></tbody></table></div></article>
+    <div class="page-head"><div><h1>Approvals</h1><p>Pending Student and Faculty accounts, plus reports awaiting review.</p></div><button class="btn secondary" id="reloadApprovals">↻ Refresh approvals</button></div>
+
+    <article class="card">
+     <div class="approval-heading"><h2>Pending Student Accounts</h2><span class="approval-number" id="pendingStudentCount">0 pending</span></div>
+     <div class="table-card"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="pendingStudentsList"></tbody></table></div>
+    </article>
+
+    <article class="card" style="margin-top:14px">
+     <div class="approval-heading"><h2>Pending Faculty Accounts</h2><span class="approval-number" id="pendingFacultyCount">0 pending</span></div>
+     <div class="table-card"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="pendingFacultyList"></tbody></table></div>
+    </article>
+
+    <article class="card" style="margin-top:14px">
+     <div class="approval-heading"><h2>Pending Item Reports</h2><span class="approval-number" id="pendingItemCount">0 pending</span></div>
+     <div class="table-card"><table><thead><tr><th>Report</th><th>Type</th><th>Category</th><th>Actions</th></tr></thead><tbody id="pendingItemsList"></tbody></table></div>
+    </article>
    </section>
 
    <!-- REPORT SUMMARY -->
@@ -433,416 +425,655 @@ tr:last-child td{border-bottom:0}
    <!-- SETTINGS -->
    <section id="settings" class="section">
     <div class="page-head"><div><h1>Settings</h1><p>Admin workspace and backend connection.</p></div></div>
-    <div class="form-card"><h2>API connection</h2><p class="muted">Dashboard data is requested from your existing CampusFind backend.</p><div class="field"><label>Backend URL</label><input readonly value="https://campus-find-hmyj.onrender.com"></div><p class="muted">Database credentials and JWT secrets must stay on the backend.</p><button class="btn secondary" data-refresh>Refresh data</button></div>
+    <div class="form-card"><h2>API connection</h2><p class="muted">Dashboard data is loaded from the existing CampusFind backend.</p><div class="field"><label>Backend URL</label><input readonly value="https://campus-find-hmyj.onrender.com"></div><button class="btn secondary" data-refresh>Refresh data</button></div>
    </section>
   </main>
  </div>
 </div>
 
 <script>
-const API_BASE="https://campus-find-hmyj.onrender.com";
-const $=id=>document.getElementById(id);
-let token=localStorage.getItem("campusFindAdminToken")||"";
-let adminUser=null,users=[],items=[];
-try{adminUser=JSON.parse(localStorage.getItem("campusFindAdminUser")||"null")}catch(e){}
-const palette=["#3987ff","#9b55f5","#11b981","#ffab2e","#27add6","#9da9c2"];
+"use strict";
 
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function date(v){if(!v)return"—";const d=new Date(v);return isNaN(d)?"—":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
-function badge(s){s=s||"Unknown";return `<span class="badge ${esc(s)}">${esc(s)}</span>`}
-function showNotice(id,msg,type="error"){const el=$(id);if(el){el.textContent=msg;el.className="notice show "+type}}
-function clearNotice(id){if($(id))$(id).className="notice"}
-function arrayFrom(data,keys){if(Array.isArray(data))return data;for(const key of keys)if(Array.isArray(data?.[key]))return data[key];return []}
-async function api(path,options={}){
- const headers={...(options.headers||{})};
- if(token)headers.Authorization="Bearer "+token;
- if(options.body)headers["Content-Type"]="application/json";
- const response=await fetch(API_BASE+path,{...options,headers});
- const raw=await response.text();let data={};
- try{data=raw?JSON.parse(raw):{}}catch(e){data={message:raw}}
- if(!response.ok)throw Error(data.message||data.error||`Request failed (${response.status})`);
- return data
+const API_BASE = "https://campus-find-hmyj.onrender.com";
+const $ = id => document.getElementById(id);
+let token = localStorage.getItem("campusFindAdminToken") || "";
+let adminUser = null;
+let users = [];
+let items = [];
+
+try {
+  adminUser = JSON.parse(localStorage.getItem("campusFindAdminUser") || "null");
+} catch (_) {}
+
+const palette = ["#3987ff","#9b55f5","#11b981","#ffab2e","#27add6","#9da9c2"];
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
 }
-function accountType(u){return u.accountType||"Student"}
-function itemType(i){return String(i.type||i.itemType||i.reportType||"Other").toLowerCase()}
-function reviewStatus(i){return i.reviewStatus||i.status||"Pending"}
-
-function goTo(id){
- document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===id));
- document.querySelectorAll("[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===id));
- const info={
-  dashboard:["👋 Dashboard","Welcome back, Admin! Here's what's happening on CampusFind."],
-  users:["Users","Manage Student and Faculty accounts."],
-  create:["Create Account","Create a Student or Faculty account."],
-  items:["Lost & Found","Review and manage item reports."],
-  approvals:["Approvals","Review pending accounts and reports."],
-  reports:["Reports","Summary of Lost & Found submissions."],
-  settings:["Settings","Admin workspace and backend connection."]
- };
- const section=$(id);
- if(id==="dashboard"){
-  section.querySelector(".page-head h1").textContent=info[id][0];
-  section.querySelector(".page-head p").textContent=info[id][1];
- }else{
-  section.querySelector(".page-head h1").textContent=info[id]?.[0]||id;
-  section.querySelector(".page-head p").textContent=info[id]?.[1]||"";
- }
- window.scrollTo({top:0,behavior:"smooth"});
+function dateText(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
 }
-document.querySelectorAll("[data-section]").forEach(b=>b.addEventListener("click",()=>goTo(b.dataset.section)));
-document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{
- if(b.dataset.account)$("accountType").value=b.dataset.account;
- goTo(b.dataset.go)
-}));
-document.querySelectorAll("[data-refresh]").forEach(b=>b.addEventListener("click",refreshAll));
-
-$("menuBtn").addEventListener("click",()=>{
- const sidebar=document.querySelector(".sidebar");
- if(window.innerWidth<=850){sidebar.classList.toggle("hidden")}
- else{
-  const app=$("adminApp");
-  if(app.style.gridTemplateColumns==="70px minmax(0px, 1fr)"){
-   app.style.gridTemplateColumns="260px minmax(0,1fr)";
-   sidebar.querySelectorAll(".nav button").forEach(b=>b.style.justifyContent="");
-  }else{
-   app.style.gridTemplateColumns="70px minmax(0, 1fr)";
-   sidebar.querySelectorAll(".nav button").forEach(b=>b.style.justifyContent="center");
+function statusBadge(status) {
+  const s = status || "Unknown";
+  return `<span class="badge ${escapeHTML(s)}">${escapeHTML(s)}</span>`;
+}
+function showNotice(id,message,type="error") {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = "notice show " + type;
+}
+function clearNotice(id) {
+  if ($(id)) $(id).className = "notice";
+}
+function normalizeArray(data,keys) {
+  if (Array.isArray(data)) return data;
+  for (const key of keys) {
+    if (Array.isArray(data?.[key])) return data[key];
   }
- }
+  return [];
+}
+function accountType(user) {
+  return user.accountType || user.role || user.userType || "Student";
+}
+function accountStatus(user) {
+  return user.accountStatus || user.status || "Approved";
+}
+function itemType(item) {
+  return String(item.type || item.itemType || item.reportType || "Other").toLowerCase();
+}
+function reviewStatus(item) {
+  return item.reviewStatus || item.status || "Pending";
+}
+function userId(user) {
+  return user._id || user.id || "";
+}
+function itemId(item) {
+  return item._id || item.id || "";
+}
+
+async function api(path,options={}) {
+  const headers = {...(options.headers || {})};
+  if (token) headers.Authorization = "Bearer " + token;
+  if (options.body) headers["Content-Type"] = "application/json";
+  const response = await fetch(API_BASE + path,{...options,headers});
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; }
+  catch (_) { data = {message:raw}; }
+  if (!response.ok) throw Error(data.message || data.error || `Request failed (${response.status})`);
+  return data;
+}
+
+/* NAVIGATION */
+function goTo(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.toggle("active",s.id===id));
+  document.querySelectorAll("[data-section]").forEach(b => b.classList.toggle("active",b.dataset.section===id));
+  const details = {
+    dashboard:["👋 Dashboard","Welcome back, Admin! Here's what's happening on CampusFind."],
+    users:["Users","Manage, approve and reset accounts."],
+    create:["Create Account","Create Student or Faculty accounts."],
+    items:["Lost & Found","Review and manage campus item reports."],
+    approvals:["Approvals","Review pending Student and Faculty accounts."],
+    reports:["Reports","Summary of existing Lost & Found submissions."],
+    settings:["Settings","Admin workspace and backend connection."]
+  };
+  const section = $(id);
+  if (id === "dashboard") {
+    section.querySelector(".page-head h1").textContent = details.dashboard[0];
+    section.querySelector(".page-head p").textContent = details.dashboard[1];
+  } else {
+    section.querySelector(".page-head h1").textContent = details[id][0];
+    section.querySelector(".page-head p").textContent = details[id][1];
+  }
+  closeDropdowns();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll("[data-section]").forEach(button => {
+  button.addEventListener("click",() => goTo(button.dataset.section));
 });
-function showApp(){
- $("loginScreen").classList.add("hidden");
- $("adminApp").classList.remove("hidden");
- 
-}
-function showLogin(){$("adminApp").classList.add("hidden");$("loginScreen").classList.remove("hidden")}
-function logout(){
- token="";adminUser=null;
- localStorage.removeItem("campusFindAdminToken");
- localStorage.removeItem("campusFindAdminUser");
- showLogin()
-}
-$("logoutBtn").addEventListener("click",logout);
-
-$("loginForm").addEventListener("submit",async e=>{
- e.preventDefault();clearNotice("loginNotice");
- $("loginBtn").disabled=true;$("loginBtn").textContent="Signing in…";
- try{
-  const data=await api("/api/auth/login",{method:"POST",body:JSON.stringify({
-   email:$("loginEmail").value.trim(),password:$("loginPassword").value
-  })});
-  if(!data.token||!data.user?.isAdmin)throw Error("This account does not have administrator access.");
-  token=data.token;adminUser=data.user;
-  localStorage.setItem("campusFindAdminToken",token);
-  localStorage.setItem("campusFindAdminUser",JSON.stringify(adminUser));
-  showApp();await refreshAll()
- }catch(err){showNotice("loginNotice",err.message)}
- finally{$("loginBtn").disabled=false;$("loginBtn").textContent="Sign in to dashboard"}
-});
-
-$("logoutBtn").addEventListener("click",logout);
-async function refreshAll(){
- clearNotice("globalNotice");
- try{
-  const [userData,itemData]=await Promise.all([
-   api("/api/auth/admin/users"),
-   api("/api/items/admin/all")
-  ]);
-  users=arrayFrom(userData,["users","data","results"]);
-  items=arrayFrom(itemData,["items","data","reports","results"]);
-  renderAll();
-  $("systemStatus").textContent="●  Backend connected • Data refreshed";
-  $("systemStatus").style.color="#0aa36d";
- }catch(err){
-  $("systemStatus").textContent="●  Connection or API error";
-  $("systemStatus").style.color="#c52d44";
-  showNotice("globalNotice","Could not load live data: "+err.message);
- }
-}
-
-function renderAll(){
- renderStats();renderUsers();renderItems();renderRecent();renderCategories();renderApprovals();renderReports()
-}
-function selectedRange(){
- const val=$("dateRange").value;
- if(val==="all")return Infinity;
- return Number(val)||7;
-}
-function includedInRange(item){
- const value=item.createdAt||item.date;
- if(!value)return false;
- const d=new Date(value);
- if(isNaN(d))return false;
- return (Date.now()-d.getTime())<=selectedRange()*86400000 && d.getTime()<=Date.now()+86400000
-}
-$("dateRange").addEventListener("change",()=>{renderStats();renderCategories();drawActivity()});
-
-function renderStats(){
- const students=users.filter(u=>accountType(u).toLowerCase()==="student").length;
- const faculty=users.filter(u=>accountType(u).toLowerCase()==="faculty").length;
- const pendingFaculty=users.filter(u=>accountType(u).toLowerCase()==="faculty"&&(u.accountStatus||"Approved")==="Pending").length;
- const lost=items.filter(i=>itemType(i)==="lost");
- const found=items.filter(i=>itemType(i)==="found");
- $("totalUsers").textContent=users.length;
- $("userSplit").textContent=`Students: ${students}  |  Faculty: ${faculty}`;
- $("lostCount").textContent=lost.length;
- $("foundCount").textContent=found.length;
- $("pendingFaculty").textContent=pendingFaculty;
-
- const pendingUsers=users.filter(u=>(u.accountStatus||"Approved")==="Pending").length;
- const pendingItems=items.filter(i=>reviewStatus(i)==="Pending").length;
- $("approvalBadge").textContent=pendingUsers+pendingItems;
- $("bellCount").textContent=pendingUsers+pendingItems;
-
- $("allReportsCount").textContent=items.length;
- $("approvedReportsCount").textContent=items.filter(i=>reviewStatus(i)==="Approved").length;
- $("pendingReportsCount").textContent=pendingItems;
- $("returnedReportsCount").textContent=items.filter(i=>itemType(i)==="returned"||/returned/i.test(i.status||"")).length;
- drawActivity()
-}
-
-function renderRecent(){
- const latestUsers=[...users].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
- $("recentUsers").innerHTML=latestUsers.length?latestUsers.map((u,n)=>`
- <tr><td><div class="user-cell"><span class="mini-avatar" style="background:${palette[n%palette.length]}">${esc((u.name||"?").slice(0,1).toUpperCase())}</span>${esc(u.name||"Unnamed")}</div></td>
- <td>${esc(u.email||"—")}</td><td>${esc(accountType(u))}</td><td>${badge(u.accountStatus||"Approved")}</td><td>${date(u.createdAt)}</td></tr>`).join(""):`<tr><td colspan="5" class="empty">No users found.</td></tr>`;
-
- const recent=[...items].sort((a,b)=>new Date(b.createdAt||b.date||0)-new Date(a.createdAt||a.date||0)).slice(0,5);
- $("recentActivity").innerHTML=recent.length?recent.map((i,n)=>{
-  const type=itemType(i);
-  let heading=type==="lost"?"New lost item reported":type==="found"?"New found item reported":type==="returned"?"Item marked as returned":"New report activity";
-  let sub=i.title||i.itemName||i.category||i.location||"Campus report";
-  return `<div class="activity"><div class="activity-icon ${n%4===1?"blue":n%4===2?"purple":n%4===3?"orange":""}">${type==="lost"?"⌕":type==="found"?"✓":type==="returned"?"▣":"●"}</div><div class="activity-text"><strong>${heading}</strong><small>${esc(sub)}</small></div><time>${date(i.createdAt||i.date)}</time></div>`
- }).join(""):`<div class="muted">No report activity yet.</div>`
-}
-
-function renderCategories(){
- const chosen=items.filter(includedInRange);
- const source=$("dateRange").value==="all"?items:chosen;
- const map={};
- source.forEach(i=>{const cat=String(i.category||"Others").trim()||"Others";map[cat]=(map[cat]||0)+1});
- let entries=Object.entries(map).sort((a,b)=>b[1]-a[1]);
- if(entries.length>6){const remainder=entries.slice(5).reduce((sum,e)=>sum+e[1],0);entries=entries.slice(0,5);entries.push(["Others",remainder])}
- const total=source.length;
- $("categoryTotal").textContent=total;
- const sum=entries.reduce((n,e)=>n+e[1],0)||1;
- let degree=0;const segments=[];
- entries.forEach(([name,count],i)=>{
-  const next=degree+count/sum*100;
-  segments.push(`${palette[i%palette.length]} ${degree}% ${next}%`);
-  degree=next;
- });
- $("categoryDonut").style.background=segments.length?`conic-gradient(${segments.join(",")})`:"conic-gradient(#dfe6f2 0 100%)";
- $("categoryLegend").innerHTML=entries.length?entries.map(([name,count],i)=>`
- <div class="category-line"><i class="dot" style="background:${palette[i%palette.length]}"></i><span>${esc(name)}</span><span class="value">${count} <small>(${Math.round(count/sum*100)}%)</small></span></div>
- `).join(""):`<span class="muted">No category data available.</span>`
-}
-
-function drawActivity(){
- const days=selectedRange()===Infinity?30:selectedRange();
- const end=new Date();end.setHours(0,0,0,0);
- const start=new Date(end);start.setDate(start.getDate()-Math.min(days-1,29));
- const countDays=Math.max(1,Math.min(days,30));
- const labels=[],series={lost:[],found:[],returned:[]};
- for(let n=0;n<countDays;n++){
-  const day=new Date(start);day.setDate(start.getDate()+n);
-  labels.push(day.toLocaleDateString("en-US",{month:"short",day:"numeric"}));
-  const dayItems=items.filter(i=>{
-   const d=new Date(i.createdAt||i.date);
-   return !isNaN(d)&&d.toDateString()===day.toDateString()
+document.querySelectorAll("[data-go]").forEach(button => {
+  button.addEventListener("click",() => {
+    if (button.dataset.account) $("accountType").value = button.dataset.account;
+    goTo(button.dataset.go);
   });
-  series.lost.push(dayItems.filter(i=>itemType(i)==="lost").length);
-  series.found.push(dayItems.filter(i=>itemType(i)==="found").length);
-  series.returned.push(dayItems.filter(i=>itemType(i)==="returned"||/returned/i.test(i.status||"")).length)
- }
+});
+document.querySelectorAll("[data-refresh]").forEach(button => button.addEventListener("click",refreshAll));
 
- const left=42,right=635,top=20,bottom=160;
- const biggest=Math.max(5,...Object.values(series).flat());
- const step=biggest<=5?1:Math.ceil(biggest/4);
- const max=step*4;
- $("chartGrid").innerHTML=[0,1,2,3,4].map(n=>{
-  const y=bottom-(bottom-top)*n/4;
-  return `<path d="M${left} ${y}H${right} M${left+(right-left)*n/4} ${top}V${bottom}" fill="none" stroke="#e8eef8"/>`
- }).join("");
- $("chartYLabels").innerHTML=[0,1,2,3,4].map(n=>{
-  const y=bottom-(bottom-top)*n/4+3;
-  return `<text x="10" y="${y}">${Math.round(max*n/4)}</text>`
- }).join("");
+function closeDropdowns() {
+  $("adminDropdown").classList.add("hidden");
+  $("notificationDropdown").classList.add("hidden");
+  $("adminMenuBtn").setAttribute("aria-expanded","false");
+  $("notificationBtn").setAttribute("aria-expanded","false");
+}
+function toggleDropdown(menuId,buttonId) {
+  const menu = $(menuId);
+  const open = menu.classList.contains("hidden");
+  closeDropdowns();
+  menu.classList.toggle("hidden",!open);
+  $(buttonId).setAttribute("aria-expanded",String(open));
+}
+$("adminMenuBtn").addEventListener("click",event => {
+  event.stopPropagation();
+  $("dropdownEmail").textContent = adminUser?.email || "Administrator";
+  toggleDropdown("adminDropdown","adminMenuBtn");
+});
+$("notificationBtn").addEventListener("click",event => {
+  event.stopPropagation();
+  updateNotificationUI();
+  toggleDropdown("notificationDropdown","notificationBtn");
+});
+document.addEventListener("click",event => {
+  if (!event.target.closest(".admin-menu-wrap") && !event.target.closest(".notification-wrap")) closeDropdowns();
+});
+$("notificationRefresh").addEventListener("click",async () => {
+  closeDropdowns();
+  await refreshAll();
+});
+document.querySelectorAll("[data-admin-action]").forEach(button => {
+  button.addEventListener("click",async () => {
+    const action = button.dataset.adminAction;
+    closeDropdowns();
+    if (action === "settings") goTo("settings");
+    if (action === "refresh") await refreshAll();
+    if (action === "logout") logout();
+  });
+});
+$("logoutBtn").addEventListener("click",logout);
 
- function points(values){return values.map((v,i)=>[
-  left+i*(right-left)/Math.max(1,values.length-1),
-  bottom-v/max*(bottom-top)
- ])}
- function line(values){return points(values).map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ")}
- function area(values){const p=points(values);return line(values)+` L ${p[p.length-1][0]} ${bottom} L ${p[0][0]} ${bottom} Z`}
- for(const key of Object.keys(series)){
-  $(key+"Line").setAttribute("d",line(series[key]));
-  $(key+"Area").setAttribute("d",area(series[key]))
- }
- const indexes=labels.length<=7?labels.map((v,i)=>i):[0,Math.round((labels.length-1)/5),Math.round((labels.length-1)*2/5),Math.round((labels.length-1)*3/5),Math.round((labels.length-1)*4/5),labels.length-1];
- const unique=[...new Set(indexes)];
- $("chartLabels").innerHTML=unique.map(i=>`<text x="${left+i*(right-left)/Math.max(1,labels.length-1)}" y="184" text-anchor="middle">${esc(labels[i])}</text>`).join("");
- const dotSpecs=[];
- for(const key of Object.keys(series)){
-  const color=key==="lost"?"#3987ff":key==="found"?"#11b981":"#8b55ff";
-  points(series[key]).forEach(p=>dotSpecs.push(`<circle cx="${p[0]}" cy="${p[1]}" r="2.8" fill="${color}"/>`))
- }
- $("chartDots").innerHTML=dotSpecs.join("");
- $("chartCaption").textContent=items.some(i=>i.createdAt||i.date)
-  ?"Counts are grouped by the report creation dates available in your backend."
-  :"No report dates were returned; historical activity is not available yet."
+$("menuBtn").addEventListener("click",() => {
+  const sidebar = document.querySelector(".sidebar");
+  if (window.innerWidth <= 850) {
+    sidebar.classList.toggle("hidden");
+  } else {
+    const app = $("adminApp");
+    const collapsed = app.dataset.collapsed === "yes";
+    app.style.gridTemplateColumns = collapsed ? "260px minmax(0,1fr)" : "78px minmax(0,1fr)";
+    app.dataset.collapsed = collapsed ? "no" : "yes";
+    document.querySelector(".brand-block").classList.toggle("hidden",!collapsed);
+    document.querySelector(".nav-label").classList.toggle("hidden",!collapsed);
+    document.querySelector(".side-bottom").classList.toggle("hidden",!collapsed);
+    document.querySelectorAll(".nav button").forEach(button => {
+      button.style.justifyContent = collapsed ? "" : "center";
+      Array.from(button.childNodes).forEach(node => {
+        if (node.nodeType === Node.TEXT_NODE) node.textContent = collapsed ? node.textContent : "";
+      });
+    });
+  }
+});
+
+/* LOGIN */
+function showApp() {
+  $("loginScreen").classList.add("hidden");
+  $("adminApp").classList.remove("hidden");
+}
+function showLogin() {
+  $("adminApp").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+}
+function logout() {
+  token = "";
+  adminUser = null;
+  localStorage.removeItem("campusFindAdminToken");
+  localStorage.removeItem("campusFindAdminUser");
+  showLogin();
+  closeDropdowns();
+}
+$("loginForm").addEventListener("submit",async event => {
+  event.preventDefault();
+  clearNotice("loginNotice");
+  $("loginBtn").disabled = true;
+  $("loginBtn").textContent = "Signing in...";
+  try {
+    const data = await api("/api/auth/login",{
+      method:"POST",
+      body:JSON.stringify({
+        email:$("loginEmail").value.trim(),
+        password:$("loginPassword").value
+      })
+    });
+    if (!data.token || !data.user?.isAdmin) throw Error("This account does not have administrator access.");
+    token = data.token;
+    adminUser = data.user;
+    localStorage.setItem("campusFindAdminToken",token);
+    localStorage.setItem("campusFindAdminUser",JSON.stringify(adminUser));
+    showApp();
+    await refreshAll();
+  } catch (error) {
+    showNotice("loginNotice",error.message);
+  } finally {
+    $("loginBtn").disabled = false;
+    $("loginBtn").textContent = "Sign in to dashboard";
+  }
+});
+
+/* LOAD EXISTING BACKEND DATA */
+async function refreshAll() {
+  clearNotice("globalNotice");
+  try {
+    const [userData,itemData] = await Promise.all([
+      api("/api/auth/admin/users"),
+      api("/api/items/admin/all")
+    ]);
+    users = normalizeArray(userData,["users","data","accounts","results"]);
+    items = normalizeArray(itemData,["items","data","reports","results"]);
+    renderAll();
+    $("systemStatus").textContent = "● Backend connected • Data refreshed";
+    $("systemStatus").style.color = "#0aa36d";
+  } catch (error) {
+    $("systemStatus").textContent = "● API connection error";
+    $("systemStatus").style.color = "#c52d44";
+    showNotice("globalNotice","Could not load live data: " + error.message);
+  }
+}
+$("reloadUsers").addEventListener("click",loadUsers);
+$("reloadItems").addEventListener("click",loadItems);
+$("reloadApprovals").addEventListener("click",refreshAll);
+
+async function loadUsers() {
+  try {
+    const data = await api("/api/auth/admin/users");
+    users = normalizeArray(data,["users","data","accounts","results"]);
+    renderAll();
+    showNotice("usersNotice",`Loaded ${users.length} accounts.`,"success");
+  } catch (error) {
+    showNotice("usersNotice","Could not load users: " + error.message);
+  }
+}
+async function loadItems() {
+  try {
+    const data = await api("/api/items/admin/all");
+    items = normalizeArray(data,["items","data","reports","results"]);
+    renderAll();
+    showNotice("itemsNotice",`Loaded ${items.length} reports.`,"success");
+  } catch (error) {
+    showNotice("itemsNotice","Could not load reports: " + error.message);
+  }
 }
 
-function renderUsers(){
- const q=(($("userSearch")?.value||"")+" "+($("globalSearch")?.value||"")).trim().toLowerCase();
- const status=$("userStatusFilter")?.value||"",type=$("userTypeFilter")?.value||"";
- const list=users.filter(u=>
-  [u.name,u.email,u.phone].join(" ").toLowerCase().includes(q)&&
-  (!status||(u.accountStatus||"Approved")===status)&&
-  (!type||accountType(u)===type)
- );
- $("usersList").innerHTML=list.length?list.map(u=>`
- <tr><td><b>${esc(u.name||"Unnamed")}</b></td><td>${esc(u.email||"—")}<br>${esc(u.phone||"")}</td>
- <td>${esc(accountType(u))}</td><td>${date(u.createdAt)}</td><td>${badge(u.accountStatus||"Approved")}</td><td><div class="actions">
- ${(u.accountStatus||"Approved")!=="Approved"?`<button class="btn good" data-user-status="Approved" data-id="${esc(u._id)}">Approve</button>`:""}
- ${u.accountStatus!=="Rejected"?`<button class="btn bad" data-user-status="Rejected" data-id="${esc(u._id)}">Reject</button>`:""}
- ${u.accountStatus!=="Disabled"?`<button class="btn secondary" data-user-status="Disabled" data-id="${esc(u._id)}">Disable</button>`:""}
- </div></td></tr>`).join(""):`<tr><td colspan="6" class="empty">No matching users.</td></tr>`
+/* DASHBOARD STATS AND CHARTS */
+function renderAll() {
+  renderStats();
+  renderUsers();
+  renderItems();
+  renderRecent();
+  renderCategories();
+  drawActivityChart();
+  renderApprovals();
+  renderReports();
+  updateNotificationUI();
+}
+function rangeDays() {
+  return $("dateRange").value === "all" ? Infinity : Number($("dateRange").value || 7);
+}
+$("dateRange").addEventListener("change",() => {
+  renderStats();
+  renderCategories();
+  drawActivityChart();
+});
+function inSelectedRange(item) {
+  if (rangeDays() === Infinity) return true;
+  const value = item.createdAt || item.date;
+  if (!value) return false;
+  const time = new Date(value).getTime();
+  return Number.isFinite(time) && time >= Date.now() - rangeDays()*86400000 && time <= Date.now()+86400000;
+}
+function renderStats() {
+  const students = users.filter(u => accountType(u).toLowerCase() === "student");
+  const faculty = users.filter(u => accountType(u).toLowerCase() === "faculty");
+  const pendingStudents = students.filter(u => accountStatus(u) === "Pending");
+  const pendingFaculty = faculty.filter(u => accountStatus(u) === "Pending");
+  const shownItems = items.filter(inSelectedRange);
+  $("totalUsers").textContent = users.length;
+  $("userSplit").textContent = `Students: ${students.length} | Faculty: ${faculty.length}`;
+  $("lostCount").textContent = shownItems.filter(i => itemType(i) === "lost").length;
+  $("foundCount").textContent = shownItems.filter(i => itemType(i) === "found").length;
+  $("pendingFaculty").textContent = pendingFaculty.length;
+  $("allReportsCount").textContent = items.length;
+  $("approvedReportsCount").textContent = items.filter(i => reviewStatus(i) === "Approved").length;
+  $("pendingReportsCount").textContent = items.filter(i => reviewStatus(i) === "Pending").length;
+  $("returnedReportsCount").textContent = items.filter(i => itemType(i) === "returned" || /returned/i.test(i.status || "")).length;
+}
+function drawActivityChart() {
+  const span = rangeDays() === Infinity ? 30 : rangeDays();
+  const totalDays = Math.max(1,Math.min(span,30));
+  const end = new Date();
+  end.setHours(0,0,0,0);
+  const start = new Date(end);
+  start.setDate(start.getDate()-totalDays+1);
+  const labels = [];
+  const series = {lost:[],found:[],returned:[]};
+  for (let dayIndex=0;dayIndex<totalDays;dayIndex++) {
+    const day = new Date(start);
+    day.setDate(start.getDate()+dayIndex);
+    labels.push(day.toLocaleDateString("en-US",{month:"short",day:"numeric"}));
+    const records = items.filter(item => {
+      const created = new Date(item.createdAt || item.date);
+      return Number.isFinite(created.getTime()) && created.toDateString() === day.toDateString();
+    });
+    series.lost.push(records.filter(i => itemType(i)==="lost").length);
+    series.found.push(records.filter(i => itemType(i)==="found").length);
+    series.returned.push(records.filter(i => itemType(i)==="returned" || /returned/i.test(i.status||"")).length);
+  }
+  const left=42,right=635,top=20,bottom=160;
+  const highest=Math.max(5,...Object.values(series).flat());
+  const step=Math.max(1,Math.ceil(highest/4));
+  const max=step*4;
+  $("chartGrid").innerHTML=[0,1,2,3,4].map(n=>{
+    const y=bottom-(bottom-top)*n/4;
+    const x=left+(right-left)*n/4;
+    return `<path d="M${left} ${y}H${right} M${x} ${top}V${bottom}" fill="none"/>`;
+  }).join("");
+  $("chartYLabels").innerHTML=[0,1,2,3,4].map(n=>{
+    const y=bottom-(bottom-top)*n/4+3;
+    return `<text x="10" y="${y}">${Math.round(max*n/4)}</text>`;
+  }).join("");
+  function points(values) {
+    return values.map((value,index)=>[
+      left+index*(right-left)/Math.max(1,values.length-1),
+      bottom-value/max*(bottom-top)
+    ]);
+  }
+  function line(values) {
+    return points(values).map((point,index)=>(index?"L":"M")+point[0].toFixed(1)+" "+point[1].toFixed(1)).join(" ");
+  }
+  function area(values) {
+    const pts=points(values);
+    return line(values)+` L ${pts[pts.length-1][0]} ${bottom} L ${pts[0][0]} ${bottom} Z`;
+  }
+  Object.keys(series).forEach(key=>{
+    $(key+"Line").setAttribute("d",line(series[key]));
+    $(key+"Area").setAttribute("d",area(series[key]));
+  });
+  const labelIndexes=labels.length<=7?labels.map((_,i)=>i):[0,Math.round((labels.length-1)/5),Math.round((labels.length-1)*2/5),Math.round((labels.length-1)*3/5),Math.round((labels.length-1)*4/5),labels.length-1];
+  $("chartLabels").innerHTML=[...new Set(labelIndexes)].map(index=>`<text x="${left+index*(right-left)/Math.max(1,labels.length-1)}" y="184" text-anchor="middle">${escapeHTML(labels[index])}</text>`).join("");
+  const dots=[];
+  Object.keys(series).forEach(key=>{
+    const color=key==="lost"?"#3987ff":key==="found"?"#11b981":"#8b55ff";
+    points(series[key]).forEach(point=>dots.push(`<circle cx="${point[0]}" cy="${point[1]}" r="2.7" fill="${color}"/>`));
+  });
+  $("chartDots").innerHTML=dots.join("");
+  $("chartCaption").textContent=items.some(i=>i.createdAt||i.date)
+    ?"Counts are grouped by report creation dates available in your backend."
+    :"No report dates were returned; historical activity is not available.";
+}
+function renderCategories() {
+  const selectedItems=items.filter(inSelectedRange);
+  const map={};
+  selectedItems.forEach(item=>{
+    const category=String(item.category||"Others").trim()||"Others";
+    map[category]=(map[category]||0)+1;
+  });
+  let entries=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  if(entries.length>6){
+    const remaining=entries.slice(5).reduce((sum,entry)=>sum+entry[1],0);
+    entries=entries.slice(0,5);
+    entries.push(["Others",remaining]);
+  }
+  const total=selectedItems.length;
+  $("categoryTotal").textContent=total;
+  const sum=entries.reduce((value,entry)=>value+entry[1],0)||1;
+  let degree=0;
+  const segments=[];
+  entries.forEach((entry,index)=>{
+    const next=degree+entry[1]/sum*100;
+    segments.push(`${palette[index%palette.length]} ${degree}% ${next}%`);
+    degree=next;
+  });
+  $("categoryDonut").style.background=segments.length?`conic-gradient(${segments.join(",")})`:"conic-gradient(#dfe6f2 0 100%)";
+  $("categoryLegend").innerHTML=entries.length?entries.map((entry,index)=>`
+    <div class="category-line"><i class="dot" style="background:${palette[index%palette.length]}"></i><span>${escapeHTML(entry[0])}</span><span class="value">${entry[1]} <small>(${Math.round(entry[1]/sum*100)}%)</small></span></div>
+  `).join(""):`<span class="muted">No category data available.</span>`;
+}
+function renderRecent() {
+  const recentUsers=[...users].sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0)).slice(0,5);
+  $("recentUsers").innerHTML=recentUsers.length?recentUsers.map((user,index)=>`
+    <tr><td><div class="user-cell"><span class="mini-avatar" style="background:${palette[index%palette.length]}">${escapeHTML((user.name||"?").slice(0,1).toUpperCase())}</span>${escapeHTML(user.name||"Unnamed")}</div></td><td>${escapeHTML(user.email||"—")}</td><td>${escapeHTML(accountType(user))}</td><td>${statusBadge(accountStatus(user))}</td><td>${dateText(user.createdAt)}</td></tr>
+  `).join(""):`<tr><td colspan="5" class="empty">No users found.</td></tr>`;
+  const recentItems=[...items].sort((a,b)=>new Date(b.createdAt||b.date||0)-new Date(a.createdAt||a.date||0)).slice(0,5);
+  $("recentActivity").innerHTML=recentItems.length?recentItems.map((item,index)=>{
+    const type=itemType(item);
+    const heading=type==="lost"?"New lost item reported":type==="found"?"New found item reported":type==="returned"?"Item marked as returned":"New report created";
+    const subtitle=item.title||item.itemName||item.category||item.location||"Campus report";
+    const icon=type==="lost"?"⌕":type==="found"?"✓":type==="returned"?"▣":"●";
+    return `<div class="activity"><div class="activity-icon ${index%4===1?"blue":index%4===2?"purple":index%4===3?"orange":""}">${icon}</div><div class="activity-text"><strong>${heading}</strong><small>${escapeHTML(subtitle)}</small></div><time>${dateText(item.createdAt||item.date)}</time></div>`;
+  }).join(""):`<div class="muted">No report activity yet.</div>`;
+}
+
+/* USERS: FILTERS + RESET PASSWORD + STATUS */
+function renderUsers() {
+  const query=$("userSearch").value.trim().toLowerCase();
+  const statusFilter=$("userStatusFilter").value;
+  const typeFilter=$("userTypeFilter").value;
+  const filtered=users.filter(user=>{
+    const search=[user.name,user.fullName,user.email,user.phone].join(" ").toLowerCase();
+    return search.includes(query)&&(!statusFilter||accountStatus(user)===statusFilter)&&(!typeFilter||accountType(user)===typeFilter);
+  });
+  $("usersList").innerHTML=filtered.length?filtered.map(user=>{
+    const id=escapeHTML(userId(user));
+    const status=accountStatus(user);
+    return `<tr>
+      <td><b>${escapeHTML(user.name||user.fullName||"Unnamed")}</b></td>
+      <td>${escapeHTML(user.email||"—")}<br>${escapeHTML(user.phone||"")}</td>
+      <td>${escapeHTML(accountType(user))}</td>
+      <td>${dateText(user.createdAt)}</td>
+      <td>${statusBadge(status)}</td>
+      <td><div class="actions">
+        ${status!=="Approved"?`<button class="btn good small" data-user-action="status" data-status="Approved" data-id="${id}">Approve</button>`:""}
+        ${status!=="Pending"?`<button class="btn secondary small" data-user-action="status" data-status="Pending" data-id="${id}">Set Pending</button>`:""}
+        ${status!=="Rejected"?`<button class="btn bad small" data-user-action="status" data-status="Rejected" data-id="${id}">Reject</button>`:""}
+        ${status!=="Disabled"?`<button class="btn secondary small" data-user-action="status" data-status="Disabled" data-id="${id}">Disable</button>`:""}
+        <button class="btn small" data-user-action="reset" data-id="${id}">Reset Password</button>
+      </div></td>
+    </tr>`;
+  }).join(""):`<tr><td colspan="6" class="empty">${users.length?"No accounts match your filters.":"No users loaded."}</td></tr>`;
 }
 ["userSearch","userStatusFilter","userTypeFilter"].forEach(id=>$(id).addEventListener("input",renderUsers));
-$("globalSearch").addEventListener("input",()=>{renderUsers();renderItems()});
 
-async function updateUser(id,status){
- await api(`/api/auth/admin/users/${encodeURIComponent(id)}/status`,{method:"PATCH",body:JSON.stringify({accountStatus:status})});
+async function runUserAction(button) {
+  const id=button.dataset.id;
+  const action=button.dataset.userAction;
+  if(!id){showNotice("usersNotice","This account has no ID in the backend response.");return;}
+  let path="",body={},method="PATCH";
+  if(action==="status"){
+    const status=button.dataset.status;
+    if(!confirm(`Set this account status to "${status}"?`))return;
+    path=`/api/auth/admin/users/${encodeURIComponent(id)}/status`;
+    body={accountStatus:status};
+  }else if(action==="reset"){
+    const newPassword=prompt("Enter a new temporary password (at least 8 characters):");
+    if(newPassword===null)return;
+    if(newPassword.length<8||newPassword.length>128){
+      showNotice("usersNotice","Password must be 8–128 characters long.");
+      return;
+    }
+    if(!confirm("Reset this user's password? Give the new password to the user privately."))return;
+    path=`/api/auth/admin/users/${encodeURIComponent(id)}/password`;
+    body={newPassword};
+  }else{return;}
+  const original=button.textContent;
+  button.disabled=true;button.textContent="Working...";
+  clearNotice("usersNotice");
+  try{
+    const result=await api(path,{method,body:JSON.stringify(body)});
+    showNotice("usersNotice",result.message||(action==="reset"?"Password reset completed. Share it privately.":`Account status changed to ${body.accountStatus}.`),"success");
+    await loadUsers();
+  }catch(error){
+    showNotice("usersNotice",`Action failed: ${error.message}. The backend must support this route.`);
+  }finally{
+    button.disabled=false;button.textContent=original;
+  }
 }
-$("usersList").addEventListener("click",async e=>{
- const b=e.target.closest("[data-user-status]");if(!b)return;
- if(!confirm(`Set account status to ${b.dataset.userStatus}?`))return;
- b.disabled=true;
- try{await updateUser(b.dataset.id,b.dataset.userStatus);showNotice("globalNotice","Account status updated.","success");await refreshAll()}
- catch(err){showNotice("globalNotice","Could not update account: "+err.message)}
- finally{b.disabled=false}
+$("usersList").addEventListener("click",async event=>{
+  const button=event.target.closest("[data-user-action]");
+  if(button)await runUserAction(button);
 });
 
-$("createForm").addEventListener("submit",async e=>{
- e.preventDefault();clearNotice("createNotice");
- const payload=Object.fromEntries(new FormData(e.currentTarget).entries());
- $("createBtn").disabled=true;
- try{
-  await api("/api/auth/admin/users",{method:"POST",body:JSON.stringify(payload)});
-  showNotice("createNotice","Account created successfully.","success");
-  e.currentTarget.reset();await refreshAll()
- }catch(err){showNotice("createNotice","Could not create account: "+err.message)}
- finally{$("createBtn").disabled=false}
+/* CREATE ACCOUNT */
+$("createForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  clearNotice("createNotice");
+  const payload=Object.fromEntries(new FormData(event.currentTarget).entries());
+  $("createBtn").disabled=true;
+  try{
+    const result=await api("/api/auth/admin/users",{method:"POST",body:JSON.stringify(payload)});
+    showNotice("createNotice",result.message||"Account created successfully.","success");
+    event.currentTarget.reset();
+    await refreshAll();
+  }catch(error){
+    showNotice("createNotice","Could not create account: "+error.message);
+  }finally{
+    $("createBtn").disabled=false;
+  }
 });
 
-function renderItems(){
- const q=(($("itemSearch")?.value||"")+" "+($("globalSearch")?.value||"")).trim().toLowerCase();
- const type=$("itemTypeFilter")?.value.toLowerCase()||"",status=$("itemStatusFilter")?.value||"";
- const list=items.filter(i=>
-  [i.title,i.itemName,i.category,i.location,i.description].join(" ").toLowerCase().includes(q)&&
-  (!type||itemType(i)===type)&&(!status||reviewStatus(i)===status)
- );
- const rows=list.map(i=>`
- <tr><td><b>${esc(i.title||i.itemName||"Untitled")}</b><br><span class="muted">${esc(i.description||"")}</span></td>
- <td>${esc(i.type||i.itemType||"—")}</td><td>${esc(i.category||"—")}<br>${esc(i.location||"—")}</td>
- <td>${date(i.createdAt||i.date)}</td><td>${badge(reviewStatus(i))}</td>
- <td><div class="actions">
- ${reviewStatus(i)!=="Approved"?`<button class="btn good" data-review="Approved" data-id="${esc(i._id)}">Approve</button>`:""}
- ${reviewStatus(i)!=="Rejected"?`<button class="btn bad" data-review="Rejected" data-id="${esc(i._id)}">Reject</button>`:""}
- <button class="btn secondary" data-delete-item="${esc(i._id)}">Delete</button>
- </div></td></tr>`).join("");
- $("itemsList").innerHTML=rows||`<tr><td colspan="6" class="empty">No matching reports.</td></tr>`;
+/* ITEMS */
+function renderItems() {
+  const query=$("itemSearch").value.trim().toLowerCase();
+  const typeFilter=$("itemTypeFilter").value;
+  const statusFilter=$("itemStatusFilter").value;
+  const filtered=items.filter(item=>{
+    const searchable=[item.title,item.itemName,item.category,item.location,item.description].join(" ").toLowerCase();
+    return searchable.includes(query)&&(!typeFilter||itemType(item)===typeFilter)&&(!statusFilter||reviewStatus(item)===statusFilter);
+  });
+  const rows=filtered.map(item=>{
+    const id=escapeHTML(itemId(item));
+    const status=reviewStatus(item);
+    return `<tr>
+      <td><b>${escapeHTML(item.title||item.itemName||"Untitled report")}</b><br><span class="muted">${escapeHTML(item.description||"")}</span></td>
+      <td>${escapeHTML(item.type||item.itemType||"—")}</td>
+      <td>${escapeHTML(item.category||"—")}<br>${escapeHTML(item.location||"—")}</td>
+      <td>${dateText(item.createdAt||item.date)}</td><td>${statusBadge(status)}</td>
+      <td><div class="actions">
+        ${status!=="Approved"?`<button class="btn good small" data-item-action="Approved" data-id="${id}">Approve</button>`:""}
+        ${status!=="Rejected"?`<button class="btn bad small" data-item-action="Rejected" data-id="${id}">Reject</button>`:""}
+        <button class="btn secondary small" data-item-action="delete" data-id="${id}">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+  $("itemsList").innerHTML=rows||`<tr><td colspan="6" class="empty">No matching reports.</td></tr>`;
 }
 ["itemSearch","itemTypeFilter","itemStatusFilter"].forEach(id=>$(id).addEventListener("input",renderItems));
-$("itemsList").addEventListener("click",async e=>{
- const review=e.target.closest("[data-review]"),del=e.target.closest("[data-delete-item]");
- if(!review&&!del)return;
- try{
-  if(review){
-   if(!confirm("Update this report's review status?"))return;
-   await api(`/api/items/admin/${encodeURIComponent(review.dataset.id)}/review`,{method:"PATCH",body:JSON.stringify({reviewStatus:review.dataset.review})});
+$("itemsList").addEventListener("click",async event=>{
+  const button=event.target.closest("[data-item-action]");
+  if(!button)return;
+  const id=button.dataset.id,action=button.dataset.itemAction;
+  if(!id){showNotice("itemsNotice","This report has no ID in the backend response.");return;}
+  let path,method="PATCH",body;
+  if(action==="delete"){
+    if(!confirm("Delete this report permanently? This cannot be undone."))return;
+    path=`/api/items/admin/${encodeURIComponent(id)}`;
+    method="DELETE";
   }else{
-   if(!confirm("Delete this report permanently? This cannot be undone."))return;
-   await api(`/api/items/admin/${encodeURIComponent(del.dataset.deleteItem)}`,{method:"DELETE"});
+    if(!confirm(`Set report review status to ${action}?`))return;
+    path=`/api/items/admin/${encodeURIComponent(id)}/review`;
+    body={reviewStatus:action};
   }
-  showNotice("globalNotice","Report updated successfully.","success");await refreshAll()
- }catch(err){showNotice("globalNotice","Report action failed: "+err.message)}
+  button.disabled=true;
+  try{
+    const result=await api(path,{method,...(body?{body:JSON.stringify(body)}:{})});
+    showNotice("itemsNotice",result.message||"Report updated successfully.","success");
+    await refreshAll();
+  }catch(error){
+    showNotice("itemsNotice","Report action failed: "+error.message);
+  }finally{button.disabled=false;}
 });
 
-function renderApprovals(){
- const pendingFaculty=users.filter(u=>accountType(u)==="Faculty"&&(u.accountStatus||"Approved")==="Pending");
- $("pendingFacultyList").innerHTML=pendingFaculty.map(u=>`
- <tr><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td>${date(u.createdAt)}</td><td><div class="actions">
- <button class="btn good" data-user-status="Approved" data-id="${esc(u._id)}">Approve</button>
- <button class="btn bad" data-user-status="Rejected" data-id="${esc(u._id)}">Reject</button>
- </div></td></tr>`).join("")||`<tr><td colspan="4" class="empty">No pending faculty accounts.</td></tr>`;
- const pendingItems=items.filter(i=>reviewStatus(i)==="Pending");
- $("pendingItemsList").innerHTML=pendingItems.map(i=>`
- <tr><td>${esc(i.title||i.itemName||"Untitled")}</td><td>${esc(i.type||i.itemType||"—")}</td><td><div class="actions">
- <button class="btn good" data-review="Approved" data-id="${esc(i._id)}">Approve</button>
- <button class="btn bad" data-review="Rejected" data-id="${esc(i._id)}">Reject</button>
- </div></td></tr>`).join("")||`<tr><td colspan="3" class="empty">No pending reports.</td></tr>`;
+/* APPROVALS: STUDENTS + FACULTY + REPORTS */
+function approvalUserRows(list) {
+  if(!list.length)return `<tr><td colspan="5" class="empty">No pending accounts.</td></tr>`;
+  return list.map(user=>{
+    const id=escapeHTML(userId(user));
+    return `<tr>
+      <td><b>${escapeHTML(user.name||user.fullName||"Unnamed")}</b></td>
+      <td>${escapeHTML(user.email||"—")}</td>
+      <td>${escapeHTML(user.phone||"—")}</td>
+      <td>${dateText(user.createdAt)}</td>
+      <td><div class="actions">
+        <button class="btn good small" data-user-action="status" data-status="Approved" data-id="${id}">Approve</button>
+        <button class="btn bad small" data-user-action="status" data-status="Rejected" data-id="${id}">Reject</button>
+      </div></td>
+    </tr>`;
+  }).join("");
 }
-$("pendingFacultyList").addEventListener("click",async e=>{
- const b=e.target.closest("[data-user-status]");if(!b)return;
- try{await updateUser(b.dataset.id,b.dataset.userStatus);await refreshAll()}
- catch(err){showNotice("globalNotice",err.message)}
-});
-$("pendingItemsList").addEventListener("click",async e=>{
- const b=e.target.closest("[data-review]");if(!b)return;
- try{await api(`/api/items/admin/${encodeURIComponent(b.dataset.id)}/review`,{method:"PATCH",body:JSON.stringify({reviewStatus:b.dataset.review})});await refreshAll()}
- catch(err){showNotice("globalNotice",err.message)}
-});
-function renderReports(){
- const rows=items.map(i=>`<tr><td>${esc(i.title||i.itemName||"Untitled")}</td><td>${esc(i.type||i.itemType||"—")}</td><td>${esc(i.category||"—")}</td><td>${date(i.createdAt||i.date)}</td><td>${badge(reviewStatus(i))}</td></tr>`).join("");
- $("allReportsList").innerHTML=rows||`<tr><td colspan="5" class="empty">No reports found.</td></tr>`
+function renderApprovals() {
+  const pendingStudents=users.filter(user=>accountType(user).toLowerCase()==="student"&&accountStatus(user)==="Pending");
+  const pendingFaculty=users.filter(user=>accountType(user).toLowerCase()==="faculty"&&accountStatus(user)==="Pending");
+  const pendingItems=items.filter(item=>reviewStatus(item)==="Pending");
+  $("pendingStudentCount").textContent=`${pendingStudents.length} pending`;
+  $("pendingFacultyCount").textContent=`${pendingFaculty.length} pending`;
+  $("pendingItemCount").textContent=`${pendingItems.length} pending`;
+  $("pendingStudentsList").innerHTML=approvalUserRows(pendingStudents);
+  $("pendingFacultyList").innerHTML=approvalUserRows(pendingFaculty);
+  $("pendingItemsList").innerHTML=pendingItems.length?pendingItems.map(item=>`
+    <tr><td><b>${escapeHTML(item.title||item.itemName||"Untitled report")}</b></td>
+      <td>${escapeHTML(item.type||item.itemType||"—")}</td>
+      <td>${escapeHTML(item.category||"—")}</td>
+      <td><div class="actions">
+        <button class="btn good small" data-approval-item="Approved" data-id="${escapeHTML(itemId(item))}">Approve</button>
+        <button class="btn bad small" data-approval-item="Rejected" data-id="${escapeHTML(itemId(item))}">Reject</button>
+      </div></td>
+    </tr>`).join(""):`<tr><td colspan="4" class="empty">No pending reports.</td></tr>`;
 }
-function start(){
- if(!token||!adminUser?.isAdmin){showLogin();return}
- showApp();refreshAll()
-}
-  const adminMenuBtn = $("adminMenuBtn");
-const adminDropdown = $("adminDropdown");
-
-adminMenuBtn.addEventListener("click", () => {
-  const opening = adminDropdown.classList.contains("hidden");
-
-  adminDropdown.classList.toggle("hidden", !opening);
-  adminMenuBtn.setAttribute("aria-expanded", String(opening));
-
-  $("dropdownEmail").textContent =
-    adminUser?.email || "Administrator";
-});
-
-document.addEventListener("click", event => {
-  if (
-    !event.target.closest(".admin-menu-wrap")
-  ) {
-    adminDropdown.classList.add("hidden");
-    adminMenuBtn.setAttribute("aria-expanded", "false");
-  }
-});
-
-document.querySelectorAll("[data-admin-action]").forEach(button => {
-  button.addEventListener("click", async () => {
-    const action = button.dataset.adminAction;
-    adminDropdown.classList.add("hidden");
-    adminMenuBtn.setAttribute("aria-expanded", "false");
-
-    if (action === "settings") {
-      goTo("settings");
-    }
-
-    if (action === "refresh") {
-      await refreshAll();
-    }
-
-    if (action === "logout") {
-      logout();
-    }
+["pendingStudentsList","pendingFacultyList"].forEach(id=>{
+  $(id).addEventListener("click",async event=>{
+    const button=event.target.closest("[data-user-action]");
+    if(button)await runUserAction(button);
   });
 });
+$("pendingItemsList").addEventListener("click",async event=>{
+  const button=event.target.closest("[data-approval-item]");
+  if(!button)return;
+  const id=button.dataset.id,status=button.dataset.approvalItem;
+  if(!id)return;
+  try{
+    await api(`/api/items/admin/${encodeURIComponent(id)}/review`,{method:"PATCH",body:JSON.stringify({reviewStatus:status})});
+    showNotice("globalNotice","Report status updated.","success");
+    await refreshAll();
+  }catch(error){
+    showNotice("globalNotice","Could not update report: "+error.message);
+  }
+});
+
+/* REPORT SUMMARY */
+function renderReports() {
+  const rows=items.map(item=>`<tr>
+    <td>${escapeHTML(item.title||item.itemName||"Untitled")}</td>
+    <td>${escapeHTML(item.type||item.itemType||"—")}</td>
+    <td>${escapeHTML(item.category||"—")}</td>
+    <td>${dateText(item.createdAt||item.date)}</td>
+    <td>${statusBadge(reviewStatus(item))}</td>
+  </tr>`).join("");
+  $("allReportsList").innerHTML=rows||`<tr><td colspan="5" class="empty">No reports found.</td></tr>`;
+}
+
+/* NOTIFICATION COUNTS */
+function updateNotificationUI() {
+  const pendingStudents=users.filter(user=>accountType(user).toLowerCase()==="student"&&accountStatus(user)==="Pending").length;
+  const pendingFaculty=users.filter(user=>accountType(user).toLowerCase()==="faculty"&&accountStatus(user)==="Pending").length;
+  const pendingItems=items.filter(item=>reviewStatus(item)==="Pending").length;
+  const total=pendingStudents+pendingFaculty+pendingItems;
+  $("pendingStudentNotice").textContent=pendingStudents;
+  $("pendingFacultyNotice").textContent=pendingFaculty;
+  $("pendingItemNotice").textContent=pendingItems;
+  $("notificationCount").textContent=total;
+  $("approvalBadge").textContent=total;
+  $("notificationSummary").textContent=total?`${total} item(s) need review`:"You're all caught up";
+}
+
+/* INITIALIZE */
+function start() {
+  if(!token||!adminUser?.isAdmin) {
+    showLogin();
+    return;
+  }
+  showApp();
+  refreshAll();
+}
 start();
 </script>
 </body>
