@@ -4,1034 +4,322 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CampusFind | College Lost & Found</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      var t = "aurora";
+      try { t = localStorage.getItem("campusFindTheme") || "aurora"; } catch (e) {}
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
 
   <style>
     :root {
       color-scheme: dark;
-      --bg: #090d17;
-      --surface: #101727;
-      --surface-2: #151f32;
-      --border: #283550;
-      --text: #e8edff;
-      --muted: #8e9bb8;
-      --purple: #6958ff;
-      --purple-light: #a99dff;
-      --red: #ff5f7c;
-      --green: #2dd6a6;
-      --yellow: #ffc857;
+      --bg: #070B1A;
+      --card: rgba(255,255,255,.055);
+      --card2: rgba(255,255,255,.09);
+      --bd: rgba(255,255,255,.12);
+      --tx: #F2F5FF;
+      --mu: #A7B0CF;
+      --g1: #8B5CF6;
+      --g2: #22D3EE;
+      --red: #FF6B8A;
+      --green: #34D399;
+      --inp: rgba(6,10,24,.6);
     }
+    [data-theme="sunset"] { --bg: #140A12; --g1: #FF7A59; --g2: #FF3D81; }
+    [data-theme="emerald"] { --bg: #06130F; --g1: #10B981; --g2: #38BDF8; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% -30%, #25204b 0, transparent 55%),
-        var(--bg);
-      color: var(--text);
-      font: 14px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      font: 15px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+      transition: background .4s;
     }
+    body::before, body::after {
+      content: ""; position: fixed; z-index: -1; pointer-events: none;
+      width: 520px; height: 520px; border-radius: 50%;
+      filter: blur(120px); opacity: .28; transition: background .4s;
+    }
+    body::before { background: var(--g1); top: -180px; left: -140px; }
+    body::after { background: var(--g2); bottom: -200px; right: -160px; }
 
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    button:disabled {
-      cursor: not-allowed;
-      opacity: .6;
-    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .6; }
 
     .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      min-height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      position: sticky; top: 0; z-index: 5; min-height: 66px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
       padding: 10px max(20px, calc((100% - 1260px) / 2));
-      background: #0e1422;
-      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 72%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--bd);
     }
+    .logo { display: flex; align-items: center; gap: 10px; font: 700 21px Poppins, sans-serif; white-space: nowrap; }
+    .logo i { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-style: normal; font-size: 17px; background: linear-gradient(135deg, var(--g1), var(--g2)); }
+    .logo b { background: linear-gradient(90deg, var(--g1), var(--g2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .nav-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+    #welcomeText { display: none; }
 
-    .logo {
-      color: #fff;
-      font-size: 20px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
+    .theme-dots { display: flex; gap: 7px; padding: 6px 9px; border: 1px solid var(--bd); border-radius: 99px; background: var(--card); }
+    .theme-dots button { width: 20px; height: 20px; padding: 0; border-radius: 50%; border: 2px solid transparent; }
+    .theme-dots button.on { border-color: #fff; }
 
-    .logo span {
-      color: var(--purple-light);
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    #welcomeText { color: #c0c9df; font-size: 12px; }
     .profile-wrap { position: relative; display: none; }
-    .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg,#7968ff,#a35cff); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
-    .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: 210px; padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: #111a2d; box-shadow: 0 14px 36px #0008; display: none; }
+    .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg, var(--g1), var(--g2)); color: #fff; font-size: 14px; font-weight: 700; border: 2px solid var(--bd); }
+    .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: 220px; padding: 7px; border: 1px solid var(--bd); border-radius: 14px; background: color-mix(in srgb, var(--bg) 92%, #fff); box-shadow: 0 14px 36px #0009; display: none; }
     .profile-menu.open { display: block; }
-    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; min-width: 0; }
-    .profile-menu .profile-heading strong { display:block; color:#f3f4ff; font-size:13px; }
-    .profile-menu .profile-heading small { display:block; max-width:100%; color:#b4bfd8; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .profile-menu button { display:block; width:100%; text-align:left; padding:10px; border:0; background:transparent; color:#dce3f7; }
-    .profile-menu button:hover { background:#202b45; }
-    .profile-menu button.profile-logout { color:#ff9caf; }
+    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid var(--bd); margin-bottom: 5px; min-width: 0; }
+    .profile-menu .profile-heading strong { display: block; font-size: 14px; }
+    .profile-menu .profile-heading small { display: block; color: var(--mu); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-menu button { display: block; width: 100%; text-align: left; padding: 10px; border: 0; border-radius: 8px; background: transparent; color: var(--tx); font-size: 14px; }
+    .profile-menu button:hover { background: var(--card2); }
+    .profile-menu button.profile-logout { color: var(--red); }
 
-    button {
-      padding: 9px 13px;
-      border: 1px solid transparent;
-      border-radius: 9px;
-      font-weight: 700;
-      transition: .16s ease;
-    }
-
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    .primary-btn {
-      background: var(--purple);
-      color: #fff;
-      box-shadow: 0 5px 16px #6858ff35;
-    }
-
-    .primary-btn:hover:not(:disabled) {
-      background: #5142e8;
-    }
-
-    .secondary-btn {
-      background: #182238;
-      border-color: #2b3854;
-      color: #d6ddf3;
-    }
-
-    .secondary-btn:hover:not(:disabled) {
-      background: #202d46;
-    }
-
-    .danger-btn {
-      background: #351a2a;
-      border-color: #613047;
-      color: #ff9caf;
-    }
-
-    .danger-btn:hover:not(:disabled) {
-      background: #492034;
-    }
+    button { padding: 10px 16px; border: 1px solid transparent; border-radius: 12px; font-weight: 600; font-size: 14px; transition: .18s ease; }
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    .primary-btn { background: linear-gradient(135deg, var(--g1), var(--g2)); color: #fff; }
+    .primary-btn:hover:not(:disabled) { box-shadow: 0 10px 26px -8px var(--g1); }
+    .secondary-btn { background: var(--card); border-color: var(--bd); color: var(--tx); }
+    .secondary-btn:hover:not(:disabled) { background: var(--card2); }
+    .danger-btn { background: rgba(255,107,138,.12); border-color: rgba(255,107,138,.4); color: var(--red); }
+    .danger-btn:hover:not(:disabled) { background: rgba(255,107,138,.2); }
 
     .urgent-banner {
-      display: block;
-      width: min(1260px, calc(100% - 36px));
-      margin: 12px auto 0;
-      padding: 9px 13px;
-      border: 1px solid #66304a;
-      border-radius: 10px;
-      background: linear-gradient(90deg, #401431, #281447);
-      color: #ffdce5;
-      text-align: left;
-      font-size: 12px;
+      display: block; width: min(1260px, calc(100% - 36px)); margin: 14px auto 0; padding: 10px 16px;
+      border: 1px solid rgba(255,107,138,.35); border-radius: 12px;
+      background: rgba(255,107,138,.09); color: var(--tx); text-align: left; font-weight: 500;
     }
-
-    .urgent-banner strong {
-      margin-right: 8px;
-      color: #ff7897;
-    }
+    .urgent-banner strong { margin-right: 8px; color: var(--red); }
 
     .dashboard {
-      display: grid;
-      grid-template-columns: 205px minmax(0, 1fr) 220px;
-      gap: 14px;
-      width: min(1260px, calc(100% - 36px));
-      margin: 16px auto 38px;
-      align-items: start;
-    }
-
-    .surface {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--surface);
-      box-shadow: 0 12px 32px #0002;
-    }
-
-    .sidebar {
-      padding: 12px;
-    }
-
-    .side-title {
-      margin: 2px 8px 9px;
-      color: #7f8ba8;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-
-    .side-nav {
-      display: grid;
-      gap: 5px;
-    }
-
-    .side-link {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding: 8px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background: transparent;
-      color: #aeb9d2;
-      text-align: left;
-      font-size: 11px;
-    }
-
-    .side-link.active,
-    .side-link:hover {
-      border-color: #4d3db3;
-      background: #271f52;
-      color: #eeeaff;
-    }
-
-    .count {
-      color: #8996b2;
-      font-size: 10px;
-    }
-
-    .zones {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .zone-chip {
-      padding: 5px 7px;
-      border: 1px solid #30405b;
-      border-radius: 7px;
-      background: #172238;
-      color: #bac6df;
-      font-size: 10px;
-    }
-
-    .zone-chip:hover {
-      border-color: var(--purple);
-    }
-
-    #statusFilter { min-width: 140px; width: 140px; }
-
-    .stat-label { display:flex !important; align-items:center; gap:7px; margin-bottom:4px; }
-    .stat-label svg { width:16px; height:16px; flex:0 0 16px; color:#a99dff; }
-    .stat strong { display:block; color:#fff; font-size:clamp(25px, 2.2vw, 30px); font-weight:850; line-height:1.15; font-variant-numeric:tabular-nums; }
-    .stat.lost .stat-label svg { color:#ff879d; }
-    .stat.found .stat-label svg { color:#55dfb1; }
-
-    .dashboard-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: radial-gradient(ellipse at top left, #25234e, #111827 65%);
-    }
-
-    .dashboard-heading h1 {
-      color: #f2f4ff;
-      font-size: clamp(18px, 2vw, 23px);
-    }
-
-    .dashboard-heading p {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .stat {
-      min-height: 68px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: var(--surface);
-    }
-
-    .stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .stat strong {
-      color: #fff;
-      font-size: 22px;
-    }
-
-    .stat.lost strong {
-      color: var(--red);
-    }
-
-    .stat.found strong,
-    .stat.returned strong {
-      color: var(--green);
-    }
-
-    .listings {
-      padding: 12px;
-    }
-
-    .listings-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .listings-heading h2 {
-      color: #e8edff;
-      font-size: 13px;
-    }
-
-    .feed-tabs {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .feed-tab {
-      padding: 6px 10px;
-      border: 1px solid transparent;
-      border-radius: 20px;
-      background: transparent;
-      color: #aab6d0;
-      font-size: 10px;
-    }
-
-    .feed-tab.active,
-    .feed-tab:hover {
-      background: var(--purple);
-      color: #fff;
-    }
-
-    .filters {
-      display: grid;
-      grid-template-columns: minmax(140px, 1fr) 130px 120px;
-      gap: 7px;
-      margin: 10px 0 12px;
-      padding-bottom: 11px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 9px 11px;
-      border: 1px solid #303d58;
-      border-radius: 9px;
-      background: #0b1220;
-      color: var(--text);
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: #77839e;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: 2px solid #6858ff66;
-      border-color: var(--purple);
-    }
-
-    select option {
-      background: #101727;
-      color: var(--text);
-    }
-
-    textarea {
-      min-height: 68px;
-      resize: vertical;
-    }
-
-    .items-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .item-card {
-      display: grid;
-      grid-template-columns: 76px minmax(0, 1fr);
-      gap: 11px;
-      padding: 11px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: linear-gradient(135deg, #121b2d, #0e1523);
-    }
-
-    .item-image,
-    .item-placeholder {
-      width: 76px;
-      height: 76px;
-      border: 1px solid #33415d;
-      border-radius: 10px;
-      background: #0a1020;
-    }
-
-    .item-image {
-      display: block;
-      object-fit: cover;
-    }
-
-    .item-placeholder {
-      display: grid;
-      place-items: center;
-      color: #94a3b8;
-      font-size: 30px;
-    }
-
-    .item-content {
-      min-width: 0;
-    }
-
-    .item-heading {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .item-content h3 {
-      color: #dbe3ff;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .status::before {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      content: "";
-    }
-
-    .status.Lost {
-      background: #3a1b2a;
-      color: #ff8da5;
-    }
-
-    .status.Lost::before {
-      background: var(--red);
-    }
-
-    .status.Found {
-      background: #12352e;
-      color: #62e8bc;
-    }
-
-    .status.Found::before {
-      background: var(--green);
-    }
-
-    .item-content p {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 11px;
-      overflow-wrap: anywhere;
-    }
-
-    .item-content strong {
-      color: #b9c5df;
-    }
-
-    .item-buttons {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 9px;
-    }
-
-    .item-buttons button {
-      padding: 6px 9px;
-      font-size: 10px;
-    }
-
-    .contact-result {
-      display: none;
-      margin-top: 9px;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      background: #0b1220;
-      color: var(--text);
-      font-size: 12px;
-    }
-
-    .contact-result.visible {
-      display: block;
-    }
-
-    .contact-links {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 7px;
-    }
-
-    .contact-links a {
-      color: var(--purple-light);
-      font-weight: 700;
-    }
-
-    .workflow-note {
-      margin-top: 8px !important;
-      padding: 7px 9px;
-      border-radius: 8px;
-      font-size: 10px !important;
-    }
-
-    .workflow-note.pending {
-      background: #372b15;
-      color: #ffd578;
-    }
-
-    .workflow-note.rejected {
-      background: #3a1b22;
-      color: #ff9ca9;
-    }
-
-    .workflow-note.returned {
-      background: #12352e;
-      color: #6be8bf;
-    }
-
-    .empty-state {
-      padding: 24px;
-      border: 1px dashed #35425d;
-      border-radius: 11px;
-      background: #0b1220;
-      color: var(--muted);
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .right-rail {
-      display: grid;
-      gap: 10px;
-    }
-
-    .rail-panel {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: var(--surface);
-    }
-
-    .rail-panel h2 {
-      margin-bottom: 9px;
-      color: #e2e8ff;
-      font-size: 12px;
-    }
-
-    .hotspot-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .hotspot-row {
-      color: #adb9d2;
-      font-size: 10px;
-    }
-
-    .hotspot-track {
-      height: 4px;
-      margin-top: 4px;
-      overflow: hidden;
-      border-radius: 9px;
-      background: #27324a;
-    }
-
-    .hotspot-fill {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #6858ff, #24d5a3);
-    }
-
-    .how-list {
-      display: grid;
-      gap: 7px;
-      padding-left: 14px;
-      color: #9eabc6;
-      font-size: 10px;
-    }
-
-    .rail-alert {
-      width: 100%;
-      margin-top: 9px;
-      background: #351a2a;
-      border-color: #613047;
-      color: #ff9caf;
-      font-size: 11px;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      background: #030610d0;
-      overflow-y: auto;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      width: min(100%, 440px);
-      max-height: 88vh;
-      padding: 17px;
-      overflow-y: auto;
-      border: 1px solid #34405a;
-      border-radius: 15px;
-      background: #111a2a;
-      color: var(--text);
-      box-shadow: 0 24px 70px #0009;
-    }
-
-    .modal h2 {
-      margin-bottom: 4px;
-      color: #f2f4ff;
-      font-size: 19px;
-    }
-
-    .modal-subtitle {
-      margin-bottom: 10px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .form-group {
-      margin-bottom: 8px;
-    }
-
-    .form-group label,
-    .report-type-label {
-      display: block;
-      margin-bottom: 4px;
-      color: #c3cde2;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      padding: 8px 10px;
-      font-size: 12px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .report-type-switch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin: 5px 0 10px;
-      padding: 4px;
-      border: 1px solid #2c3852;
-      border-radius: 10px;
-      background: #0b1220;
-    }
-
-    .type-option {
-      padding: 8px 5px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background: transparent;
-      color: #9eabc6;
-      font-size: 11px;
-    }
-
-    .type-option.active[data-item-type="Lost"] {
-      background: #3b1b2b;
-      border-color: #7a304b;
-      color: #ff9caf;
-    }
-
-    .type-option.active[data-item-type="Found"] {
-      background: #12392f;
-      border-color: #267b66;
-      color: #76edc8;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .form-actions button {
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .auth-switch {
-      margin-top: 15px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .text-button {
-      padding: 0;
-      background: transparent;
-      color: var(--purple-light);
-      text-decoration: underline;
-    }
-
-    .message {
-      display: none;
-      margin: 9px 0;
-      padding: 9px;
-      border-radius: 8px;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-
-    .message.error {
-      display: block;
-      background: #3a1b22;
-      color: #ffabb5;
-    }
-
-    .message.success {
-      display: block;
-      background: #12352e;
-      color: #80edca;
-    }
-
-    #imagePreview {
-      display: none;
-      width: 100%;
-      max-height: 120px;
-      margin-top: 7px;
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      background: #0b1220;
-      object-fit: contain;
-    }
-
-    body.logged-out .urgent-banner,
-    body.logged-out .dashboard,
-    body.logged-out footer {
-      display: none;
-    }
-
-    footer {
-      padding: 18px;
-      color: #71809e;
-      text-align: center;
-      font-size: 10px;
-    }
+      display: grid; grid-template-columns: 210px minmax(0, 1fr) 250px; gap: 18px;
+      width: min(1260px, calc(100% - 36px)); margin: 18px auto 40px; align-items: start;
+    }
+    .surface, .rail-panel { border: 1px solid var(--bd); border-radius: 20px; background: var(--card); backdrop-filter: blur(10px); }
+    .sidebar { padding: 14px; position: sticky; top: 84px; }
+    .side-title { margin: 2px 8px 10px; color: var(--mu); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+    .side-nav { display: grid; gap: 6px; }
+    .side-link { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 10px 12px; border: 1px solid transparent; border-radius: 12px; background: transparent; color: var(--mu); text-align: left; font-size: 14px; }
+    .side-link.active, .side-link:hover { background: var(--card2); border-color: var(--g1); color: var(--tx); }
+    .count { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: var(--card2); }
+
+    .hero { padding: 28px 24px; margin-bottom: 14px; border: 1px solid var(--bd); border-radius: 22px; background: var(--card); backdrop-filter: blur(10px); text-align: center; }
+    .hero h1 { font: 700 clamp(26px, 4vw, 40px)/1.15 Poppins, sans-serif; margin-bottom: 8px; }
+    .hero h1 em { font-style: normal; background: linear-gradient(90deg, var(--g1), var(--g2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p { color: var(--mu); margin-bottom: 18px; }
+    .hero input[type="search"] { max-width: 600px; margin: 0 auto; display: block; padding: 14px 18px; font-size: 16px; border-radius: 14px; }
+    .zones { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+    .zone-chip { padding: 8px 14px; min-height: 38px; border: 1px solid var(--bd); border-radius: 99px; background: var(--card); color: var(--tx); font-size: 13px; font-weight: 500; }
+    .zone-chip:hover, .zone-chip.on { border-color: var(--g1); background: var(--card2); }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .stat { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--bd); border-radius: 18px; background: var(--card); backdrop-filter: blur(10px); transition: transform .25s; }
+    .stat:hover { transform: translateY(-3px); }
+    .stat .ic { width: 42px; height: 42px; flex: 0 0 42px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, var(--g1), var(--g2)); color: #fff; }
+    .stat .ic svg { width: 20px; height: 20px; }
+    .stat span { display: block; color: var(--mu); font-size: 12px; }
+    .stat strong { display: block; font: 700 26px/1.1 Poppins, sans-serif; font-variant-numeric: tabular-nums; }
+    .stat.lost strong { color: var(--red); }
+    .stat.found strong, .stat.returned strong { color: var(--green); }
+
+    .listings { padding: 16px; }
+    .listings-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .listings-heading h2 { font: 600 19px Poppins, sans-serif; }
+    .feed-tabs { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--bd); border-radius: 14px; background: var(--card); }
+    .feed-tab { padding: 8px 16px; min-height: 38px; border-radius: 10px; background: transparent; color: var(--mu); font-size: 13px; }
+    .feed-tab.active, .feed-tab:hover { background: linear-gradient(135deg, var(--g1), var(--g2)); color: #fff; }
+    .filters { margin: 4px 0 14px; padding-bottom: 14px; border-bottom: 1px solid var(--bd); }
+
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--bd); border-radius: 12px; background: var(--inp); color: var(--tx); }
+    input::placeholder, textarea::placeholder { color: var(--mu); }
+    input:focus, select:focus, textarea:focus { outline: 2px solid color-mix(in srgb, var(--g1) 50%, transparent); border-color: var(--g1); }
+    select option { background: var(--bg); color: var(--tx); }
+    textarea { min-height: 72px; resize: vertical; }
+
+    .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+    .item-card { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--bd); border-radius: 20px; background: var(--card); transition: transform .25s, border-color .25s; }
+    .item-card:hover { transform: translateY(-5px); border-color: var(--g1); }
+    .item-image, .item-placeholder { width: 100%; height: 150px; display: block; }
+    .item-image { object-fit: cover; }
+    .item-placeholder { display: grid; place-items: center; font-size: 52px; background: linear-gradient(135deg, color-mix(in srgb, var(--g1) 30%, transparent), color-mix(in srgb, var(--g2) 18%, transparent)); }
+    .item-content { min-width: 0; padding: 14px 16px 16px; }
+    .item-heading { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+    .item-content h3 { font: 600 17px Poppins, sans-serif; overflow-wrap: anywhere; }
+    .item-content p { margin-top: 4px; color: var(--mu); font-size: 14px; overflow-wrap: anywhere; }
+    .item-content strong { color: var(--tx); font-weight: 600; }
+    .status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    .status::before { width: 6px; height: 6px; border-radius: 50%; content: ""; }
+    .status.Lost { background: rgba(255,107,138,.14); color: var(--red); }
+    .status.Lost::before { background: var(--red); }
+    .status.Found { background: rgba(52,211,153,.14); color: var(--green); }
+    .status.Found::before { background: var(--green); }
+    .item-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .item-buttons button { padding: 8px 12px; font-size: 13px; }
+
+    .contact-result { display: none; margin-top: 10px; padding: 12px; border: 1px solid var(--bd); border-radius: 12px; background: var(--inp); font-size: 13px; }
+    .contact-result.visible { display: block; }
+    .contact-result hr { border: 0; border-top: 1px solid var(--bd); margin: 8px 0; }
+    .contact-links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 7px; }
+    .contact-links a { color: var(--g2); font-weight: 600; }
+    .workflow-note { margin-top: 8px !important; padding: 8px 10px; border-radius: 10px; font-size: 13px !important; }
+    .workflow-note.pending { background: rgba(255,200,87,.14); color: #ffd578 !important; }
+    .workflow-note.rejected { background: rgba(255,107,138,.14); color: var(--red) !important; }
+    .workflow-note.returned { background: rgba(52,211,153,.14); color: var(--green) !important; }
+    .empty-state { grid-column: 1 / -1; padding: 32px 20px; border: 1px dashed var(--bd); border-radius: 16px; color: var(--mu); text-align: center; }
+
+    .right-rail { display: grid; gap: 14px; position: sticky; top: 84px; }
+    .rail-panel { padding: 16px; }
+    .rail-panel h2 { margin-bottom: 10px; font: 600 15px Poppins, sans-serif; }
+    .hotspot-list { display: grid; gap: 10px; }
+    .hotspot-row { color: var(--mu); font-size: 13px; }
+    .hotspot-track { height: 5px; margin-top: 5px; overflow: hidden; border-radius: 9px; background: var(--card2); }
+    .hotspot-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--g1), var(--g2)); }
+    .how-list { display: grid; gap: 8px; padding-left: 16px; color: var(--mu); font-size: 13px; }
+
+    .modal-overlay { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 12px; background: rgba(3,6,16,.78); overflow-y: auto; backdrop-filter: blur(6px); }
+    .modal-overlay.active { display: flex; }
+    .modal { width: min(100%, 460px); max-height: 90vh; padding: 22px; overflow-y: auto; border: 1px solid var(--bd); border-radius: 22px; background: color-mix(in srgb, var(--bg) 90%, #fff); box-shadow: 0 24px 70px #000a; }
+    .modal h2 { margin-bottom: 4px; font: 600 22px Poppins, sans-serif; }
+    .modal-subtitle { margin-bottom: 12px; color: var(--mu); font-size: 13px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label, .report-type-label { display: block; margin-bottom: 5px; color: var(--tx); font-size: 13px; font-weight: 600; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .report-type-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 5px 0 12px; padding: 4px; border: 1px solid var(--bd); border-radius: 14px; background: var(--inp); }
+    .type-option { padding: 10px 6px; border-radius: 10px; background: transparent; color: var(--mu); font-size: 13px; }
+    .type-option.active[data-item-type="Lost"] { background: rgba(255,107,138,.16); border-color: var(--red); color: var(--red); }
+    .type-option.active[data-item-type="Found"] { background: rgba(52,211,153,.16); border-color: var(--green); color: var(--green); }
+    .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .form-actions button { flex: 1; min-width: 110px; }
+    .auth-switch { margin-top: 16px; color: var(--mu); text-align: center; font-size: 14px; }
+    .text-button { padding: 0; background: transparent; color: var(--g2); text-decoration: underline; }
+    .message { display: none; margin: 10px 0; padding: 10px; border-radius: 10px; font-size: 13px; overflow-wrap: anywhere; }
+    .message.error { display: block; background: rgba(255,107,138,.14); color: var(--red); }
+    .message.success { display: block; background: rgba(52,211,153,.14); color: var(--green); }
+    #imagePreview { display: none; width: 100%; max-height: 130px; margin-top: 8px; border: 1px solid var(--bd); border-radius: 12px; background: var(--inp); object-fit: contain; }
+
+    body.logged-out .urgent-banner, body.logged-out .dashboard, body.logged-out footer { display: none; }
+    footer { padding: 18px; color: var(--mu); text-align: center; font-size: 13px; }
 
     @media (max-width: 1000px) {
-      .dashboard {
-        grid-template-columns: 180px minmax(0, 1fr);
-      }
-
-      .right-rail {
-        grid-column: 2;
-        grid-template-columns: 1fr 1fr;
-      }
+      .dashboard { grid-template-columns: minmax(0, 1fr); }
+      .sidebar, .right-rail { position: static; }
+      .side-nav { grid-template-columns: repeat(3, 1fr); }
+      .side-link { justify-content: center; gap: 6px; padding: 9px 6px; font-size: 13px; }
+      .right-rail { grid-template-columns: 1fr 1fr; }
     }
-
     @media (max-width: 700px) {
-      .navbar {
-        padding: 9px 12px;
-      }
-
-      .logo {
-        font-size: 17px;
-      }
-
-      .nav-actions {
-        gap: 5px;
-      }
-
-      .nav-actions button {
-        padding: 7px 9px;
-        font-size: 11px;
-      }
-
-      #welcomeText { display: none; }
-      .profile-avatar { width: 36px; height: 36px; }
-      .profile-menu { right: 0; }
-
-      .urgent-banner,
-      .dashboard {
-        width: calc(100% - 20px);
-      }
-
-      .dashboard {
-        grid-template-columns: 1fr;
-        gap: 9px;
-        margin-top: 10px;
-      }
-
-      .sidebar {
-        padding: 9px;
-      }
-
-      .side-nav {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .side-link {
-        justify-content: center;
-        padding: 7px 4px;
-        font-size: 10px;
-      }
-
-      .side-link .count,
-      .sidebar-zones {
-        display: none;
-      }
-
-      .right-rail {
-        grid-column: auto;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .stat {
-        min-height: 60px;
-        padding: 8px 10px;
-      }
-
-      .filters {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .filters input {
-        grid-column: 1 / -1;
-      }
-
-      .item-card {
-        grid-template-columns: 62px minmax(0, 1fr);
-        gap: 8px;
-        padding: 9px;
-      }
-
-      .item-image,
-      .item-placeholder {
-        width: 62px;
-        height: 62px;
-      }
-
-      .modal {
-        max-height: 90dvh;
-        padding: 14px;
-      }
+      .navbar { padding: 9px 12px; }
+      .logo { font-size: 18px; }
+      .nav-actions { gap: 6px; }
+      .nav-actions > button { padding: 8px 10px; font-size: 13px; }
+      .urgent-banner, .dashboard { width: calc(100% - 20px); }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .hero { padding: 22px 14px; }
+      .modal { padding: 16px; }
     }
-
-    @media (max-width: 430px) {
-      .right-rail {
-        grid-template-columns: 1fr;
-      }
-
-      .form-row {
-        gap: 5px;
-      }
-
+    @media (max-width: 480px) {
+      .right-rail { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .theme-dots { padding: 5px 7px; gap: 5px; }
     }
   </style>
 </head>
 
 <body class="logged-out">
   <header class="navbar">
-    <div class="logo">🔎 Campus<span>Find</span></div>
+    <div class="logo"><i>🔎</i><span>Campus<b>Find</b></span></div>
 
     <div class="nav-actions">
       <span id="welcomeText"></span>
+
+      <div class="theme-dots" role="group" aria-label="Choose theme">
+        <button type="button" data-t="aurora" style="background:linear-gradient(135deg,#8B5CF6,#22D3EE)" aria-label="Aurora theme" title="Aurora"></button>
+        <button type="button" data-t="sunset" style="background:linear-gradient(135deg,#FF7A59,#FF3D81)" aria-label="Sunset theme" title="Sunset"></button>
+        <button type="button" data-t="emerald" style="background:linear-gradient(135deg,#10B981,#38BDF8)" aria-label="Emerald theme" title="Emerald"></button>
+      </div>
+
+      <button id="loginButton" class="primary-btn" type="button" onclick="handlePrimaryAction()">Login</button>
 
       <div class="profile-wrap" id="profileWrap">
         <button class="profile-avatar" id="profileAvatar" type="button" aria-label="Open profile menu" aria-expanded="false" onclick="toggleProfileMenu()">AS</button>
         <div class="profile-menu" id="profileMenu" role="menu">
           <div class="profile-heading"><strong id="profileMenuName">Student</strong><small id="profileMenuEmail"></small></div>
-          <button type="button" role="menuitem" onclick="openPhoneFromProfile()">My phone / Profile settings</button>
+          <button type="button" role="menuitem" onclick="openPhoneFromProfile()">Profile and phone</button>
           <button type="button" role="menuitem" onclick="openMyReports()">My reports</button>
           <button type="button" role="menuitem" class="profile-logout" onclick="logout()">Logout</button>
         </div>
       </div>
-
-      <button
-        id="phoneButton"
-        class="secondary-btn"
-        type="button"
-        onclick="openPhoneModal()"
-        style="display:none"
-      >
-        My phone
-      </button>
-
-      <button
-        id="loginButton"
-        class="primary-btn"
-        type="button"
-        onclick="handlePrimaryAction()"
-      >
-        Login / Register
-      </button>
-
-      <button
-        id="logoutButton"
-        class="secondary-btn"
-        type="button"
-        onclick="logout()"
-        style="display:none"
-      >
-        Logout
-      </button>
     </div>
   </header>
 
   <button class="urgent-banner" type="button" onclick="handleUrgentAlert()" aria-label="Urgent alert: report a lost item">
-    <strong>⚠ URGENT ALERT</strong>
-    Lost something valuable? Click here to report it.
+    <strong>⚠ URGENT</strong>
+    Lost something valuable? Report it here.
   </button>
 
   <main class="dashboard">
     <aside class="sidebar surface">
       <p class="side-title">Navigation</p>
-
       <nav class="side-nav" aria-label="Item filters">
-        <button class="side-link active" type="button" data-status-filter="">
-          ◉ All live feeds <span class="count" id="navTotal">0</span>
-        </button>
-        <button class="side-link" type="button" data-status-filter="Lost">
-          ● Lost items only <span class="count" id="navLost">0</span>
-        </button>
-        <button class="side-link" type="button" data-status-filter="Found">
-          ● Found items only <span class="count" id="navFound">0</span>
-        </button>
+        <button class="side-link active" type="button" data-status-filter="">◉ All feeds <span class="count" id="navTotal">0</span></button>
+        <button class="side-link" type="button" data-status-filter="Lost">● Lost <span class="count" id="navLost">0</span></button>
+        <button class="side-link" type="button" data-status-filter="Found">● Found <span class="count" id="navFound">0</span></button>
       </nav>
-
-      <div class="sidebar-zones">
-        <p class="side-title" style="margin-top:18px">Campus zones</p>
-        <div class="zones">
-          <button class="zone-chip" type="button" data-zone="Engineering">Engineering</button>
-          <button class="zone-chip" type="button" data-zone="Library">Library</button>
-          <button class="zone-chip" type="button" data-zone="Canteen">Canteen</button>
-          <button class="zone-chip" type="button" data-zone="Sports">Sports</button>
-        </div>
-      </div>
     </aside>
 
     <section class="feed-column">
-      <div class="dashboard-heading">
-        <div>
-          <h1>CampusFind dashboard</h1>
-          <p>Find it, report it, reunite with it.</p>
+      <div class="hero">
+        <h1>Lost something? <em>Let’s get it back to you.</em></h1>
+        <p>Find it, report it, reunite with it.</p>
+        <input id="searchInput" type="search" placeholder="Search for a bag, ID card, phone, keys…" aria-label="Search items">
+        <div class="zones">
+          <button class="zone-chip on" type="button" data-zone="">All zones</button>
+          <button class="zone-chip" type="button" data-zone="Engineering">🏛️ Engineering</button>
+          <button class="zone-chip" type="button" data-zone="Library">📚 Library</button>
+          <button class="zone-chip" type="button" data-zone="Canteen">🍽️ Canteen</button>
+          <button class="zone-chip" type="button" data-zone="Sports">⚽ Sports</button>
         </div>
       </div>
 
       <div class="stats">
         <div class="stat">
-          <span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>Total reports</span>
-          <strong id="statTotal">0</strong>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg></div>
+          <div><span>Total reports</span><strong id="statTotal">0</strong></div>
         </div>
         <div class="stat lost">
-          <span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Active lost</span>
-          <strong id="statLost">0</strong>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div><span>Active lost</span><strong id="statLost">0</strong></div>
         </div>
         <div class="stat found">
-          <span class="stat-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7 10 17l-5-5"/><path d="M21 12a9 9 0 1 1-5.3-8.2"/></svg>Found items</span>
-          <strong id="statFound">0</strong>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 7 10 17l-5-5"/></svg></div>
+          <div><span>Found items</span><strong id="statFound">0</strong></div>
         </div>
         <div class="stat returned">
-          <span>Returned</span>
-          <strong id="statReturned">0</strong>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></div>
+          <div><span>Returned</span><strong id="statReturned">0</strong></div>
         </div>
       </div>
 
       <section class="listings surface">
         <div class="listings-heading">
-          <h2>Campus item listings</h2>
-
+          <h2>Latest reports</h2>
           <div class="feed-tabs" aria-label="Filter listings">
-            <button class="feed-tab active" type="button" data-status-filter="">
-              All
-            </button>
-            <button class="feed-tab" type="button" data-status-filter="Lost">
-              Lost
-            </button>
-            <button class="feed-tab" type="button" data-status-filter="Found">
-              Found
-            </button>
+            <button class="feed-tab active" type="button" data-status-filter="">All</button>
+            <button class="feed-tab" type="button" data-status-filter="Lost">Lost</button>
+            <button class="feed-tab" type="button" data-status-filter="Found">Found</button>
           </div>
         </div>
 
         <div class="filters">
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search items, locations, descriptions..."
-          >
-
-          <select id="categoryFilter">
+          <input id="statusFilter" type="hidden" value="">
+          <select id="categoryFilter" aria-label="Filter by category">
             <option value="">All categories</option>
             <option value="Bags">Bags</option>
             <option value="Books">Books</option>
@@ -1040,12 +328,6 @@
             <option value="Keys">Keys</option>
             <option value="Clothing">Clothing</option>
             <option value="Other">Other</option>
-          </select>
-
-          <select id="statusFilter" aria-label="Filter by Lost or Found">
-            <option value="">Lost &amp; Found</option>
-            <option value="Lost">Lost</option>
-            <option value="Found">Found</option>
           </select>
         </div>
 
@@ -1079,11 +361,7 @@
   <div class="modal-overlay" id="authModal">
     <div class="modal">
       <h2 id="authTitle">Welcome to CampusFind</h2>
-
-      <p id="authSubtitle" class="modal-subtitle">
-        Login to access campus Lost &amp; Found reports.
-      </p>
-
+      <p id="authSubtitle" class="modal-subtitle">Login to access campus Lost &amp; Found reports.</p>
       <div id="authMessage" class="message"></div>
 
       <form id="authForm">
@@ -1091,67 +369,43 @@
           <label for="authName">Name *</label>
           <input id="authName" type="text" placeholder="Your name">
         </div>
-
         <div class="form-group">
           <label for="authEmail">Email *</label>
-          <input
-            id="authEmail"
-            type="email"
-            placeholder="you@example.com"
-            required
-          >
+          <input id="authEmail" type="email" placeholder="you@example.com" required>
         </div>
-
         <div class="form-group" id="phoneGroup" style="display:none">
           <label for="authPhone">Phone number (optional)</label>
           <input id="authPhone" type="tel" placeholder="+91 9876543210">
         </div>
-
         <div class="form-group">
           <label for="authPassword">Password *</label>
-          <input
-            id="authPassword"
-            type="password"
-            placeholder="Minimum 6 characters"
-            required
-          >
+          <input id="authPassword" type="password" placeholder="Minimum 6 characters" required>
         </div>
-
         <div class="form-actions">
           <button id="authSubmit" class="primary-btn" type="submit">Login</button>
         </div>
       </form>
 
+      <p class="auth-switch">
+        <span id="authSwitchText">New to CampusFind?</span>
+        <button id="authSwitchButton" class="text-button" type="button" onclick="toggleAuthMode()">Create an account</button>
+      </p>
     </div>
   </div>
 
   <div class="modal-overlay" id="phoneModal">
     <div class="modal">
       <h2>My phone number</h2>
-
-      <p class="modal-subtitle">
-        Optional. Students can use this number to call you.
-      </p>
-
+      <p class="modal-subtitle">Optional. Students can use this number to call you.</p>
       <div id="phoneMessage" class="message"></div>
-
       <form id="phoneForm">
         <div class="form-group">
           <label for="profilePhone">Phone number</label>
           <input id="profilePhone" type="tel" placeholder="+91 9876543210">
         </div>
-
         <div class="form-actions">
-          <button
-            type="button"
-            class="secondary-btn"
-            onclick="closeModal('phoneModal')"
-          >
-            Cancel
-          </button>
-          <button id="phoneSubmit" type="submit" class="primary-btn">
-            Save phone
-          </button>
+          <button type="button" class="secondary-btn" onclick="closeModal('phoneModal')">Cancel</button>
+          <button id="phoneSubmit" type="submit" class="primary-btn">Save phone</button>
         </div>
       </form>
     </div>
@@ -1160,11 +414,7 @@
   <div class="modal-overlay" id="reportModal">
     <div class="modal">
       <h2 id="reportTitle">Report an Item</h2>
-
-      <p class="modal-subtitle">
-        New reports are checked by an admin before other students can see them.
-      </p>
-
+      <p class="modal-subtitle">New reports are checked by an admin before other students can see them.</p>
       <div id="reportMessage" class="message"></div>
 
       <form id="reportForm">
@@ -1172,22 +422,8 @@
 
         <label class="report-type-label">What are you reporting?</label>
         <div class="report-type-switch" role="group" aria-label="Choose Lost or Found">
-          <button
-            class="type-option active"
-            type="button"
-            data-item-type="Lost"
-            aria-pressed="true"
-          >
-            🔴 I lost an item
-          </button>
-          <button
-            class="type-option"
-            type="button"
-            data-item-type="Found"
-            aria-pressed="false"
-          >
-            🟢 I found an item
-          </button>
+          <button class="type-option active" type="button" data-item-type="Lost" aria-pressed="true">🔴 I lost an item</button>
+          <button class="type-option" type="button" data-item-type="Found" aria-pressed="false">🟢 I found an item</button>
         </div>
 
         <div class="form-group">
@@ -1231,6 +467,7 @@
             <option>Semester 8</option>
           </select>
         </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="itemCategory">Category *</label>
@@ -1245,7 +482,6 @@
               <option value="Other">Other</option>
             </select>
           </div>
-
           <div class="form-group">
             <label for="itemDate">Date *</label>
             <input id="itemDate" type="date" required>
@@ -1254,21 +490,12 @@
 
         <div class="form-group">
           <label for="itemLocation">Campus location *</label>
-          <input
-            id="itemLocation"
-            type="text"
-            placeholder="Library, 3rd floor"
-            required
-          >
+          <input id="itemLocation" type="text" placeholder="Library, 3rd floor" required>
         </div>
 
         <div class="form-group">
           <label for="itemDescription">Description *</label>
-          <textarea
-            id="itemDescription"
-            placeholder="Colour, brand, or unique marks..."
-            required
-          ></textarea>
+          <textarea id="itemDescription" placeholder="Colour, brand, or unique marks..." required></textarea>
         </div>
 
         <div class="form-group">
@@ -1278,16 +505,8 @@
         </div>
 
         <div class="form-actions">
-          <button
-            type="button"
-            class="secondary-btn"
-            onclick="closeModal('reportModal')"
-          >
-            Cancel
-          </button>
-          <button id="reportSubmit" type="submit" class="primary-btn">
-            Submit report
-          </button>
+          <button type="button" class="secondary-btn" onclick="closeModal('reportModal')">Cancel</button>
+          <button id="reportSubmit" type="submit" class="primary-btn">Submit report</button>
         </div>
       </form>
     </div>
@@ -1302,6 +521,27 @@
   let selectedImage = "";
   let authMode = "login";
 
+  const CATEGORY_ICONS = {
+    "Bags": "🎒", "Books": "📚", "Electronics": "🎧",
+    "ID Card": "🪪", "Keys": "🔑", "Clothing": "👕", "Other": "📦"
+  };
+
+  /* ---------- Theme switcher ---------- */
+  function setTheme(name) {
+    document.documentElement.setAttribute("data-theme", name);
+    try { localStorage.setItem("campusFindTheme", name); } catch (e) {}
+    document.querySelectorAll(".theme-dots button").forEach(button => {
+      button.classList.toggle("on", button.dataset.t === name);
+    });
+  }
+
+  document.querySelectorAll(".theme-dots button").forEach(button => {
+    button.addEventListener("click", () => setTheme(button.dataset.t));
+  });
+
+  setTheme(document.documentElement.getAttribute("data-theme") || "aurora");
+
+  /* ---------- Session helpers ---------- */
   function isLoggedIn() {
     return Boolean(localStorage.getItem("campusFindToken"));
   }
@@ -1320,11 +560,7 @@
 
   function authHeaders(extraHeaders = {}) {
     const headers = { ...extraHeaders };
-
-    if (getToken()) {
-      headers.Authorization = `Bearer ${getToken()}`;
-    }
-
+    if (getToken()) headers.Authorization = `Bearer ${getToken()}`;
     return headers;
   }
 
@@ -1348,10 +584,7 @@
         clearSession();
         updateLoginUI();
       }
-
-      throw new Error(
-        data.message || data.error || `Request failed (${response.status})`
-      );
+      throw new Error(data.message || data.error || `Request failed (${response.status})`);
     }
 
     return data;
@@ -1359,18 +592,13 @@
 
   function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, character => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     })[character]);
   }
 
   function showMessage(elementId, message, type = "error") {
     const element = document.getElementById(elementId);
     if (!element) return;
-
     element.textContent = message;
     element.className = `message ${type}`;
   }
@@ -1378,7 +606,6 @@
   function clearMessage(elementId) {
     const element = document.getElementById(elementId);
     if (!element) return;
-
     element.textContent = "";
     element.className = "message";
   }
@@ -1396,46 +623,27 @@
     document.body.classList.toggle("logged-out", !loggedIn);
 
     const loginButton = document.getElementById("loginButton");
-    const logoutButton = document.getElementById("logoutButton");
-    const phoneButton = document.getElementById("phoneButton");
-    const welcomeText = document.getElementById("welcomeText");
     const profileWrap = document.getElementById("profileWrap");
-    const profileMenuName = document.getElementById("profileMenuName");
-    const profileMenuEmail = document.getElementById("profileMenuEmail");
     const profileAvatar = document.getElementById("profileAvatar");
     const authModal = document.getElementById("authModal");
 
-    if (loginButton) {
-      loginButton.textContent = loggedIn ? "＋ Report Item" : "Login";
-    }
-
-    if (logoutButton) {
-      logoutButton.style.display = loggedIn ? "inline-block" : "none";
-    }
-
-    if (phoneButton) {
-      phoneButton.style.display = loggedIn ? "inline-block" : "none";
-    }
-
-    if (welcomeText) welcomeText.textContent = "";
+    if (loginButton) loginButton.textContent = loggedIn ? "＋ Report item" : "Login";
     if (profileWrap) profileWrap.style.display = loggedIn ? "block" : "none";
-    if (profileMenuName) profileMenuName.textContent = user?.name || "Student";
-    if (profileMenuEmail) profileMenuEmail.textContent = user?.email || "";
+    document.getElementById("profileMenuName").textContent = user?.name || "Student";
+    document.getElementById("profileMenuEmail").textContent = user?.email || "";
+
     if (profileAvatar) {
-      const name = String(user?.name || "Aditya Sharma").trim();
+      const name = String(user?.name || "Student").trim();
       const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
-      profileAvatar.textContent = initials || "AS";
+      profileAvatar.textContent = initials || "ST";
     }
 
-    if (authModal) {
-      authModal.classList.toggle("active", !loggedIn);
-    }
+    if (authModal) authModal.classList.toggle("active", !loggedIn);
 
     if (!loggedIn) {
       const itemsContainer = document.getElementById("itemsContainer");
       if (itemsContainer) {
-        itemsContainer.innerHTML =
-          '<div class="empty-state">Login to view campus reports.</div>';
+        itemsContainer.innerHTML = '<div class="empty-state">Login to view campus reports.</div>';
       }
     }
   }
@@ -1463,8 +671,7 @@
 
   function openMyReports() {
     closeProfileMenu();
-    const target = document.getElementById("myReports") || document.getElementById("itemsContainer");
-    target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("itemsContainer")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function handleUrgentAlert() {
@@ -1473,11 +680,8 @@
   }
 
   function handlePrimaryAction() {
-    if (isLoggedIn()) {
-      openReport("Lost");
-    } else {
-      openAuth();
-    }
+    if (isLoggedIn()) openReport("Lost");
+    else openAuth();
   }
 
   function openAuth() {
@@ -1502,9 +706,7 @@
     document.getElementById("authPassword").placeholder = registering
       ? "At least 8 characters"
       : "Minimum 6 characters";
-    document.getElementById("authSubmit").textContent = registering
-      ? "Create account"
-      : "Login";
+    document.getElementById("authSubmit").textContent = registering ? "Create account" : "Login";
     document.getElementById("authSwitchText").textContent = registering
       ? "Already have an account?"
       : "New to CampusFind?";
@@ -1521,25 +723,19 @@
   }
 
   function closeModal(modalId) {
-    if (modalId === "authModal" && !isLoggedIn()) {
-      return;
-    }
-
+    if (modalId === "authModal" && !isLoggedIn()) return;
     document.getElementById(modalId)?.classList.remove("active");
   }
 
   document.querySelectorAll(".modal-overlay").forEach(modal => {
     modal.addEventListener("click", event => {
       if (event.target !== modal) return;
-
-      if (modal.id === "authModal" && !isLoggedIn()) {
-        return;
-      }
-
+      if (modal.id === "authModal" && !isLoggedIn()) return;
       modal.classList.remove("active");
     });
   });
 
+  /* ---------- Login / Register ---------- */
   document.getElementById("authForm").addEventListener("submit", async event => {
     event.preventDefault();
     clearMessage("authMessage");
@@ -1608,9 +804,9 @@
     }
   });
 
+  /* ---------- Phone ---------- */
   function openPhoneModal() {
     const user = getCurrentUser();
-
     document.getElementById("profilePhone").value = user?.phone || "";
     clearMessage("phoneMessage");
     document.getElementById("phoneModal").classList.add("active");
@@ -1626,21 +822,14 @@
       const result = await apiRequest("/api/auth/phone", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: document.getElementById("profilePhone").value.trim()
-        })
+        body: JSON.stringify({ phone: document.getElementById("profilePhone").value.trim() })
       });
 
       const user = getCurrentUser() || {};
       user.phone = result.phone || "";
-
       localStorage.setItem("campusFindUser", JSON.stringify(user));
 
-      showMessage(
-        "phoneMessage",
-        result.message || "Phone number saved.",
-        "success"
-      );
+      showMessage("phoneMessage", result.message || "Phone number saved.", "success");
     } catch (error) {
       showMessage("phoneMessage", error.message || "Could not save phone number.");
     } finally {
@@ -1648,33 +837,14 @@
     }
   });
 
-  function getItemId(item) {
-    return item?._id || item?.id || "";
-  }
-
-  function getItemName(item) {
-    return item?.itemName || item?.title || "Untitled item";
-  }
-
-  function getItemType(item) {
-    return item?.type || item?.status || "Lost";
-  }
-
-  function getCourse(item) {
-    return item?.course || item?.studentCourse || "Not provided";
-  }
-
-  function getDepartment(item) {
-    return item?.department || item?.studentDepartment || "Not provided";
-  }
-
-  function getBatch(item) {
-    return item?.batch || item?.studentBatch || "Not provided";
-  }
-
-  function getSemester(item) {
-    return item?.semester || item?.studentSemester || "Not provided";
-  }
+  /* ---------- Item helpers ---------- */
+  function getItemId(item) { return item?._id || item?.id || ""; }
+  function getItemName(item) { return item?.itemName || item?.title || "Untitled item"; }
+  function getItemType(item) { return item?.type || item?.status || "Lost"; }
+  function getCourse(item) { return item?.course || item?.studentCourse || "Not provided"; }
+  function getDepartment(item) { return item?.department || item?.studentDepartment || "Not provided"; }
+  function getBatch(item) { return item?.batch || item?.studentBatch || "Not provided"; }
+  function getSemester(item) { return item?.semester || item?.studentSemester || "Not provided"; }
 
   function normalizeItems(data) {
     if (Array.isArray(data)) return data;
@@ -1687,16 +857,14 @@
     if (!isLoggedIn()) return;
 
     const container = document.getElementById("itemsContainer");
-    container.innerHTML =
-      '<div class="empty-state">Loading reports...</div>';
+    container.innerHTML = '<div class="empty-state">Loading reports...</div>';
 
     try {
       const data = await apiRequest("/api/items");
       allItems = normalizeItems(data);
       renderItems();
     } catch (error) {
-      container.innerHTML =
-        `<div class="empty-state">${escapeHTML(error.message)}</div>`;
+      container.innerHTML = `<div class="empty-state">${escapeHTML(error.message)}</div>`;
     }
   }
 
@@ -1704,15 +872,12 @@
     const total = allItems.length;
     const lost = allItems.filter(item => getItemType(item) !== "Found").length;
     const found = allItems.filter(item => getItemType(item) === "Found").length;
-    const returned = allItems.filter(
-      item => item.resolutionStatus === "Returned"
-    ).length;
+    const returned = allItems.filter(item => item.resolutionStatus === "Returned").length;
 
     document.getElementById("statTotal").textContent = total;
     document.getElementById("statLost").textContent = lost;
     document.getElementById("statFound").textContent = found;
     document.getElementById("statReturned").textContent = returned;
-
     document.getElementById("navTotal").textContent = total;
     document.getElementById("navLost").textContent = lost;
     document.getElementById("navFound").textContent = found;
@@ -1720,36 +885,28 @@
     const locations = {};
 
     allItems.forEach(item => {
-      const place = (item.location || "Other campus areas")
-        .split(",")[0]
-        .trim();
-
+      const place = (item.location || "Other campus areas").split(",")[0].trim();
       locations[place] = (locations[place] || 0) + 1;
     });
 
-    const topLocations = Object.entries(locations)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-
+    const topLocations = Object.entries(locations).sort((a, b) => b[1] - a[1]).slice(0, 3);
     const hotspotList = document.getElementById("hotspotList");
 
     if (!topLocations.length) {
-      hotspotList.innerHTML =
-        '<div class="hotspot-row">No reports yet.</div>';
+      hotspotList.innerHTML = '<div class="hotspot-row">No reports yet.</div>';
       return;
     }
 
     hotspotList.innerHTML = topLocations.map(([place, count]) => {
-      // A single known location is a count, not a meaningful percentage comparison.
       if (topLocations.length === 1) {
-        return `<div class="hotspot-row"><strong>${escapeHTML(place)}</strong><span style="float:right;color:#c4baff">${count} ${count === 1 ? "item" : "items"}</span></div>`;
+        return `<div class="hotspot-row"><strong>${escapeHTML(place)}</strong><span style="float:right">${count} ${count === 1 ? "item" : "items"}</span></div>`;
       }
 
       const percent = total ? Math.round((count / total) * 100) : 0;
       return `
         <div class="hotspot-row">
           ${escapeHTML(place)}
-          <span style="float:right;color:#c4baff">${count} · ${percent}%</span>
+          <span style="float:right">${count} · ${percent}%</span>
           <div class="hotspot-track" role="progressbar" aria-label="${escapeHTML(place)} reports" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}">
             <span class="hotspot-fill" style="width:${percent}%"></span>
           </div>
@@ -1760,41 +917,26 @@
 
   function formatDisplayDate(value) {
     if (!value) return "Not specified";
-    // Parse date-only values as local calendar dates to avoid UTC timezone shifts.
     const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
     const date = match
       ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
       : new Date(value);
     if (Number.isNaN(date.getTime())) return String(value);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short", day: "numeric", year: "numeric"
-    }).format(date);
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date);
   }
 
   function renderItems() {
     updateDashboardStats();
 
     const container = document.getElementById("itemsContainer");
-    const query = document
-      .getElementById("searchInput")
-      .value
-      .trim()
-      .toLowerCase();
-
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
     const category = document.getElementById("categoryFilter").value;
     const status = document.getElementById("statusFilter").value;
 
     const filtered = allItems.filter(item => {
       const searchable = [
-        getItemName(item),
-        item.category,
-        item.description,
-        item.location,
-        getCourse(item),
-        getDepartment(item),
-        getBatch(item),
-        getSemester(item),
-        item.studentName
+        getItemName(item), item.category, item.description, item.location,
+        getCourse(item), getDepartment(item), getBatch(item), getSemester(item), item.studentName
       ].join(" ").toLowerCase();
 
       return (
@@ -1805,8 +947,7 @@
     });
 
     if (!filtered.length) {
-      container.innerHTML =
-        '<div class="empty-state">No reports found.</div>';
+      container.innerHTML = '<div class="empty-state"><strong>No reports found</strong><br>Try another search, or report the item yourself.</div>';
       return;
     }
 
@@ -1814,9 +955,9 @@
       const id = escapeHTML(getItemId(item));
       const title = escapeHTML(getItemName(item));
       const type = getItemType(item) === "Found" ? "Found" : "Lost";
-      const course = escapeHTML(getCourse(item));
       const reviewStatus = item.reviewStatus || "Approved";
       const resolutionStatus = item.resolutionStatus || "Open";
+      const courseRaw = item.course || item.studentCourse;
 
       const imageSource =
         typeof item.image === "string" &&
@@ -1824,34 +965,28 @@
           ? item.image
           : "";
 
+      const icon = CATEGORY_ICONS[item.category] || "📦";
       const imageHTML = imageSource
         ? `<img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}">`
-        : '<div class="item-placeholder" aria-label="No photo">📦</div>';
+        : `<div class="item-placeholder" aria-label="No photo">${icon}</div>`;
 
       let workflowNote = "";
 
       if (item.isOwner && reviewStatus === "Pending") {
-        workflowNote =
-          '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
+        workflowNote = '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
       } else if (item.isOwner && reviewStatus === "Rejected") {
-        workflowNote =
-          '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
+        workflowNote = '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
       } else if (resolutionStatus === "Returned") {
-        workflowNote =
-          '<p class="workflow-note returned">Returned — this report is closed.</p>';
+        workflowNote = '<p class="workflow-note returned">Returned — this report is closed.</p>';
       }
 
-      const moreInfoButton =
-        reviewStatus === "Approved"
-          ? `<button class="primary-btn" type="button" data-action="more-info" data-id="${id}" aria-expanded="false">More information</button>`
-          : "";
+      const moreInfoButton = reviewStatus === "Approved"
+        ? `<button class="primary-btn" type="button" data-action="more-info" data-id="${id}" aria-expanded="false">More information</button>`
+        : "";
 
-      const returnedButton =
-        item.isOwner &&
-        reviewStatus === "Approved" &&
-        resolutionStatus === "Open"
-          ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${id}">Mark returned</button>`
-          : "";
+      const returnedButton = item.isOwner && reviewStatus === "Approved" && resolutionStatus === "Open"
+        ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${id}">Mark returned</button>`
+        : "";
 
       const deleteButton = item.isOwner
         ? `<button class="danger-btn" type="button" data-action="delete" data-id="${id}">Delete report</button>`
@@ -1868,9 +1003,9 @@
             </div>
 
             <p><strong>Category:</strong> ${escapeHTML(item.category || "Other")}</p>
-            <p><strong>Course:</strong> ${course}</p>
-            <p><strong>Campus location:</strong> ${escapeHTML(item.location || "Not specified")}</p>
-            <p><strong>Date:</strong> ${escapeHTML(formatDisplayDate(item.date))}</p>
+            ${courseRaw ? `<p><strong>Course:</strong> ${escapeHTML(courseRaw)}</p>` : ""}
+            <p>📍 ${escapeHTML(item.location || "Not specified")}</p>
+            <p>📅 ${escapeHTML(formatDisplayDate(item.date))}</p>
             <p>${escapeHTML(item.description || "No description provided.")}</p>
 
             ${workflowNote}
@@ -1888,21 +1023,9 @@
     }).join("");
   }
 
+  /* ---------- Filters ---------- */
   document.getElementById("searchInput").addEventListener("input", renderItems);
   document.getElementById("categoryFilter").addEventListener("change", renderItems);
-
-  document.getElementById("statusFilter").addEventListener("change", event => {
-    const selected = event.target.value;
-
-    document.querySelectorAll("[data-status-filter]").forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.statusFilter === selected
-      );
-    });
-
-    renderItems();
-  });
 
   document.querySelectorAll("[data-status-filter]").forEach(button => {
     button.addEventListener("click", () => {
@@ -1910,10 +1033,7 @@
       document.getElementById("statusFilter").value = selected;
 
       document.querySelectorAll("[data-status-filter]").forEach(option => {
-        option.classList.toggle(
-          "active",
-          option.dataset.statusFilter === selected
-        );
+        option.classList.toggle("active", option.dataset.statusFilter === selected);
       });
 
       renderItems();
@@ -1923,39 +1043,26 @@
   document.querySelectorAll("[data-zone]").forEach(button => {
     button.addEventListener("click", () => {
       document.getElementById("searchInput").value = button.dataset.zone;
+      document.querySelectorAll("[data-zone]").forEach(chip => {
+        chip.classList.toggle("on", chip === button);
+      });
       renderItems();
     });
   });
 
-  document.getElementById("itemsContainer").addEventListener(
-    "click",
-    async event => {
-      const button = event.target.closest("button[data-action]");
-      if (!button) return;
+  document.getElementById("itemsContainer").addEventListener("click", async event => {
+    const button = event.target.closest("button[data-action]");
+    if (!button) return;
 
-      const { action, id } = button.dataset;
+    const { action, id } = button.dataset;
 
-      if (action === "more-info") {
-        await showMoreInfo(id, button);
-      }
-
-      if (action === "delete") {
-        await deleteItem(id);
-      }
-
-      if (action === "resolve") {
-        await markReturned(id);
-      }
-    }
-  );
+    if (action === "more-info") await showMoreInfo(id, button);
+    if (action === "delete") await deleteItem(id);
+    if (action === "resolve") await markReturned(id);
+  });
 
   function detailLine(label, value) {
-    return `
-      <p>
-        <strong>${escapeHTML(label)}:</strong>
-        ${escapeHTML(value || "Not provided")}
-      </p>
-    `;
+    return `<p><strong>${escapeHTML(label)}:</strong> ${escapeHTML(value || "Not provided")}</p>`;
   }
 
   async function showMoreInfo(id, button) {
@@ -1974,9 +1081,7 @@
     button.textContent = "Hide information";
     button.setAttribute("aria-expanded", "true");
 
-    const item = allItems.find(
-      report => String(getItemId(report)) === String(id)
-    );
+    const item = allItems.find(report => String(getItemId(report)) === String(id));
 
     if (!item) {
       result.innerHTML = "<p>Report details could not be found.</p>";
@@ -1986,43 +1091,25 @@
     let contact = {};
 
     try {
-      const response = await apiRequest(
-        `/api/items/${encodeURIComponent(id)}/contact`
-      );
-
+      const response = await apiRequest(`/api/items/${encodeURIComponent(id)}/contact`);
       contact = response.contact || response;
     } catch (error) {
       contact = {};
     }
 
-    const studentName =
-      contact.studentName || item.studentName || "Student";
-    const email =
-      contact.studentContact ||
-      contact.studentEmail ||
-      contact.email ||
-      item.studentContact ||
-      "";
-    const phone =
-      contact.studentPhone ||
-      contact.phone ||
-      item.studentPhone ||
-      "";
-
+    const studentName = contact.studentName || item.studentName || "Student";
+    const email = contact.studentContact || contact.studentEmail || contact.email || item.studentContact || "";
+    const phone = contact.studentPhone || contact.phone || item.studentPhone || "";
     const type = getItemType(item) === "Found" ? "Found" : "Lost";
 
     const emailActions = email
       ? `
         <div class="contact-links">
-          <a
-            href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Open Gmail</a>
+          <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}" target="_blank" rel="noopener noreferrer">Open Gmail</a>
           <a href="mailto:${encodeURIComponent(email)}">Open email app</a>
         </div>
       `
-      : '<p>Email/Gmail: Not available</p>';
+      : "<p>Email/Gmail: Not available</p>";
 
     const phoneAction = phone
       ? `<div class="contact-links"><a href="tel:${encodeURIComponent(phone)}">Call ${escapeHTML(phone)}</a></div>`
@@ -2036,7 +1123,7 @@
       ${detailLine("Location", item.location)}
       ${detailLine("Date", item.date)}
       ${detailLine("Description", item.description)}
-      <hr style="margin:8px 0;border-color:#283550">
+      <hr>
       <strong>Student information</strong>
       ${detailLine("Name", studentName)}
       ${detailLine("Course", getCourse(item))}
@@ -2049,16 +1136,10 @@
   }
 
   async function deleteItem(id) {
-    if (!confirm("Are you sure you want to delete this report?")) {
-      return;
-    }
+    if (!confirm("Are you sure you want to delete this report?")) return;
 
     try {
-      await apiRequest(
-        `/api/items/${encodeURIComponent(id)}`,
-        { method: "DELETE" }
-      );
-
+      await apiRequest(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
       await loadItemsFromDatabase();
       alert("Report deleted.");
     } catch (error) {
@@ -2067,16 +1148,10 @@
   }
 
   async function markReturned(id) {
-    if (!confirm("Has this item been returned to its owner?")) {
-      return;
-    }
+    if (!confirm("Has this item been returned to its owner?")) return;
 
     try {
-      await apiRequest(
-        `/api/items/${encodeURIComponent(id)}/resolve`,
-        { method: "PATCH" }
-      );
-
+      await apiRequest(`/api/items/${encodeURIComponent(id)}/resolve`, { method: "PATCH" });
       await loadItemsFromDatabase();
       alert("Report marked as returned.");
     } catch (error) {
@@ -2084,12 +1159,10 @@
     }
   }
 
+  /* ---------- Report form ---------- */
   function localDateString() {
     const now = new Date();
-    const localDate = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60000
-    );
-
+    const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
     return localDate.toISOString().slice(0, 10);
   }
 
@@ -2108,9 +1181,7 @@
   }
 
   document.querySelectorAll(".type-option").forEach(button => {
-    button.addEventListener("click", () => {
-      setReportType(button.dataset.itemType);
-    });
+    button.addEventListener("click", () => setReportType(button.dataset.itemType));
   });
 
   function openReport(status) {
@@ -2122,8 +1193,7 @@
     document.getElementById("reportForm").reset();
     setReportType(status);
     document.getElementById("itemDate").value = localDateString();
-    document.getElementById("studentName").value =
-      getCurrentUser()?.name || "";
+    document.getElementById("studentName").value = getCurrentUser()?.name || "";
 
     selectedImage = "";
 
@@ -2167,57 +1237,48 @@
     };
 
     reader.onerror = () => {
-      showMessage(
-        "reportMessage",
-        "Could not read that image. Please try another one."
-      );
+      showMessage("reportMessage", "Could not read that image. Please try another one.");
     };
 
     reader.readAsDataURL(file);
   });
 
-  document.getElementById("reportForm").addEventListener(
-    "submit",
-    async event => {
-      event.preventDefault();
+  document.getElementById("reportForm").addEventListener("submit", async event => {
+    event.preventDefault();
 
-      const button = document.getElementById("reportSubmit");
-      button.disabled = true;
-      clearMessage("reportMessage");
+    const button = document.getElementById("reportSubmit");
+    button.disabled = true;
+    clearMessage("reportMessage");
 
-      try {
-        await apiRequest("/api/items", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: document.getElementById("itemTitle").value.trim(),
-            studentName: document.getElementById("studentName").value.trim(),
-            course: document.getElementById("studentCourse").value.trim(),
-            department: document.getElementById("studentDepartment").value.trim(),
-            batch: document.getElementById("studentBatch").value.trim(),
-            semester: document.getElementById("studentSemester").value,
-            category: document.getElementById("itemCategory").value,
-            status: document.getElementById("itemStatus").value,
-            location: document.getElementById("itemLocation").value.trim(),
-            date: document.getElementById("itemDate").value,
-            description: document.getElementById("itemDescription").value.trim(),
-            image: selectedImage
-          })
-        });
+    try {
+      await apiRequest("/api/items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: document.getElementById("itemTitle").value.trim(),
+          studentName: document.getElementById("studentName").value.trim(),
+          course: document.getElementById("studentCourse").value.trim(),
+          department: document.getElementById("studentDepartment").value.trim(),
+          batch: document.getElementById("studentBatch").value.trim(),
+          semester: document.getElementById("studentSemester").value,
+          category: document.getElementById("itemCategory").value,
+          status: document.getElementById("itemStatus").value,
+          location: document.getElementById("itemLocation").value.trim(),
+          date: document.getElementById("itemDate").value,
+          description: document.getElementById("itemDescription").value.trim(),
+          image: selectedImage
+        })
+      });
 
-        closeModal("reportModal");
-        await loadItemsFromDatabase();
-
-        alert(
-          "Report submitted. It will appear to everyone after admin approval."
-        );
-      } catch (error) {
-        showMessage("reportMessage", error.message || "Could not submit report.");
-      } finally {
-        button.disabled = false;
-      }
+      closeModal("reportModal");
+      await loadItemsFromDatabase();
+      alert("Report submitted. It will appear to everyone after admin approval.");
+    } catch (error) {
+      showMessage("reportMessage", error.message || "Could not submit report.");
+    } finally {
+      button.disabled = false;
     }
-  );
+  });
 
   document.addEventListener("DOMContentLoaded", async () => {
     updateLoginUI();
