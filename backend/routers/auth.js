@@ -1,4 +1,3 @@
-
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -111,6 +110,7 @@ router.post("/register", (req, res) => {
       "Public registration is disabled. Please contact the administrator."
   });
 });
+
 // Login approved users and the configured administrator.
 router.post("/login", async (req, res) => {
   try {
@@ -146,10 +146,11 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    const adminEmail = getAdminEmail();
     const isAdmin =
-      Boolean(getAdminEmail()) &&
-      cleanEmail === getAdminEmail();
+      Boolean(adminEmail) && cleanEmail === adminEmail;
 
+    // Verify the selected role for non-admin accounts.
     if (!isAdmin) {
       if (!["Student", "Faculty"].includes(requestedAccountType)) {
         return res.status(400).json({
@@ -165,6 +166,7 @@ router.post("/login", async (req, res) => {
         });
       }
 
+      // Only approved accounts may log in.
       if (user.accountStatus !== "Approved") {
         let message = "Your account is waiting for admin approval.";
 
@@ -180,11 +182,14 @@ router.post("/login", async (req, res) => {
       }
     }
 
+    const accountType =
+      user.accountType || (isAdmin ? "Admin" : "Student");
+
     const token = jwt.sign(
       {
         id: String(user._id),
         email: user.email,
-        accountType: user.accountType || (isAdmin ? "Admin" : "Student"),
+        accountType,
         isAdmin
       },
       process.env.JWT_SECRET,
@@ -199,151 +204,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone || "",
-        accountType: user.accountType || (isAdmin ? "Admin" : "Student"),
-        isAdmin
-      }
-    });
-  } catch (error) {
-    console.error("Login error:", error.message);
-
-    return res.status(500).json({
-      message: "Could not log in."
-    });
-  }
-});
-
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: cleanEmail });
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({
-        message: "Invalid email or password."
-      });
-    }
-
-    const adminEmail = getAdminEmail();
-    const isAdmin =
-      Boolean(adminEmail) && cleanEmail === adminEmail;
-// Student aur Faculty ke login type ko verify karo.
-if (!isAdmin) {
-  if (!["Student", "Faculty"].includes(requestedAccountType)) {
-    return res.status(400).json({
-      message: "Please select Student or Faculty login."
-    });
-  }
-
-  const actualAccountType = user.accountType || "Student";
-
-  if (actualAccountType !== requestedAccountType) {
-    return res.status(403).json({
-      message: `This account is registered as ${actualAccountType}. Please select ${actualAccountType} to log in.`
-    });
-  }
-}
-    
-      const savedAccountType = user.accountType || "Student";
-
-      if (savedAccountType !== requestedAccountType) {
-        return res.status(403).json({
-          message:
-            `This account is registered as ${savedAccountType}. ` +
-            `Please select ${savedAccountType} login.`
-        });
-      }
-    }
-
-    // Existing account approval rules preserve karo.
-    if (!isAdmin && user.accountStatus !== "Approved") {
-      let message = "Your account is waiting for admin approval.";
-
-      if (user.accountStatus === "Rejected") {
-        message =
-          "Your account request was rejected. Contact the campus admin.";
-      } else if (user.accountStatus === "Disabled") {
-        message = "This account is disabled. Contact the campus admin.";
-      }
-
-      return res.status(403).json({ message });
-    }
-
-    const token = jwt.sign(
-      {
-        id: String(user._id),
-        email: user.email
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    return res.json({
-      message: "Login successful.",
-      token,
-      user: {
-        id: String(user._id),
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        accountType: user.accountType || "Student",
-        isAdmin
-      }
-    });
-  } catch (error) {
-    console.error("Login error:", error.message);
-
-    return res.status(500).json({
-      message: "Could not log in."
-    });
-  }
-});
-
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: cleanEmail });
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({
-        message: "Invalid email or password."
-      });
-    }
-
-    const adminEmail = getAdminEmail();
-    const isAdmin =
-      Boolean(adminEmail) && cleanEmail === adminEmail;
-
-    if (!isAdmin && user.accountStatus !== "Approved") {
-      let message = "Your account is waiting for admin approval.";
-
-      if (user.accountStatus === "Rejected") {
-        message =
-          "Your account request was rejected. Contact the campus admin.";
-      } else if (user.accountStatus === "Disabled") {
-        message = "This account is disabled. Contact the campus admin.";
-      }
-
-      return res.status(403).json({ message });
-    }
-
-    const token = jwt.sign(
-      {
-        id: String(user._id),
-        email: user.email
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    return res.json({
-      message: "Login successful.",
-      token,
-      user: {
-        id: String(user._id),
-        name: user.name,
-        email: user.email,
-        phone: user.phone || "",
-        accountType: user.accountType || "Student",
+        accountType,
         isAdmin
       }
     });
@@ -622,7 +483,7 @@ router.patch("/phone", authenticateUser, async (req, res) => {
     console.error("Update phone error:", error.message);
 
     return res.status(500).json({
-      message: "Could not update phone number."
+      message: "Could not update the phone number."
     });
   }
 });
