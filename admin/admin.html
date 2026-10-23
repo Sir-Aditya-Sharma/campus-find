@@ -186,7 +186,7 @@
         <td>${escapeHTML(user.phone || user.phoneNumber || "—")}</td>
         <td>${pill(status)}</td>
         <td><div class="actions">
-          <button class="btn small ${disabled ? "success" : "secondary"}" data-user-action="status" data-id="${safeId}" data-status="${disabled ? "Active" : "Disabled"}">${disabled ? "Activate" : "Disable"}</button>
+          <button class="btn small ${disabled ? "success" : "secondary"}" data-user-action="status" data-id="${safeId}" data-status="${disabled ? "Approved" : "Disabled"}">${disabled ? "Activate" : "Disable"}</button>
           <button class="btn small success" data-user-action="status" data-id="${safeId}" data-status="Approved">Approve</button>
           <button class="btn small danger" data-user-action="status" data-id="${safeId}" data-status="Rejected">Reject</button>
           <button class="btn small ghost" data-user-action="reset" data-id="${safeId}">Reset password</button>
@@ -324,16 +324,16 @@
       const status = button.dataset.status;
       if (!confirm(`Set this account status to "${status}"?`)) return;
       path = `/api/auth/admin/users/${encodeURIComponent(id)}/status`;
-      body = { accountStatus: status, status };
+      body = { accountStatus: status };
     } else if (action === "reset") {
-      const newPassword = prompt("Enter a new temporary password (at least 6 characters):");
+      const newPassword = prompt("Enter a new temporary password (at least 8 characters):");
       if (newPassword === null) return;
-      if (newPassword.length < 6) {
-        notice("usersNotice", "Password must be at least 6 characters long.");
+      if (newPassword.length < 8) {
+        notice("usersNotice", "Password must be at least 8 characters long.");
         return;
       }
-      path = `/api/auth/admin/users/${encodeURIComponent(id)}/reset-password`;
-      body = { newPassword, password: newPassword };
+      path = `/api/auth/admin/users/${encodeURIComponent(id)}/password`;
+      body = { newPassword };
     } else return;
 
     button.disabled = true;
