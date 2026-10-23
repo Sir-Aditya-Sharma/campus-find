@@ -176,6 +176,19 @@ tr:last-child td{border-bottom:0}
 .table-card th,.table-card td{font-size:11px}
 .actions{display:flex;gap:5px;flex-wrap:wrap}
 .actions .btn{font-size:10px;padding:7px 8px}
+/* User-row actions: keep the table clean and prevent buttons from colliding. */
+#users .table-card{overflow:hidden}
+#users .table-card .table-wrap{overflow:auto}
+#users .table-card table{min-width:900px;table-layout:auto}
+#users .table-card th:last-child,#users .table-card td:last-child{min-width:170px;width:170px}
+.user-actions-details{position:relative;min-width:145px}
+.user-actions-details>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:9px 11px;font-size:11px;white-space:nowrap;cursor:pointer;user-select:none}
+.user-actions-details>summary::-webkit-details-marker{display:none}
+.user-actions-details[open]>summary{border-radius:8px 8px 0 0;background:#e5ebff;color:#334bc0}
+.user-actions-list{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;padding:9px;background:#fff;border:1px solid #e1e9f6;border-radius:0 0 9px 9px;box-shadow:0 5px 12px #17284b0c}
+.user-actions-list .btn{width:100%;min-width:0;white-space:normal;line-height:1.25;min-height:32px;padding:7px 5px;font-size:10px}
+.user-actions-list .reset-action{grid-column:1/-1;background:#6957f5;color:white}
+@media(max-width:520px){#users .table-card table{min-width:900px}.user-actions-details{min-width:140px}}
 .form-card{max-width:760px;background:white;border:1px solid #e1eaf7;border-radius:12px;padding:22px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
 .empty{text-align:center;padding:25px;color:var(--muted)}
@@ -862,13 +875,18 @@ function renderUsers() {
       <td>${escapeHTML(accountType(user))}</td>
       <td>${dateText(user.createdAt)}</td>
       <td>${statusBadge(status)}</td>
-      <td><div class="actions">
-        ${status!=="Approved"?`<button class="btn good small" data-user-action="status" data-status="Approved" data-id="${id}">Approve</button>`:""}
-        ${status!=="Pending"?`<button class="btn secondary small" data-user-action="status" data-status="Pending" data-id="${id}">Set Pending</button>`:""}
-        ${status!=="Rejected"?`<button class="btn bad small" data-user-action="status" data-status="Rejected" data-id="${id}">Reject</button>`:""}
-        ${status!=="Disabled"?`<button class="btn secondary small" data-user-action="status" data-status="Disabled" data-id="${id}">Disable</button>`:""}
-        <button class="btn small" data-user-action="reset" data-id="${id}">Reset Password</button>
-      </div></td>
+      <td>
+        <details class="user-actions-details">
+          <summary class="btn secondary small">Manage actions <span aria-hidden="true">⌄</span></summary>
+          <div class="user-actions-list">
+            ${status!=="Approved"?`<button type="button" class="btn good small" data-user-action="status" data-status="Approved" data-id="${id}">Approve</button>`:""}
+            ${status!=="Pending"?`<button type="button" class="btn secondary small" data-user-action="status" data-status="Pending" data-id="${id}">Set Pending</button>`:""}
+            ${status!=="Rejected"?`<button type="button" class="btn bad small" data-user-action="status" data-status="Rejected" data-id="${id}">Reject</button>`:""}
+            ${status!=="Disabled"?`<button type="button" class="btn secondary small" data-user-action="status" data-status="Disabled" data-id="${id}">Disable</button>`:""}
+            <button type="button" class="btn small reset-action" data-user-action="reset" data-id="${id}">Reset Password</button>
+          </div>
+        </details>
+      </td>
     </tr>`;
   }).join(""):`<tr><td colspan="6" class="empty">${users.length?"No accounts match your filters.":"No users loaded."}</td></tr>`;
 }
@@ -910,19 +928,25 @@ async function runUserAction(button) {
 }
 $("usersList").addEventListener("click",async event=>{
   const button=event.target.closest("[data-user-action]");
-  if(button)await runUserAction(button);
+  if(button){
+    const panel=button.closest(".user-actions-details");
+    if(panel)panel.open=false;
+    await runUserAction(button);
+  }
 });
 
 /* CREATE ACCOUNT */
 $("createForm").addEventListener("submit",async event=>{
   event.preventDefault();
+  const form = event.currentTarget;
   clearNotice("createNotice");
-  const payload=Object.fromEntries(new FormData(event.currentTarget).entries());
+  const payload=Object.fromEntries(new FormData(form).entries());
   $("createBtn").disabled=true;
   try{
     const result=await api("/api/auth/admin/users",{method:"POST",body:JSON.stringify(payload)});
     showNotice("createNotice",result.message||"Account created successfully.","success");
-    event.currentTarget.reset();
+    // Keep a stable form reference: event.currentTarget can be null after await.
+    form.reset();
     await refreshAll();
   }catch(error){
     showNotice("createNotice","Could not create account: "+error.message);
