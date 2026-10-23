@@ -147,16 +147,23 @@ router.post("/login", async (req, res) => {
     const adminEmail = getAdminEmail();
     const isAdmin =
       Boolean(adminEmail) && cleanEmail === adminEmail;
+// Student aur Faculty ke login type ko verify karo.
+if (!isAdmin) {
+  if (!["Student", "Faculty"].includes(requestedAccountType)) {
+    return res.status(400).json({
+      message: "Please select Student or Faculty login."
+    });
+  }
 
-    // Student aur Faculty ke login type ko verify karo.
-    // Admin login ke liye account type select karna zaroori nahi.
-    if (!isAdmin) {
-      if (!["Student", "Faculty"].includes(requestedAccountType)) {
-        return res.status(400).json({
-          message: "Please select Student or Faculty login."
-        });
-      }
+  const actualAccountType = user.accountType || "Student";
 
+  if (actualAccountType !== requestedAccountType) {
+    return res.status(403).json({
+      message: `This account is registered as ${actualAccountType}. Please select ${actualAccountType} to log in.`
+    });
+  }
+}
+    
       const savedAccountType = user.accountType || "Student";
 
       if (savedAccountType !== requestedAccountType) {
