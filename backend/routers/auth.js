@@ -15,7 +15,7 @@ function isValidPhone(phone) {
   return !phone || /^[+0-9().\-\s]{7,30}$/.test(phone);
 }
 
-// Authenticate a logged-in user and identify the configured admin.
+// Authenticate a logged-in user.
 async function authenticateUser(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
@@ -43,7 +43,7 @@ async function authenticateUser(req, res, next) {
     }
 
     const user = await User.findById(decoded.id).select(
-      "name email phone accountStatus"
+      "name email phone accountType accountStatus"
     );
 
     if (!user) {
@@ -68,6 +68,7 @@ async function authenticateUser(req, res, next) {
       name: user.name,
       email: user.email,
       phone: user.phone || "",
+      accountType: user.accountType || "Student",
       isAdmin
     };
 
@@ -103,7 +104,7 @@ function authenticateAdmin(req, res, next) {
   });
 }
 
-// Public student registration is disabled.
+// Public registration remains disabled.
 router.post("/register", (req, res) => {
   return res.status(403).json({
     message:
@@ -111,7 +112,7 @@ router.post("/register", (req, res) => {
   });
 });
 
-// Login approved students and the configured administrator.
+// Login approved users and the configured administrator.
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body || {};
@@ -177,6 +178,7 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone || "",
+        accountType: user.accountType || "Student",
         isAdmin
       }
     });
@@ -189,10 +191,16 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Admin: create an approved student account.
+// Admin: create a Student or Faculty account.
 router.post("/admin/users", authenticateAdmin, async (req, res) => {
   try {
     const { name, email, password, phone } = req.body || {};
+
+    // Default to Student for compatibility with older admin forms.
+    const accountType =
+      req.body?.accountType === undefined
+        ? "Student"
+        : req.body.accountType;
 
     if (
       typeof name !== "string" ||
@@ -211,13 +219,19 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
       });
     }
 
+    if (!["Student", "Faculty"].includes(accountType)) {
+      return res.status(400).json({
+        message: "Account type must be Student or Faculty."
+      });
+    }
+
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
     const cleanPhone = typeof phone === "string" ? phone.trim() : "";
 
     if (cleanEmail === getAdminEmail()) {
       return res.status(400).json({
-        message: "Use a different email for the student account."
+        message: "Use a different email for this account."
       });
     }
 
@@ -235,23 +249,32 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
       });
     }
 
+    // Students are approved immediately; Faculty require admin approval.
+    const accountStatus =
+      accountType === "Faculty" ? "Pending" : "Approved";
+
     const user = new User({
       name: cleanName,
       email: cleanEmail,
       password: await bcrypt.hash(password, 12),
       phone: cleanPhone,
-      accountStatus: "Approved"
+      accountType,
+      accountStatus
     });
 
     await user.save();
 
     return res.status(201).json({
-      message: "Student account created successfully.",
+      message:
+        accountType === "Faculty"
+          ? "Faculty account created. Admin approval is required."
+          : "Student account created successfully.",
       user: {
         id: String(user._id),
         name: user.name,
         email: user.email,
         phone: user.phone || "",
+        accountType: user.accountType,
         accountStatus: user.accountStatus
       }
     });
@@ -262,35 +285,43 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
       });
     }
 
-    console.error("Admin student creation failed:", error.message);
+    console.error("Admin account creation failed:", error.message);
 
     return res.status(500).json({
-      message: "Could not create the student account."
+      message: "Could not create the account."
     });
   }
 });
 
-// Admin: list student accounts without exposing password hashes.
+// Admin: list accounts without exposing password hashes.
 router.get("/admin/users", authenticateAdmin, async (req, res) => {
   try {
     const users = await User.find({
       email: { $ne: getAdminEmail() }
     })
-      .select("name email phone accountStatus createdAt")
+      .select(
+        "name email phone accountType accountStatus createdAt"
+      )
       .sort({ createdAt: -1 })
       .lean();
 
-    return res.json(users);
+    // Older accounts without accountType are treated as Students.
+    const normalizedUsers = users.map((user) => ({
+      ...user,
+      accountType: user.accountType || "Student"
+    }));
+
+    return res.json(normalizedUsers);
   } catch (error) {
     console.error("Load users error:", error.message);
 
     return res.status(500).json({
-      message: "Could not load student accounts."
+      message: "Could not load accounts."
     });
   }
 });
 
-// Admin: approve, reject, or disable a student account.
+// Admin: approve, reject, set pending, or disable an account.
 router.patch(
   "/admin/users/:id/status",
   authenticateAdmin,
@@ -304,11 +335,15 @@ router.patch(
 
       const { accountStatus } = req.body || {};
 
-      if (!["Pending", "Approved", "Rejected", "Disabled"].includes(accountStatus)) {
-  return res.status(400).json({
-    message: "Choose Pending, Approved, Rejected, or Disabled."
-  });
-}
+      if (
+        !["Pending", "Approved", "Rejected", "Disabled"].includes(
+          accountStatus
+        )
+      ) {
+        return res.status(400).json({
+          message: "Choose Pending, Approved, Rejected, or Disabled."
+        });
+      }
 
       const user = await User.findOne({
         _id: req.params.id,
@@ -317,7 +352,7 @@ router.patch(
 
       if (!user) {
         return res.status(404).json({
-          message: "Student account not found."
+          message: "Account not found."
         });
       }
 
@@ -325,7 +360,7 @@ router.patch(
       await user.save();
 
       return res.json({
-        message: `Account ${accountStatus.toLowerCase()}.`,
+        message: `Account status updated to ${accountStatus}.`,
         accountStatus
       });
     } catch (error) {
@@ -338,7 +373,7 @@ router.patch(
   }
 );
 
-// Admin: reset a student's password.
+// Admin: reset an account password.
 router.patch(
   "/admin/users/:id/password",
   authenticateAdmin,
@@ -369,7 +404,7 @@ router.patch(
 
       if (!user) {
         return res.status(404).json({
-          message: "Student account not found."
+          message: "Account not found."
         });
       }
 
@@ -377,8 +412,7 @@ router.patch(
       await user.save();
 
       return res.json({
-        message:
-          "Password reset. Give the new password to the student privately."
+        message: "Password reset successfully. Share it privately."
       });
     } catch (error) {
       console.error("Password reset error:", error.message);
@@ -390,7 +424,7 @@ router.patch(
   }
 );
 
-// Logged-in student: update their optional phone number.
+// Logged-in Student or Faculty: update optional phone number.
 router.patch("/phone", authenticateUser, async (req, res) => {
   try {
     const phone =
