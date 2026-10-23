@@ -51,7 +51,7 @@
       <div class="toolbar"><input id="userSearch" placeholder="Search name, email or phone" aria-label="Search accounts"><select id="roleFilter" aria-label="Filter account type"><option value="">All types</option><option>Student</option><option>Teacher</option><option>Faculty</option><option>Admin</option></select><select id="statusFilter" aria-label="Filter account status"><option value="">All statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option><option>Disabled</option><option>Active</option></select><button class="btn secondary small" id="reloadUsers">Load accounts</button></div>
       <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Phone</th><th>Account status</th><th>Account controls</th></tr></thead><tbody id="usersBody"><tr><td class="empty" colspan="6">Sign in to load accounts.</td></tr></tbody></table></div>
       <div id="usersNotice" class="notice" style="margin:12px 22px" role="status"></div>
-      <div class="table-note">Buttons remain available for every account. If the backend rejects an action, the exact API error is shown below the table.</div>
+      <div class="table-note">Activate sets the account to Approved; Set Pending removes approval and blocks student login. If the backend rejects an action, the exact API error is shown below the table.</div>
     </section>
     <section class="panel">
       <div class="panel-head"><div><h2>Lost &amp; Found reports</h2><p>Review submitted items and update their review status.</p></div><span class="count" id="reportCount">0 reports</span></div>
@@ -142,7 +142,7 @@
   }
 
   function statusOf(user) {
-    return String(user.accountStatus || user.status || (user.isActive === false ? "Disabled" : "Active"));
+    return String(user.accountStatus || user.status || (user.isActive === false ? "Disabled" : "Approved"));
   }
   function userId(user) { return user._id || user.id || user.userId || user.user_id || ""; }
   function reportId(report) { return report._id || report.id || report.itemId || report.item_id || ""; }
@@ -188,6 +188,7 @@
         <td><div class="actions">
           <button class="btn small ${disabled ? "success" : "secondary"}" data-user-action="status" data-id="${safeId}" data-status="${disabled ? "Approved" : "Disabled"}">${disabled ? "Activate" : "Disable"}</button>
           <button class="btn small success" data-user-action="status" data-id="${safeId}" data-status="Approved">Approve</button>
+          <button class="btn small ghost" data-user-action="status" data-id="${safeId}" data-status="Pending">Set Pending</button>
           <button class="btn small danger" data-user-action="status" data-id="${safeId}" data-status="Rejected">Reject</button>
           <button class="btn small ghost" data-user-action="reset" data-id="${safeId}">Reset password</button>
         </div></td>
