@@ -174,6 +174,73 @@ tr:last-child td{border-bottom:0}
  .legend-inline{gap:8px}.page-head{align-items:flex-start}
  .date-select{min-width:0;padding:9px;font-size:10px}.form-grid{grid-template-columns:1fr}
  .quick-actions{grid-template-columns:1fr}
+  .admin-menu-wrap {
+  position: relative;
+}
+
+.top-profile {
+  border: 0;
+  background: white;
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 5px 7px;
+}
+
+.top-profile:hover {
+  background: #f2f6ff;
+}
+
+.admin-dropdown {
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 235px;
+  padding: 8px;
+  background: white;
+  border: 1px solid #e2eaf7;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px #17284b20;
+}
+
+.admin-dropdown.hidden {
+  display: none;
+}
+
+.dropdown-heading {
+  padding: 12px;
+  border-bottom: 1px solid #edf1f8;
+  margin-bottom: 5px;
+}
+
+.dropdown-heading strong,
+.dropdown-heading small {
+  display: block;
+}
+
+.dropdown-heading small {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.admin-dropdown > button {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: white;
+  color: var(--ink);
+  padding: 12px;
+  text-align: left;
+}
+
+.admin-dropdown > button:hover {
+  background: #f0f4ff;
+}
 }
 </style>
 </head>
@@ -204,7 +271,7 @@ tr:last-child td{border-bottom:0}
    <button data-section="settings"><span class="ico">⚙</span>Settings</button>
   </nav>
   <div class="side-bottom">
-   <div class="profile"><div class="avatar">A</div><div><strong>Admin</strong><small id="sidebarEmail">Administrator</small></div></div>
+   <div class="profile"><div class="avatar">A</div><div><strong>Admin</strong><small> Admin Panel</small></div></div>
    <button id="logoutBtn" class="logout">⇥ &nbsp; Logout</button>
   </div>
  </aside>
@@ -214,7 +281,27 @@ tr:last-child td{border-bottom:0}
    <button class="hamb" id="menuBtn" aria-label="Toggle menu">☰</button>
    <div class="search"><span>⌕</span><input id="globalSearch" placeholder="Search users, items, or by email..."></div>
    <div class="top-right"><div class="bell">♧<b id="bellCount">0</b></div>
-    <div class="top-profile"><div class="avatar">A</div><div class="details"><strong>Admin</strong><small>Administrator</small></div><span>⌄</span></div>
+    <div class="admin-menu-wrap">
+  <button type="button" class="top-profile" id="adminMenuBtn"
+          aria-expanded="false">
+    <div class="avatar">A</div>
+    <div class="details">
+      <strong>Admin</strong>
+      <small>Administrator</small>
+    </div>
+    <span>⌄</span>
+  </button>
+
+  <div class="admin-dropdown hidden" id="adminDropdown">
+    <div class="dropdown-heading">
+      <strong>Admin Account</strong>
+      <small id="dropdownEmail">Administrator</small>
+    </div>
+    <button type="button" data-admin-action="settings">⚙ Settings</button>
+    <button type="button" data-admin-action="refresh">↻ Refresh Dashboard</button>
+    <button type="button" data-admin-action="logout">⇥ Log out</button>
+  </div>
+</div>
    </div>
   </header>
 
@@ -426,7 +513,7 @@ $("menuBtn").addEventListener("click",()=>{
 function showApp(){
  $("loginScreen").classList.add("hidden");
  $("adminApp").classList.remove("hidden");
- $("sidebarEmail").textContent=adminUser?.email||"Administrator";
+ 
 }
 function showLogin(){$("adminApp").classList.add("hidden");$("loginScreen").classList.remove("hidden")}
 function logout(){
@@ -474,7 +561,7 @@ async function refreshAll(){
 }
 
 function renderAll(){
- renderStats();renderUsers();renderItems();renderRecent();renderCategories();renderActivity();renderApprovals();renderReports()
+ renderStats();renderUsers();renderItems();renderRecent();renderCategories();renderApprovals();renderReports()
 }
 function selectedRange(){
  const val=$("dateRange").value;
@@ -715,6 +802,47 @@ function start(){
  if(!token||!adminUser?.isAdmin){showLogin();return}
  showApp();refreshAll()
 }
+  const adminMenuBtn = $("adminMenuBtn");
+const adminDropdown = $("adminDropdown");
+
+adminMenuBtn.addEventListener("click", () => {
+  const opening = adminDropdown.classList.contains("hidden");
+
+  adminDropdown.classList.toggle("hidden", !opening);
+  adminMenuBtn.setAttribute("aria-expanded", String(opening));
+
+  $("dropdownEmail").textContent =
+    adminUser?.email || "Administrator";
+});
+
+document.addEventListener("click", event => {
+  if (
+    !event.target.closest(".admin-menu-wrap")
+  ) {
+    adminDropdown.classList.add("hidden");
+    adminMenuBtn.setAttribute("aria-expanded", "false");
+  }
+});
+
+document.querySelectorAll("[data-admin-action]").forEach(button => {
+  button.addEventListener("click", async () => {
+    const action = button.dataset.adminAction;
+    adminDropdown.classList.add("hidden");
+    adminMenuBtn.setAttribute("aria-expanded", "false");
+
+    if (action === "settings") {
+      goTo("settings");
+    }
+
+    if (action === "refresh") {
+      await refreshAll();
+    }
+
+    if (action === "logout") {
+      logout();
+    }
+  });
+});
 start();
 </script>
 </body>
