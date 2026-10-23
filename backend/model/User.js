@@ -7,6 +7,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    accountType: {
+  type: String,
+  enum: ["Student", "Faculty"],
+  default: "Student",
+  trim: true
+},
 
     email: {
       type: String,
