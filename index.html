@@ -1759,6 +1759,23 @@
     }).join("");
   }
 
+  // Format report dates safely; this function is used by item cards.
+  function formatDisplayDate(value) {
+    if (!value) return "Not specified";
+
+    const raw = String(value).trim();
+    // Treat YYYY-MM-DD as a local calendar date to avoid timezone shifts.
+    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const date = match
+      ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+      : new Date(raw);
+
+    if (Number.isNaN(date.getTime())) return raw;
+    return new Intl.DateTimeFormat("en-IN", {
+      day: "numeric", month: "short", year: "numeric"
+    }).format(date);
+  }
+
   function renderItems() {
     updateDashboardStats();
 
