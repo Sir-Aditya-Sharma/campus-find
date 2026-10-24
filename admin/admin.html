@@ -1,1547 +1,1412 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CampusFind | College Lost & Found</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusFind | Admin Dashboard</title>
 
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #090d17;
-      --surface: #101727;
-      --surface-2: #151f32;
-      --border: #283550;
-      --text: #e8edff;
-      --muted: #8e9bb8;
-      --purple: #6958ff;
-      --purple-light: #a99dff;
-      --red: #ff5f7c;
-      --green: #2dd6a6;
-      --yellow: #ffc857;
-      --accent-1: #8B5CF6;
-      --accent-2: #22D3EE;
-    }
+<style>
+:root{
+  --navy:#101a34;--ink:#12204b;--muted:#62759d;--line:#e2eaf7;
+  --purple:#6957f5;--blue:#258bf0;--green:#11b981;--orange:#ff9d27;
+  --red:#ff5261;--bg:#f7faff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;font-size:13px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
 
-    :root[data-theme="sunset"] {
-      --bg: #140A12; --surface: #21121f; --surface-2: #30182b; --border: #573044;
-      --text: #fff0f5; --muted: #d1a9bb; --purple: #FF7A59; --purple-light: #ff9bb9;
-      --accent-1: #FF7A59; --accent-2: #FF3D81;
-    }
+/* ---------- login ---------- */
+.login-screen{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#101a34,#33427e)}
+.login-card{width:min(420px,100%);padding:32px;background:white;border-radius:19px;box-shadow:0 20px 60px #07122e38}
+.brand{display:flex;align-items:center;gap:11px;font-size:23px;font-weight:850;letter-spacing:-.7px}
+.cap{font-size:35px;color:#7868ff}
+.login-card h1{margin:28px 0 6px;font-size:26px}
+.field{display:grid;gap:7px;margin:15px 0}
+.field label{font-size:12px;font-weight:650;color:#465a82}
+.field input,.field select{width:100%;border:1px solid #dce5f3;background:#fbfdff;border-radius:9px;padding:12px;color:#17264d;outline:none}
+.field input:focus,.field select:focus{border-color:#8175ff;box-shadow:0 0 0 3px #8175ff22}
+.btn{border:0;border-radius:8px;padding:10px 13px;color:white;background:var(--purple);font-weight:700}
+.btn:hover{filter:brightness(1.04)}
+.btn.full{width:100%;padding:13px}
+.btn.secondary{background:#eaf0fb;color:#34486e}
+.btn.good{background:#ddf8eb;color:#078858}
+.btn.bad{background:#ffe7eb;color:#c73348}
+.btn.small{font-size:10px;padding:7px 9px}
+.notice{display:none;padding:11px 13px;border-radius:9px;margin:12px 0;font-size:12px;overflow-wrap:anywhere}
+.notice.show{display:block}
+.notice.error{background:#ffeaed;color:#b5263b}
+.notice.success{background:#e0f8ee;color:#08794f}
+.notice.info{background:#eaf2ff;color:#244d8a}
 
-    :root[data-theme="emerald"] {
-      --bg: #06130F; --surface: #0d211b; --surface-2: #143128; --border: #245044;
-      --text: #e8fff5; --muted: #9bc7b7; --purple: #10B981; --purple-light: #6ee7b7;
-      --accent-1: #10B981; --accent-2: #38BDF8;
-    }
+/* ---------- layout ---------- */
+.app{min-height:100vh;display:grid;grid-template-columns:260px minmax(0,1fr)}
+.app.collapsed{grid-template-columns:78px minmax(0,1fr)}
+.sidebar{background:linear-gradient(180deg,#111b35,#0c162d);color:#d9e2f8;padding:20px 12px;display:flex;flex-direction:column;min-height:100vh;height:100vh;position:sticky;top:0;z-index:10}
+.brand-block{padding:2px 11px 27px}
+.brand-block .brand{color:white;font-size:22px}
+.brand-block .cap{color:#887cff}
+.brand-block small{display:block;color:#9eadd0;font-size:11px;font-weight:450;letter-spacing:0;margin-top:5px}
+.nav-label{font-size:10px;color:#7889ae;letter-spacing:1.5px;margin:5px 10px 10px}
+.nav{display:grid;gap:5px}
+.nav button{width:100%;border:0;background:transparent;color:#c5d1eb;text-align:left;padding:13px 15px;border-radius:9px;font-size:13px;display:flex;align-items:center;gap:13px;white-space:nowrap}
+.nav button:hover{background:#ffffff12}
+.nav button.active{background:linear-gradient(110deg,#454da0,#343f87);color:white;box-shadow:0 6px 18px #050c2340}
+.nav .ico{width:18px;text-align:center;font-size:17px}
+.nav .count{margin-left:auto;background:#ff4f60;color:white;border-radius:20px;font-size:10px;padding:3px 7px}
+.side-bottom{margin-top:auto;border-top:1px solid #ffffff19;padding:18px 9px 0}
+.profile{display:flex;align-items:center;gap:11px;padding:0 3px 17px}
+.avatar{width:40px;height:40px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#dedbff,#9a8bff);color:#483cba;font-size:17px;font-weight:800}
+.profile strong{display:block;color:white;font-size:12px}
+.profile small{display:block;color:#96a6ca;font-size:10px;margin-top:4px}
+.logout{width:100%;text-align:left;padding:10px 4px;border:0;background:transparent;color:#bbc8e0}
+/* collapsed sidebar: icons only (labels are hidden with CSS, never deleted) */
+.app.collapsed .brand-block,.app.collapsed .nav-label,.app.collapsed .side-bottom,.app.collapsed .nav .label,.app.collapsed .nav .count{display:none}
+.app.collapsed .nav button{justify-content:center;padding:13px 0}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+.workspace{min-width:0}
+.topbar{height:72px;background:white;border-bottom:1px solid #e5edf8;display:flex;align-items:center;gap:20px;padding:0 27px;position:sticky;top:0;z-index:20}
+.hamb{border:0;background:transparent;color:#506b9e;font-size:22px}
+.search{position:relative;flex:1;max-width:540px}
+.search>span{position:absolute;left:14px;top:8px;font-size:20px;color:#64799e}
+.search input{width:100%;padding:12px 15px 12px 43px;border:1px solid #e1eaf7;border-radius:10px;background:#f8faff;outline:none;color:#21365f}
+.search-results{position:absolute;z-index:100;top:calc(100% + 8px);left:0;right:0;max-height:380px;overflow:auto;background:white;border:1px solid #e1e9f6;border-radius:12px;box-shadow:0 15px 40px #17284b24;padding:6px}
+.search-results h4{margin:8px 10px 4px;font-size:10px;letter-spacing:1px;color:#7889ae;text-transform:uppercase}
+.search-results button{display:block;width:100%;text-align:left;border:0;background:white;border-radius:8px;padding:9px 10px;color:#24395f;font-size:12px}
+.search-results button:hover{background:#f0f4ff}
+.search-results small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.search-results .none{padding:12px;color:var(--muted);font-size:12px}
+.top-right{display:flex;align-items:center;gap:17px;margin-left:auto}
+.admin-menu-wrap,.notification-wrap{position:relative}
+.notification-button{position:relative;border:0;background:white;color:#405782;border-radius:9px;padding:8px;font-size:22px}
+.notification-button:hover{background:#f1f5ff}
+.notification-button .count{position:absolute;top:0;right:0;background:#ff4f60;color:white;font-size:9px;border-radius:20px;padding:3px 5px}
+.top-profile{display:flex;align-items:center;gap:10px;border:0;background:white;color:var(--ink);border-radius:10px;padding:5px 8px}
+.top-profile:hover{background:#f2f6ff}
+.top-profile .avatar{width:37px;height:37px}
+.top-profile .details{text-align:left}
+.top-profile strong{font-size:12px;display:block}
+.top-profile small{display:block;color:var(--muted);margin-top:3px}
+.menu-caret{font-size:14px;margin-left:3px}
 
-    body {
-      min-height: 100vh;
-      background: radial-gradient(ellipse at 50% -30%, #25204b 0, transparent 55%), var(--bg);
-      color: var(--text);
-      font: 14px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
-    }
+.dropdown{position:absolute;z-index:100;top:calc(100% + 10px);right:0;width:255px;padding:8px;background:white;border:1px solid #e1e9f6;border-radius:12px;box-shadow:0 15px 40px #17284b24}
+.dropdown-heading{padding:12px;border-bottom:1px solid #edf1f8;margin-bottom:5px}
+.dropdown-heading strong{display:block;font-size:12px}
+.dropdown-heading small{display:block;margin-top:6px;color:var(--muted);font-size:11px;overflow-wrap:anywhere}
+.dropdown button{display:block;width:100%;text-align:left;background:white;border:0;color:#24395f;border-radius:8px;padding:11px 12px;font-size:12px}
+.dropdown button:hover{background:#f0f4ff}
+.dropdown button b{float:right;background:#eef2ff;color:#4a3fc7;border-radius:20px;padding:1px 9px;font-size:10px}
+.dropdown .dropdown-meta{color:var(--muted);font-size:10px;padding:10px 12px}
 
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    button:disabled { cursor: not-allowed; opacity: .6; }
-    .muted { color: var(--muted); }
+.content{max-width:1700px;margin:auto;padding:26px 28px 30px}
+.section{display:none}
+.section.active{display:block}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:24px}
+.page-head h1{font-size:25px;letter-spacing:-.7px;margin:0 0 5px}
+.page-head p{margin:0;color:var(--muted);font-size:13px}
+.date-select{background:white;border:1px solid #e0e8f5;border-radius:9px;padding:11px 12px;color:#2b426e;min-width:155px}
 
-    /* ---------- Navbar ---------- */
-    .navbar {
-      position: sticky; top: 0; z-index: 5; min-height: 64px;
-      display: flex; align-items: center; justify-content: space-between; gap: 16px;
-      padding: 10px max(20px, calc((100% - 1260px) / 2));
-      background: var(--surface); border-bottom: 1px solid var(--border);
-    }
-    .logo { color: #fff; font-size: 20px; font-weight: 850; white-space: nowrap; }
-    .logo span { color: var(--purple-light); }
-    .nav-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+/* ---------- dashboard ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat{border:1px solid;border-radius:9px;padding:17px 19px 15px;min-height:176px;min-width:0}
+#reports .stat{min-height:96px}
+.stat.p{background:linear-gradient(130deg,#f6f3ff,#fff);border-color:#ded7ff}
+.stat.b{background:linear-gradient(130deg,#f1f8ff,#fff);border-color:#c8e5ff}
+.stat.g{background:linear-gradient(130deg,#effbf5,#fff);border-color:#c7f0dc}
+.stat.o{background:linear-gradient(130deg,#fffaf0,#fff);border-color:#ffe6b9}
+.stat-top{display:flex;align-items:center;gap:13px}
+.stat-icon{width:55px;height:55px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-size:25px;background:#e7e0ff;color:#6248ee}
+.stat.b .stat-icon{background:#d9efff;color:#0877d4}
+.stat.g .stat-icon{background:#d8f6e8;color:#07885a}
+.stat.o .stat-icon{background:#fff0cc;color:#c87800}
+.stat-label{font-size:12px;font-weight:650}
+.stat-value{font-size:29px;font-weight:800;line-height:1.25;margin-top:6px;letter-spacing:-.6px}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:7px}
+.stat-foot{margin-top:22px;font-size:11px;color:#07985e}
+.stat-foot span{color:#8193b5;margin-left:10px}
 
-    .theme-dots { display: flex; align-items: center; gap: 6px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); }
-    .theme-dots button { display: block; width: 20px; height: 20px; min-width: 20px; padding: 0; border: 2px solid transparent; border-radius: 50%; }
-    .theme-dots button.active { border-color: var(--text); box-shadow: 0 0 0 1px var(--bg); }
+.analytics{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,.95fr);gap:14px;margin-top:16px}
+.card{background:white;border:1px solid #e1eaf7;border-radius:9px;padding:17px 20px;min-width:0}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card h2{font-size:15px;margin:0 0 6px;letter-spacing:-.2px}
+.card p{font-size:11px;color:var(--muted);margin:0}
+.legend-inline{display:flex;gap:14px;flex-wrap:wrap;font-size:10px}
+.legend-inline span{display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.chart-svg{width:100%;height:auto;display:block;margin-top:15px}
+.category-layout{display:flex;align-items:center;justify-content:center;gap:22px;min-height:205px}
+.donut{width:170px;height:170px;flex-shrink:0;border-radius:50%;position:relative;display:grid;place-items:center}
+.donut:after{content:"";position:absolute;width:92px;height:92px;background:white;border-radius:50%}
+.donut-label{z-index:1;text-align:center}
+.donut-label strong{font-size:20px;display:block}
+.donut-label small{font-size:11px;color:#52668e}
+.category-legend{flex:1;min-width:0;display:grid;gap:13px}
+.category-line{display:grid;grid-template-columns:10px minmax(0,1fr) auto;align-items:center;gap:8px;font-size:11px}
+.category-line .value{color:#52668e;white-space:nowrap}
 
-    .profile-wrap { position: relative; display: none; }
-    .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
-    .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: max-content; min-width: 250px; max-width: min(360px, calc(100vw - 20px)); padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: var(--surface-2); box-shadow: 0 14px 36px #0008; display: none; }
-    .profile-menu.open { display: block; }
-    .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; }
-    .profile-heading strong { display: block; color: #f3f4ff; font-size: 13px; }
-    .profile-heading small { display: block; color: #9ca9c7; font-size: 11px; white-space: nowrap; }
-    .profile-theme-section { padding: 9px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
-    .profile-theme-label { color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 7px; }
-    .profile-theme-section .theme-dots { width: max-content; max-width: 100%; }
-    .profile-menu > button { display: block; width: 100%; text-align: left; padding: 10px; border: 0; background: transparent; color: #dce3f7; }
-    .profile-menu > button:hover { background: #202b45; }
-    .profile-menu > button.profile-logout { color: #ff9caf; }
+.bottom-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,1fr) minmax(230px,.72fr);gap:14px;margin-top:15px}
+.small-link{color:#356cff;font-size:11px;border:0;background:transparent;white-space:nowrap}
+.table-wrap{overflow:auto;margin-top:16px}
+table{border-collapse:collapse;width:100%;min-width:490px}
+th{text-align:left;background:#f6f9ff;color:#24385f;font-size:10px;font-weight:650;padding:11px 10px}
+td{padding:11px 10px;border-bottom:1px solid #edf1f8;font-size:10px;color:#2b406b;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.user-cell{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.mini-avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:white;font-weight:800;font-size:11px;flex-shrink:0}
+.badge{display:inline-block;border-radius:6px;padding:5px 8px;font-size:9px;font-weight:700;background:#edf1f8;color:#4d6082;white-space:nowrap;margin:1px 2px 1px 0}
+.badge.Approved,.badge.Returned,.badge.Found{background:#d9f7ec;color:#008858}
+.badge.Pending,.badge.Lost{background:#fff1d1;color:#b86a00}
+.badge.Rejected,.badge.Disabled{background:#ffe3e7;color:#c52d44}
+.activity-list{display:grid;gap:18px;margin-top:19px}
+.activity{display:flex;align-items:flex-start;gap:10px;min-width:0}
+.activity-icon{width:31px;height:31px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;color:white;font-size:14px;background:#24c58b}
+.activity-icon.blue{background:#398eff}.activity-icon.purple{background:#9a58f5}.activity-icon.orange{background:#ffba42}
+.activity-text{flex:1;min-width:0}
+.activity-text strong{font-size:10px;display:block;margin:2px 0 4px}
+.activity-text small{font-size:9px;color:var(--muted);display:block;overflow-wrap:anywhere}
+.activity time{font-size:9px;color:var(--muted);white-space:nowrap;margin-top:4px}
+.quick-actions{display:grid;gap:10px;margin-top:15px}
+.quick-actions button{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:0;border-radius:7px;color:white;font-size:10px;font-weight:750}
+.quick-actions button:nth-child(1){background:linear-gradient(100deg,#7255ff,#6143ee)}
+.quick-actions button:nth-child(2){background:linear-gradient(100deg,#2699ff,#1685ed)}
+.quick-actions button:nth-child(3){background:linear-gradient(100deg,#20c68d,#12b77d)}
+.quick-actions button:nth-child(4){background:linear-gradient(100deg,#ff8b27,#ff7417)}
+.system{margin-top:13px;padding:14px}
+.system strong{font-size:11px}.system p{margin-top:10px;color:#0aa36d;font-size:10px}
 
-    /* ---------- Buttons ---------- */
-    button { padding: 9px 13px; border: 1px solid transparent; border-radius: 9px; font-weight: 700; transition: .16s ease; }
-    button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
-    .primary-btn { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; box-shadow: 0 5px 16px #6858ff35; }
-    .secondary-btn { background: var(--surface-2); border-color: var(--border); color: var(--text); }
-    .secondary-btn:hover:not(:disabled) { background: #202d46; }
-    .danger-btn { background: #351a2a; border-color: #613047; color: #ff9caf; }
-    .danger-btn:hover:not(:disabled) { background: #492034; }
+/* ---------- tables / forms ---------- */
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
+.toolbar input,.toolbar select{border:1px solid #dce5f3;border-radius:8px;padding:10px 12px;background:white;color:#23395f}
+.toolbar input{flex:1;min-width:180px}
+.table-card{background:white;border:1px solid #e1eaf7;border-radius:10px;padding:15px;overflow:hidden}
+.table-card .table-wrap{margin-top:0;overflow:auto}
+.table-card table{min-width:760px}
+.table-card th,.table-card td{font-size:11px}
+.actions{display:flex;gap:5px;flex-wrap:wrap}
+.actions .btn{font-size:10px;padding:7px 8px}
+#users .table-card table{min-width:900px;table-layout:auto}
+#users .table-card th:last-child,#users .table-card td:last-child{min-width:170px;width:170px}
+.user-actions-details{position:relative;min-width:145px}
+.user-actions-details>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:9px 11px;font-size:11px;white-space:nowrap;cursor:pointer;user-select:none}
+.user-actions-details>summary::-webkit-details-marker{display:none}
+.user-actions-details[open]>summary{border-radius:8px 8px 0 0;background:#e5ebff;color:#334bc0}
+.user-actions-list{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;padding:9px;background:#fff;border:1px solid #e1e9f6;border-radius:0 0 9px 9px;box-shadow:0 5px 12px #17284b0c}
+.user-actions-list .btn{width:100%;min-width:0;white-space:normal;line-height:1.25;min-height:32px;padding:7px 5px;font-size:10px}
+.user-actions-list .reset-action{grid-column:1/-1;background:#6957f5;color:white}
+.form-card{max-width:760px;background:white;border:1px solid #e1eaf7;border-radius:12px;padding:22px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+.approval-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.approval-heading h2{margin:0}
+.approval-number{background:#fff1d1;color:#af6500;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:750}
+.report-cell{display:flex;align-items:center;gap:10px;min-width:220px}
+.report-cell .thumb{width:46px;height:46px;flex-shrink:0;border-radius:8px;object-fit:cover;background:#eaf0fb;display:grid;place-items:center;font-size:20px}
+.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-width:300px}
 
-    .urgent-banner {
-      display: block; width: min(1260px, calc(100% - 36px)); margin: 12px auto 0; padding: 9px 13px;
-      border: 1px solid #66304a; border-radius: 10px; background: linear-gradient(90deg, #401431, #281447);
-      color: #ffdce5; text-align: left; font-size: 12px;
-    }
-    .urgent-banner strong { margin-right: 8px; color: #ff7897; }
+/* ---------- popups ---------- */
+.modal-back{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:14px;background:#0a122acc;overflow-y:auto}
+.modal-box{width:min(100%,460px);background:white;border-radius:14px;padding:22px;box-shadow:0 24px 70px #07122e55}
+.modal-box h2{margin:0 0 6px;font-size:18px}
+.modal-box.wide{width:min(100%,900px);padding:0;max-height:92vh;overflow:auto}
+.row-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+.view-head{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:16px 20px;background:white;border-bottom:1px solid #e1eaf7}
+.view-head h2{margin:6px 0 2px;font-size:20px;overflow-wrap:anywhere}
+.view-head p{margin:0;color:var(--muted);font-size:12px}
+.view-close{flex-shrink:0;width:34px;height:34px;border:0;border-radius:50%;background:#eaf0fb;color:#34486e;font-size:14px}
+.view-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;padding:16px 20px;align-items:start}
+.view-pad{padding:24px 20px}
+.view-foot{display:flex;gap:8px;flex-wrap:wrap;padding:0 20px 20px}
+.info-card{margin-bottom:10px;padding:12px 14px;border:1px solid #e1eaf7;border-radius:12px;background:#fbfdff}
+.info-card h4{margin:0 0 8px;color:#5a49e0;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.info-card dl{margin:0}
+.info-row{display:grid;grid-template-columns:105px minmax(0,1fr);gap:8px;padding:5px 0;border-bottom:1px dashed #dfe7f5;font-size:12px}
+.info-row:last-child{border-bottom:0}
+.info-row dt{color:var(--muted)}
+.info-row dd{margin:0;color:#1d2f5b;overflow-wrap:anywhere}
+.info-desc{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;color:#1d2f5b;margin:0}
+.gallery{display:grid;gap:10px}
+.gallery-stage{position:relative;display:flex;align-items:center;justify-content:center;height:clamp(230px,44vh,400px);overflow:hidden;border:1px solid #e1eaf7;border-radius:12px;background:#0d1426}
+.gallery-main{width:100%;height:100%;object-fit:contain;cursor:zoom-in;transition:transform .18s ease;user-select:none;-webkit-user-drag:none}
+.gallery-stage.zoomed{touch-action:none}
+.gallery-stage.zoomed .gallery-main{cursor:zoom-out}
+.gallery-nav{position:absolute;top:50%;z-index:2;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:#000a;color:#fff;font-size:22px;line-height:1;transform:translateY(-50%)}
+.gallery-nav.prev{left:8px}.gallery-nav.next{right:8px}
+.gallery-counter{position:absolute;left:8px;bottom:8px;padding:2px 10px;border-radius:20px;background:#000b;color:#fff;font-size:11px}
+.gallery-hint{margin:0;color:var(--muted);font-size:11px;text-align:center}
+.gallery-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.gallery-thumb{flex:0 0 62px;width:62px;height:62px;padding:0;overflow:hidden;border:2px solid transparent;border-radius:9px;background:#eaf0fb;opacity:.65}
+.gallery-thumb.active{border-color:var(--purple);opacity:1}
+.gallery-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.gallery-empty{display:grid;place-items:center;min-height:180px;border:1px dashed #cfd9ec;border-radius:12px;color:var(--muted);font-size:12px}
 
-    /* ---------- Dashboard layout ---------- */
-    .dashboard {
-      display: grid; grid-template-columns: minmax(190px, 0.78fr) minmax(0, 2.8fr) minmax(220px, 0.9fr);
-      gap: clamp(12px, 1.2vw, 20px); width: min(1880px, calc(100% - 32px));
-      margin: 14px auto 24px; align-items: stretch;
-    }
-    .dashboard > .sidebar, .dashboard > .feed-column, .dashboard > .right-rail { min-width: 0; }
-    .dashboard > .sidebar, .dashboard > .right-rail { position: sticky; top: 82px; }
-    .feed-column { display: flex; flex-direction: column; gap: 10px; }
-
-    .surface { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: 0 12px 32px #0002; }
-    .sidebar { padding: 12px; }
-    .side-title { margin: 2px 8px 9px; color: #7f8ba8; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-    .side-nav { display: grid; gap: 5px; }
-    .side-link { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 8px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #aeb9d2; text-align: left; font-size: 11px; }
-    .side-link.active, .side-link:hover { border-color: #4d3db3; background: #271f52; color: #eeeaff; }
-    .count { color: #8996b2; font-size: 10px; }
-    .zones { display: flex; flex-wrap: wrap; gap: 5px; }
-    .zone-chip { padding: 5px 7px; border: 1px solid #30405b; border-radius: 7px; background: #172238; color: #bac6df; font-size: 10px; }
-    .zone-chip:hover { border-color: var(--purple); }
-
-    .dashboard-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: radial-gradient(ellipse at top left, #25234e, #111827 65%); }
-    .dashboard-heading h1 { color: #f2f4ff; font-size: clamp(18px, 2vw, 23px); }
-    .dashboard-heading p { margin-top: 3px; color: var(--muted); font-size: 11px; }
-
-    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-    .stat { min-height: 68px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
-    .stat span { display: block; color: var(--muted); font-size: 10px; }
-    .stat strong { color: #fff; font-size: 22px; }
-    .stat.lost strong { color: var(--red); }
-    .stat.found strong, .stat.returned strong { color: var(--green); }
-
-    .listings { padding: 12px; }
-    .listings-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
-    .listings-heading h2 { color: #e8edff; font-size: 13px; }
-    #listingsTitle { cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; transition: color .18s ease; }
-    #listingsTitle:hover { color: var(--purple-light); }
-    .title-switch-icon { font-size: .85em; opacity: .7; }
-    .feed-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
-    .feed-tab { padding: 6px 10px; border: 1px solid transparent; border-radius: 20px; background: transparent; color: #aab6d0; font-size: 10px; }
-    .feed-tab.active, .feed-tab:hover { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; }
-
-    .filters { display: grid; grid-template-columns: minmax(140px, 1fr) 130px 120px; gap: 7px; margin: 10px 0 12px; padding-bottom: 11px; border-bottom: 1px solid var(--border); }
-    input, select, textarea { width: 100%; padding: 9px 11px; border: 1px solid #303d58; border-radius: 9px; background: #0b1220; color: var(--text); }
-    input::placeholder, textarea::placeholder { color: #77839e; }
-    input:focus, select:focus, textarea:focus { outline: 2px solid #6858ff66; border-color: var(--purple); }
-    input[readonly] { opacity: .75; cursor: not-allowed; }
-    select option { background: #101727; color: var(--text); }
-    textarea { min-height: 68px; resize: vertical; }
-
-    /* ---------- Item cards ---------- */
-    .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 12px; align-items: stretch; min-width: 0; width: 100%; }
-    .item-card { display: flex; flex-direction: column; overflow: hidden; min-width: 0; border: 1px solid var(--border); border-radius: 13px; background: linear-gradient(135deg, #121b2d, #0e1523); transition: border-color .16s ease, transform .16s ease; }
-    .item-card:hover { border-color: var(--purple); transform: translateY(-2px); }
-    .item-media { position: relative; display: block; width: 100%; height: 160px; padding: 0; border: 0; border-radius: 0; background: #0a1020; cursor: zoom-in; }
-    .item-media:hover:not(:disabled) { transform: none; }
-    .item-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .item-media.no-photo { cursor: default; display: grid; place-items: center; font-size: 52px; color: #94a3b8; }
-    .photo-count { position: absolute; right: 8px; bottom: 8px; padding: 2px 9px; border-radius: 20px; background: #000b; color: #fff; font-size: 10px; font-weight: 700; }
-    .item-body { display: flex; flex-direction: column; flex: 1; gap: 3px; padding: 11px 12px 12px; min-width: 0; }
-    .item-heading { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .item-body h3 { color: #dbe3ff; font-size: 14px; overflow-wrap: anywhere; }
-    .status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
-    .status::before { width: 6px; height: 6px; border-radius: 50%; content: ""; }
-    .status.Lost { background: #3a1b2a; color: #ff8da5; }
-    .status.Lost::before { background: var(--red); }
-    .status.Found { background: #12352e; color: #62e8bc; }
-    .status.Found::before { background: var(--green); }
-    .item-body p { color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
-    .item-body .card-btn { width: 100%; }
-    .item-body .card-btn-wrap { margin-top: auto; padding-top: 9px; }
-
-    .workflow-note { margin-top: 6px; padding: 7px 9px; border-radius: 8px; font-size: 10px; }
-    .workflow-note.pending { background: #372b15; color: #ffd578; }
-    .workflow-note.rejected { background: #3a1b22; color: #ff9ca9; }
-    .workflow-note.returned { background: #12352e; color: #6be8bf; }
-    .empty-state { grid-column: 1 / -1; padding: 24px; border: 1px dashed #35425d; border-radius: 11px; background: #0b1220; color: var(--muted); text-align: center; font-size: 12px; }
-
-    /* ---------- Right rail ---------- */
-    .right-rail { display: grid; gap: 10px; align-content: start; }
-    .rail-panel { padding: 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
-    .rail-panel h2 { margin-bottom: 9px; color: #e2e8ff; font-size: 12px; }
-    .hotspot-list { display: grid; gap: 8px; }
-    .hotspot-row { color: #adb9d2; font-size: 10px; }
-    .hotspot-track { height: 4px; margin-top: 4px; overflow: hidden; border-radius: 9px; background: #27324a; }
-    .hotspot-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6858ff, #24d5a3); }
-    .how-list { display: grid; gap: 7px; padding-left: 14px; color: #9eabc6; font-size: 10px; }
-
-    /* ---------- Modals ---------- */
-    .modal-overlay { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 12px; background: #030610d0; overflow-y: auto; backdrop-filter: blur(4px); }
-    .modal-overlay.active { display: flex; }
-    #photoModal { z-index: 30; }
-    .modal { width: min(100%, 440px); max-height: 88vh; padding: 17px; overflow-y: auto; border: 1px solid #34405a; border-radius: 15px; background: #111a2a; color: var(--text); box-shadow: 0 24px 70px #0009; }
-    .modal h2 { margin-bottom: 4px; color: #f2f4ff; font-size: 19px; }
-    .modal-subtitle { margin-bottom: 10px; color: var(--muted); font-size: 11px; }
-    .form-group { margin-bottom: 8px; }
-    .form-group label, .report-type-label { display: block; margin-bottom: 4px; color: #c3cde2; font-size: 11px; font-weight: 700; }
-    .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; font-size: 12px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .report-type-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 5px 0 10px; padding: 4px; border: 1px solid #2c3852; border-radius: 10px; background: #0b1220; }
-    .type-option { padding: 8px 5px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #9eabc6; font-size: 11px; }
-    .type-option.active[data-item-type="Lost"] { background: #3b1b2b; border-color: #7a304b; color: #ff9caf; }
-    .type-option.active[data-item-type="Found"] { background: #12392f; border-color: #267b66; color: #76edc8; }
-    .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .form-actions button { flex: 1; min-width: 100px; }
-    .message { display: none; margin: 9px 0; padding: 9px; border-radius: 8px; font-size: 12px; overflow-wrap: anywhere; }
-    .message.error { display: block; background: #3a1b22; color: #ffabb5; }
-    .message.success { display: block; background: #12352e; color: #80edca; }
-
-    /* photo picker inside the report form */
-    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; margin-top: 8px; }
-    .photo-grid:empty { display: none; }
-    .photo-tile { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--border); border-radius: 9px; background: #0a1020; }
-    .photo-tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .photo-tile button { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: #000c; color: #fff; font-size: 11px; line-height: 1; }
-    .photo-tile span { position: absolute; left: 3px; bottom: 3px; padding: 1px 6px; border-radius: 10px; background: #000c; color: #fff; font-size: 9px; }
-    .photo-help { margin-top: 5px; color: var(--muted); font-size: 11px; }
-
-    /* ---------- Details + photo popups ---------- */
-    .modal.wide { width: min(100%, 900px); max-height: 92vh; padding: 0; }
-    .detail-head { position: sticky; top: 0; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: #111a2a; }
-    .detail-head h2 { margin: 6px 0 2px; font-size: 20px; overflow-wrap: anywhere; }
-    .detail-head p { color: var(--muted); font-size: 12px; }
-    .detail-close { flex-shrink: 0; width: 34px; height: 34px; padding: 0; border-radius: 50%; background: var(--surface-2); border-color: var(--border); color: var(--text); }
-    .detail-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; padding: 16px 18px 18px; align-items: start; }
-    .detail-body-pad { padding: 16px 18px 18px; }
-    .info-card { margin-bottom: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
-    .info-card h4 { margin-bottom: 8px; color: var(--purple-light); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-    .info-row { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 8px; padding: 5px 0; border-bottom: 1px dashed #28355055; font-size: 12px; }
-    .info-row:last-child { border-bottom: 0; }
-    .info-row dt { color: var(--muted); }
-    .info-row dd { color: var(--text); overflow-wrap: anywhere; }
-    .info-desc { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
-    .contact-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .contact-actions a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 13px; border-radius: 9px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; }
-    .contact-actions a.alt { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); }
-    .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    /* gallery: 1 big photo + small photos below */
-    .gallery { display: grid; gap: 10px; }
-    .gallery-stage { position: relative; display: flex; align-items: center; justify-content: center; height: clamp(240px, 46vh, 420px); overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #070b14; }
-    .gallery-main { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; transition: transform .18s ease; user-select: none; -webkit-user-drag: none; }
-    .gallery-stage.zoomed { touch-action: none; }
-    .gallery-stage.zoomed .gallery-main { cursor: zoom-out; }
-    .gallery-nav { position: absolute; top: 50%; z-index: 2; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: #000a; color: #fff; font-size: 22px; line-height: 1; transform: translateY(-50%); }
-    .gallery-nav:hover:not(:disabled) { transform: translateY(-50%) scale(1.08); }
-    .gallery-nav.prev { left: 8px; }
-    .gallery-nav.next { right: 8px; }
-    .gallery-counter { position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 20px; background: #000b; color: #fff; font-size: 11px; }
-    .gallery-hint { color: var(--muted); font-size: 11px; text-align: center; }
-    .gallery-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-    .gallery-thumb { flex: 0 0 64px; width: 64px; height: 64px; padding: 0; overflow: hidden; border: 2px solid transparent; border-radius: 9px; background: #0a1020; opacity: .6; }
-    .gallery-thumb.active { border-color: var(--purple); opacity: 1; }
-    .gallery-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .gallery-empty { display: grid; place-items: center; min-height: 200px; border: 1px dashed var(--border); border-radius: 12px; color: var(--muted); font-size: 12px; }
-
-    body.logged-out .urgent-banner, body.logged-out .dashboard, body.logged-out footer { display: none; }
-    footer { padding: 18px; color: #71809e; text-align: center; font-size: 10px; }
-
-    @media (max-width: 1250px) {
-      .dashboard { grid-template-columns: minmax(165px, 0.7fr) minmax(0, 2fr); width: calc(100% - 28px); gap: 12px; }
-      .dashboard > .sidebar, .dashboard > .right-rail { position: static; }
-      .right-rail { grid-column: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 760px) {
-      .detail-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 700px) {
-      .navbar { padding: 9px 12px; }
-      .logo { font-size: 17px; }
-      .nav-actions { gap: 5px; }
-      .nav-actions > button { padding: 7px 9px; font-size: 11px; }
-      .profile-avatar { width: 36px; height: 36px; }
-      .urgent-banner, .dashboard { width: calc(100% - 20px); }
-      .dashboard { grid-template-columns: minmax(0, 1fr); gap: 9px; margin-top: 10px; }
-      .feed-column { gap: 9px; }
-      .sidebar { padding: 9px; }
-      .side-nav { grid-template-columns: repeat(3, 1fr); }
-      .side-link { justify-content: center; padding: 7px 4px; font-size: 10px; }
-      .side-link .count, .sidebar-zones { display: none; }
-      .right-rail { grid-column: auto; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .stat { min-height: 60px; padding: 8px 10px; }
-      .filters { grid-template-columns: 1fr 1fr; }
-      .filters input { grid-column: 1 / -1; }
-      .modal { max-height: 90dvh; padding: 14px; }
-      .modal.wide { padding: 0; max-height: 94dvh; }
-      .detail-head, .detail-grid, .detail-body-pad { padding-left: 13px; padding-right: 13px; }
-      .info-row { grid-template-columns: 92px minmax(0, 1fr); }
-    }
-
-    @media (max-width: 430px) {
-      .right-rail { grid-template-columns: 1fr; }
-      .form-row { gap: 5px; }
-    }
-  </style>
+@media(max-width:1200px){
+ .app{grid-template-columns:225px minmax(0,1fr)}
+ .content{padding:22px 18px}.topbar{padding:0 18px}
+ .stats{gap:9px}.stat{padding:14px}.stat-icon{width:45px;height:45px}
+ .analytics{grid-template-columns:minmax(0,1.2fr) minmax(300px,1fr)}
+ .bottom-grid{grid-template-columns:minmax(0,1.2fr) minmax(260px,1fr)}
+ .quick-col{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+ .quick-col .card{margin:0}.quick-actions{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:850px){
+ .app,.app.collapsed{grid-template-columns:1fr}
+ .sidebar{position:relative;top:auto;height:auto;min-height:0;padding:12px}
+ .brand-block{padding:2px 7px 12px}.brand-block .brand{font-size:18px}
+ .nav{display:flex;overflow-x:auto}.nav button{white-space:nowrap;padding:10px}
+ .side-bottom,.nav-label{display:none}
+ .topbar{height:60px}.top-profile .details{display:none}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .analytics,.bottom-grid{grid-template-columns:1fr}
+ .quick-col{grid-column:auto;display:block}.quick-col .card{margin-top:12px}
+ .category-layout{justify-content:flex-start}.page-head h1{font-size:22px}
+ .view-grid{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+ .content{padding:18px 11px}.topbar{padding:0 12px;gap:10px}
+ .search input{font-size:11px;padding-left:35px}.search>span{left:11px}
+ .top-right{gap:7px}.top-profile{padding:4px}
+ .top-profile .avatar{width:31px;height:31px}.top-profile .menu-caret{display:none}
+ .stats{gap:8px}.stat{padding:11px;min-height:150px}.stat-top{gap:8px}
+ .stat-icon{width:37px;height:37px;font-size:19px}.stat-label{font-size:10px}
+ .stat-value{font-size:25px}.stat-sub{font-size:10px}.stat-foot{margin-top:16px;font-size:10px}
+ .card{padding:14px}.category-layout{gap:13px}.donut{width:120px;height:120px}
+ .donut:after{width:67px;height:67px}.category-legend{gap:10px}.category-line{font-size:10px}
+ .legend-inline{gap:8px}.page-head{align-items:flex-start}
+ .date-select{min-width:0;padding:9px;font-size:10px}
+ .form-grid{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr}
+ .dropdown{width:min(270px,85vw)}
+ .view-head,.view-grid,.view-foot,.view-pad{padding-left:13px;padding-right:13px}
+ .info-row{grid-template-columns:92px minmax(0,1fr)}
+}
+</style>
 </head>
+<body>
 
-<body class="logged-out">
-  <header class="navbar">
-    <div class="logo">🔎 Campus<span>Find</span></div>
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+ <form class="login-card" id="loginForm">
+  <div class="brand"><span class="cap">◆</span><span>CampusFind</span></div>
+  <h1>Admin sign in</h1>
+  <p class="muted">Manage campus Lost & Found and community accounts.</p>
+  <div id="loginNotice" class="notice"></div>
+  <div class="field"><label for="loginEmail">Email address</label><input id="loginEmail" type="email" required autocomplete="username" placeholder="admin@campusfind.com"></div>
+  <div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Enter password"></div>
+  <button class="btn full" id="loginBtn" type="submit">Sign in to dashboard</button>
+ </form>
+</div>
 
-    <div class="nav-actions">
-      <div class="profile-wrap" id="profileWrap">
-        <button class="profile-avatar" id="profileAvatar" type="button" aria-label="Open profile menu" aria-expanded="false">U</button>
-        <div class="profile-menu" id="profileMenu" role="menu">
-          <div class="profile-heading"><strong id="profileMenuName">Student</strong><small id="profileMenuEmail"></small></div>
-          <div class="profile-theme-section">
-            <div class="profile-theme-label">Theme colors</div>
-            <div class="theme-dots" role="group" aria-label="Choose theme">
-              <button type="button" class="active" data-theme-choice="aurora" style="background:linear-gradient(135deg,#8B5CF6,#22D3EE)" aria-label="Aurora theme" title="Aurora theme"></button>
-              <button type="button" data-theme-choice="sunset" style="background:linear-gradient(135deg,#FF7A59,#FF3D81)" aria-label="Sunset theme" title="Sunset theme"></button>
-              <button type="button" data-theme-choice="emerald" style="background:linear-gradient(135deg,#10B981,#38BDF8)" aria-label="Emerald theme" title="Emerald theme"></button>
-            </div>
-          </div>
-          <button type="button" role="menuitem" id="profileSettingsBtn">My phone / Profile settings</button>
-          <button type="button" role="menuitem" class="profile-logout" id="profileLogoutBtn">Logout</button>
-        </div>
-      </div>
+<div id="adminApp" class="app hidden">
+ <aside class="sidebar">
+  <div class="brand-block">
+   <div class="brand"><span class="cap">◆</span><span>CampusFind<small>Lost & Found • Campus Community</small></span></div>
+  </div>
+  <div class="nav-label">MAIN MENU</div>
+  <nav class="nav">
+   <button class="active" data-section="dashboard" title="Dashboard"><span class="ico">▦</span><span class="label">Dashboard</span></button>
+   <button data-section="users" title="Users"><span class="ico">♟</span><span class="label">Users</span></button>
+   <button data-section="create" title="Create Account"><span class="ico">⊕</span><span class="label">Create Account</span></button>
+   <button data-section="items" title="Lost & Found"><span class="ico">⬡</span><span class="label">Lost & Found</span></button>
+   <button data-section="approvals" title="Approvals"><span class="ico">✓</span><span class="label">Approvals</span><span id="approvalBadge" class="count">0</span></button>
+   <button data-section="reports" title="Reports"><span class="ico">▥</span><span class="label">Reports</span></button>
+   <button data-section="settings" title="Settings"><span class="ico">⚙</span><span class="label">Settings</span></button>
+  </nav>
+  <div class="side-bottom">
+   <div class="profile"><div class="avatar">A</div><div><strong>Admin</strong><small>Admin Panel</small></div></div>
+   <button id="logoutBtn" class="logout">⇥ &nbsp; Logout</button>
+  </div>
+ </aside>
 
-      <button id="loginButton" class="primary-btn" type="button">Login</button>
+ <div class="workspace">
+  <header class="topbar">
+   <button class="hamb" id="menuBtn" type="button" aria-label="Toggle sidebar">☰</button>
+   <div class="search">
+    <span>⌕</span>
+    <input id="globalSearch" placeholder="Search users, items, or by email..." autocomplete="off">
+    <div id="searchResults" class="search-results hidden"></div>
+   </div>
+
+   <div class="top-right">
+    <div class="notification-wrap">
+     <button id="notificationBtn" class="notification-button" type="button" aria-label="Notifications" aria-expanded="false">
+      ♧<span id="notificationCount" class="count">0</span>
+     </button>
+     <div id="notificationDropdown" class="dropdown hidden">
+      <div class="dropdown-heading"><strong>Notifications</strong><small id="notificationSummary">Loading pending requests...</small></div>
+      <button type="button" data-go="approvals">♟ &nbsp; Pending student approvals <b id="pendingStudentNotice">0</b></button>
+      <button type="button" data-go="approvals">▣ &nbsp; Pending faculty approvals <b id="pendingFacultyNotice">0</b></button>
+      <button type="button" data-go="approvals">◷ &nbsp; Pending report reviews <b id="pendingItemNotice">0</b></button>
+      <button type="button" id="notificationRefresh">↻ &nbsp; Refresh notifications</button>
+      <div class="dropdown-meta">Counts come from the existing backend data.</div>
+     </div>
     </div>
+
+    <div class="admin-menu-wrap">
+     <button class="top-profile" id="adminMenuBtn" type="button" aria-expanded="false">
+      <div class="avatar">A</div>
+      <div class="details"><strong>Admin</strong><small>Administrator</small></div>
+      <span class="menu-caret">⌄</span>
+     </button>
+     <div id="adminDropdown" class="dropdown hidden">
+      <div class="dropdown-heading"><strong>Admin Account</strong><small id="dropdownEmail">Administrator</small></div>
+      <button type="button" data-admin-action="settings">⚙ &nbsp; Settings</button>
+      <button type="button" data-admin-action="refresh">↻ &nbsp; Refresh Dashboard</button>
+      <button type="button" data-admin-action="logout">⇥ &nbsp; Log out</button>
+     </div>
+    </div>
+   </div>
   </header>
 
-  <button class="urgent-banner" id="urgentBanner" type="button" aria-label="Urgent alert: report a lost item">
-    <strong>⚠ URGENT ALERT</strong>
-    Lost something valuable? Click here to report it.
-  </button>
+  <main class="content">
+   <div id="globalNotice" class="notice"></div>
 
-  <main class="dashboard">
-    <aside class="sidebar surface">
-      <p class="side-title">Navigation</p>
+   <!-- DASHBOARD -->
+   <section id="dashboard" class="section active">
+    <div class="page-head">
+     <div><h1>👋 Dashboard</h1><p>Welcome back, Admin! Here's what's happening on CampusFind.</p></div>
+     <select id="dateRange" class="date-select" aria-label="Date range"><option value="7">Last 7 days</option><option value="30">Last 30 days</option><option value="all">All time</option></select>
+    </div>
 
-      <nav class="side-nav" aria-label="Item filters">
-        <button class="side-link active" type="button" data-status-filter="">◉ All live feeds <span class="count" id="navTotal">0</span></button>
-        <button class="side-link" type="button" data-status-filter="Lost">● Lost items only <span class="count" id="navLost">0</span></button>
-        <button class="side-link" type="button" data-status-filter="Found">● Found items only <span class="count" id="navFound">0</span></button>
-      </nav>
+    <div class="stats">
+     <article class="stat p"><div class="stat-top"><div class="stat-icon">♟</div><div><div class="stat-label">Total Users</div><div class="stat-value" id="totalUsers">—</div><div class="stat-sub" id="userSplit">Students: — | Faculty: —</div></div></div><div class="stat-foot">● <b>Live data</b><span>from your database</span></div></article>
+     <article class="stat b"><div class="stat-top"><div class="stat-icon">▣</div><div><div class="stat-label">Lost Items</div><div class="stat-value" id="lostCount">—</div><div class="stat-sub">Approved lost reports</div></div></div><div class="stat-foot">● <b>Live data</b><span>from reports</span></div></article>
+     <article class="stat g"><div class="stat-top"><div class="stat-icon">✓</div><div><div class="stat-label">Found Items</div><div class="stat-value" id="foundCount">—</div><div class="stat-sub">Approved found reports</div></div></div><div class="stat-foot">● <b>Live data</b><span>from reports</span></div></article>
+     <article class="stat o"><div class="stat-top"><div class="stat-icon">◷</div><div><div class="stat-label">Pending Faculty</div><div class="stat-value" id="pendingFaculty">—</div><div class="stat-sub">Need approval</div></div></div><div class="stat-foot" style="color:#d98200">◷ <b>Needs review</b><span>faculty accounts</span></div></article>
+    </div>
 
-      <div class="sidebar-zones">
-        <p class="side-title" style="margin-top:18px">Campus zones</p>
-        <div class="zones">
-          <button class="zone-chip" type="button" data-zone="Engineering">Engineering</button>
-          <button class="zone-chip" type="button" data-zone="Library">Library</button>
-          <button class="zone-chip" type="button" data-zone="Canteen">Canteen</button>
-          <button class="zone-chip" type="button" data-zone="Sports">Sports</button>
-        </div>
+    <div class="analytics">
+     <article class="card">
+      <div class="card-head"><div><h2>Item Activity</h2><p>Approved Lost & Found items (selected period)</p></div>
+       <div class="legend-inline"><span><i class="dot" style="background:#3987ff"></i>Lost</span><span><i class="dot" style="background:#11b981"></i>Found</span><span><i class="dot" style="background:#8b55ff"></i>Returned</span></div>
       </div>
-    </aside>
+      <svg id="activityChart" class="chart-svg" viewBox="0 0 650 205" role="img" aria-label="Item activity chart">
+       <g id="chartGrid" stroke="#e8eef8" stroke-width="1"></g><g id="chartYLabels" fill="#63769b" font-size="10"></g>
+       <path id="lostArea" fill="#3987ff" opacity=".08"></path><path id="foundArea" fill="#11b981" opacity=".08"></path><path id="returnedArea" fill="#8b55ff" opacity=".08"></path>
+       <path id="lostLine" fill="none" stroke="#3987ff" stroke-width="2.5" stroke-linecap="round"></path><path id="foundLine" fill="none" stroke="#11b981" stroke-width="2.5" stroke-linecap="round"></path><path id="returnedLine" fill="none" stroke="#8b55ff" stroke-width="2.5" stroke-linecap="round"></path>
+       <g id="chartDots"></g><g id="chartLabels" fill="#63769b" font-size="10"></g>
+      </svg>
+      <p id="chartCaption">Counts are grouped using report dates returned by your backend.</p>
+     </article>
 
-    <section class="feed-column">
-      <div class="dashboard-heading">
-        <div>
-          <h1>CampusFind dashboard</h1>
-          <p>Find it, report it, reunite with it.</p>
-        </div>
+     <article class="card">
+      <div class="card-head"><div><h2>Item Categories</h2><p>Approved items by category</p></div></div>
+      <div class="category-layout">
+       <div id="categoryDonut" class="donut" style="background:conic-gradient(#dfe6f2 0 100%)"><div class="donut-label"><strong id="categoryTotal">0</strong><small>Total Items</small></div></div>
+       <div id="categoryLegend" class="category-legend"><span class="muted">Loading categories...</span></div>
       </div>
+     </article>
+    </div>
 
-      <div class="stats">
-        <div class="stat"><span>Total reports</span><strong id="statTotal">0</strong></div>
-        <div class="stat lost"><span>Active lost</span><strong id="statLost">0</strong></div>
-        <div class="stat found"><span>Active found</span><strong id="statFound">0</strong></div>
-        <div class="stat returned"><span>Returned</span><strong id="statReturned">0</strong></div>
-      </div>
+    <div class="bottom-grid">
+     <article class="card"><div class="card-head"><div><h2>Recent Users</h2></div><button class="small-link" data-go="users">View all →</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Type</th><th>Status</th><th>Joined</th></tr></thead><tbody id="recentUsers"><tr><td colspan="5">Loading...</td></tr></tbody></table></div>
+     </article>
+     <article class="card"><div class="card-head"><div><h2>Recent Activity</h2></div><button class="small-link" data-go="reports">View all →</button></div><div id="recentActivity" class="activity-list"><span class="muted">Loading activity...</span></div></article>
+     <div class="quick-col">
+      <article class="card"><h2>Quick Actions</h2><div class="quick-actions">
+       <button data-go="create" data-account="Student"><span>♟＋</span>Create Student Account</button>
+       <button data-go="create" data-account="Faculty"><span>♟＋</span>Create Faculty Account</button>
+       <button data-go="items"><span>⬡</span>Manage Lost & Found</button>
+       <button data-go="approvals"><span>✓</span>View Pending Approvals</button>
+      </div></article>
+      <article class="card system"><strong>System Status</strong><p id="systemStatus">● Waiting for backend connection</p></article>
+     </div>
+    </div>
+   </section>
 
-      <section class="listings surface">
-        <div class="listings-heading">
-          <h2 id="listingsTitle" role="button" tabindex="0" aria-label="Switch between Campus item listings and My reports" title="Click to switch between Campus item listings and My reports">Campus item listings <span aria-hidden="true" class="title-switch-icon">↔</span></h2>
+   <!-- USERS -->
+   <section id="users" class="section">
+    <div class="page-head"><div><h1>Users</h1><p>Manage, approve and reset accounts.</p></div><button class="btn" data-go="create">＋ Create Account</button></div>
+    <div class="toolbar">
+     <input id="userSearch" placeholder="Search name, email or phone...">
+     <select id="userStatusFilter" aria-label="Filter by status">
+      <option value="">All statuses</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option><option value="Disabled">Disabled</option>
+     </select>
+     <select id="userTypeFilter" aria-label="Filter by account type"><option value="">All account types</option><option value="Student">Student</option><option value="Faculty">Faculty</option></select>
+     <button class="btn secondary" id="reloadUsers">↻ Refresh users</button>
+    </div>
+    <div id="usersNotice" class="notice"></div>
+    <div class="table-card"><div class="table-wrap"><table><thead><tr><th>User</th><th>Contact</th><th>Type</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="usersList"><tr><td colspan="6">Loading users...</td></tr></tbody></table></div></div>
+   </section>
 
-          <div class="feed-tabs" id="publicFeedTabs" aria-label="Filter listings">
-            <button class="feed-tab active" type="button" data-status-filter="">All</button>
-            <button class="feed-tab" type="button" data-status-filter="Lost">Lost</button>
-            <button class="feed-tab" type="button" data-status-filter="Found">Found</button>
-          </div>
-          <div class="feed-tabs" id="myReportTabs" aria-label="Filter my reports" style="display:none">
-            <button class="feed-tab active" type="button" data-my-report-filter="">All Reports</button>
-            <button class="feed-tab" type="button" data-my-report-filter="Lost">Lost Reports</button>
-            <button class="feed-tab" type="button" data-my-report-filter="Found">Found Reports</button>
-          </div>
-        </div>
+   <!-- CREATE ACCOUNT -->
+   <section id="create" class="section">
+    <div class="page-head"><div><h1>Create Account</h1><p>Create Student or Faculty accounts.</p></div></div>
+    <div class="form-card"><form id="createForm"><div id="createNotice" class="notice"></div>
+     <div class="form-grid">
+      <div class="field"><label>Full name</label><input name="name" required maxlength="100" placeholder="Full name"></div>
+      <div class="field"><label>Email address</label><input name="email" type="email" required placeholder="name@college.edu"></div>
+      <div class="field"><label>Phone</label><input name="phone" maxlength="30" placeholder="Optional phone"></div>
+      <div class="field"><label>Temporary password (8–128 characters)</label><input name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="Create password"></div>
+      <div class="field"><label>Account type</label><select name="accountType" id="accountType"><option value="Student">Student</option><option value="Faculty">Faculty</option></select></div>
+     </div>
+     <button class="btn" id="createBtn" type="submit">＋ Create Account</button>
+    </form></div>
+   </section>
 
-        <div class="filters">
-          <input id="searchInput" type="search" placeholder="Search items, locations, descriptions...">
+   <!-- LOST & FOUND -->
+   <section id="items" class="section">
+    <div class="page-head"><div><h1>Lost & Found</h1><p>Review and manage campus item reports.</p></div></div>
+    <div class="toolbar"><input id="itemSearch" placeholder="Search title, category or location..."><select id="itemTypeFilter" aria-label="Filter by type"><option value="">All types</option><option value="lost">Lost</option><option value="found">Found</option><option value="returned">Returned</option></select><select id="itemStatusFilter" aria-label="Filter by review status"><option value="">All review statuses</option><option>Pending</option><option>Approved</option><option>Rejected</option></select><button class="btn secondary" id="reloadItems">↻ Refresh reports</button></div>
+    <div id="itemsNotice" class="notice"></div>
+    <div class="table-card"><div class="table-wrap"><table><thead><tr><th>Report</th><th>Type</th><th>Category / Location</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="itemsList"><tr><td colspan="6">Loading reports...</td></tr></tbody></table></div></div>
+   </section>
 
-          <select id="categoryFilter">
-            <option value="">All categories</option>
-            <option value="Bags">Bags</option>
-            <option value="Books">Books</option>
-            <option value="Electronics">Electronics</option>
-            <option value="ID Card">ID Card</option>
-            <option value="Keys">Keys</option>
-            <option value="Clothing">Clothing</option>
-            <option value="Other">Other</option>
-          </select>
+   <!-- APPROVALS -->
+   <section id="approvals" class="section">
+    <div class="page-head"><div><h1>Approvals</h1><p>Pending Student and Faculty accounts, plus reports awaiting review.</p></div><button class="btn secondary" id="reloadApprovals">↻ Refresh approvals</button></div>
+    <div id="approvalsNotice" class="notice"></div>
 
-          <select id="statusFilter" aria-label="Filter by Lost or Found">
-            <option value="">Lost &amp; Found</option>
-            <option value="Lost">Lost</option>
-            <option value="Found">Found</option>
-          </select>
-        </div>
+    <article class="card">
+     <div class="approval-heading"><h2>Pending Student Accounts</h2><span class="approval-number" id="pendingStudentCount">0 pending</span></div>
+     <div class="table-card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="pendingStudentsList"></tbody></table></div></div>
+    </article>
 
-        <div id="itemsContainer" class="items-grid">
-          <div class="empty-state">Loading reports...</div>
-        </div>
-      </section>
-    </section>
+    <article class="card" style="margin-top:14px">
+     <div class="approval-heading"><h2>Pending Faculty Accounts</h2><span class="approval-number" id="pendingFacultyCount">0 pending</span></div>
+     <div class="table-card"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="pendingFacultyList"></tbody></table></div></div>
+    </article>
 
-    <aside class="right-rail">
-      <section class="rail-panel">
-        <h2>📍 Top campus hotspots</h2>
-        <div id="hotspotList" class="hotspot-list">
-          <div class="hotspot-row">Reports will appear here as items are posted.</div>
-        </div>
-      </section>
+    <article class="card" style="margin-top:14px">
+     <div class="approval-heading"><h2>Pending Item Reports</h2><span class="approval-number" id="pendingItemCount">0 pending</span></div>
+     <div class="table-card"><div class="table-wrap"><table><thead><tr><th>Report</th><th>Type</th><th>Category / Location</th><th>Reported by</th><th>Actions</th></tr></thead><tbody id="pendingItemsList"></tbody></table></div></div>
+    </article>
+   </section>
 
-      <section class="rail-panel">
-        <h2>ⓘ How CampusFind works</h2>
-        <ul class="how-list">
-          <li>Post clear item details. Photos are optional (up to 5).</li>
-          <li>New reports are checked before others can see them.</li>
-          <li>Contact the student to arrange a safe return.</li>
-        </ul>
-      </section>
-    </aside>
+   <!-- REPORT SUMMARY -->
+   <section id="reports" class="section">
+    <div class="page-head"><div><h1>Reports</h1><p>Summary of existing Lost & Found submissions.</p></div></div>
+    <div class="stats">
+     <article class="stat b"><div class="stat-label">All reports</div><div class="stat-value" id="allReportsCount">0</div></article>
+     <article class="stat p"><div class="stat-label">Approved</div><div class="stat-value" id="approvedReportsCount">0</div></article>
+     <article class="stat o"><div class="stat-label">Pending review</div><div class="stat-value" id="pendingReportsCount">0</div></article>
+     <article class="stat g"><div class="stat-label">Returned</div><div class="stat-value" id="returnedReportsCount">0</div></article>
+    </div>
+    <div class="table-card" style="margin-top:16px"><div class="table-wrap"><table><thead><tr><th>Report</th><th>Type</th><th>Category</th><th>Date</th><th>Status</th></tr></thead><tbody id="allReportsList"></tbody></table></div></div>
+   </section>
+
+   <!-- SETTINGS -->
+   <section id="settings" class="section">
+    <div class="page-head"><div><h1>Settings</h1><p>Admin workspace and backend connection.</p></div></div>
+    <div class="form-card"><h2>API connection</h2><p class="muted">Dashboard data is loaded from the CampusFind backend.</p><div class="field"><label>Backend URL</label><input id="backendUrl" readonly></div><button class="btn secondary" data-refresh>Refresh data</button></div>
+   </section>
   </main>
+ </div>
+</div>
 
-  <footer>© 2026 CampusFind · College Lost &amp; Found Portal</footer>
-
-  <!-- LOGIN -->
-  <div class="modal-overlay" id="authModal">
-    <div class="modal">
-      <h2>Welcome to CampusFind</h2>
-      <p class="modal-subtitle">Login to access campus Lost &amp; Found reports.</p>
-
-      <div id="authMessage" class="message"></div>
-
-      <form id="authForm">
-        <div class="form-group">
-          <label for="authRole">Login as *</label>
-          <select id="authRole" required>
-            <option value="Student">Student</option>
-            <option value="Faculty">Teacher / Faculty</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="authEmail">Username / Email *</label>
-          <input id="authEmail" type="email" placeholder="you@example.com" autocomplete="username" required>
-        </div>
-
-        <div class="form-group">
-          <label for="authPassword">Password *</label>
-          <input id="authPassword" type="password" placeholder="Enter your password" autocomplete="current-password" required>
-        </div>
-
-        <div class="form-actions">
-          <button id="authSubmit" class="primary-btn" type="submit">Login</button>
-        </div>
-      </form>
-    </div>
+<!-- RESET PASSWORD POPUP -->
+<div id="pwModal" class="modal-back hidden">
+ <form class="modal-box" id="pwForm">
+  <h2>Reset password</h2>
+  <p class="muted">Enter a new temporary password (8–128 characters). Share it with the user privately.</p>
+  <div id="pwNotice" class="notice"></div>
+  <div class="field"><label for="pwInput">New password</label><input id="pwInput" type="password" required minlength="8" maxlength="128" autocomplete="new-password"></div>
+  <div class="row-actions">
+   <button type="button" class="btn secondary" id="pwCancel">Cancel</button>
+   <button type="submit" class="btn" id="pwSubmit">Reset password</button>
   </div>
+ </form>
+</div>
 
-  <!-- PHONE -->
-  <div class="modal-overlay" id="phoneModal">
-    <div class="modal">
-      <h2>My phone number</h2>
-      <p class="modal-subtitle">Optional. Other users can use this number to call you about a report.</p>
+<!-- REPORT VIEW POPUP (photos + full details) -->
+<div id="viewModal" class="modal-back hidden">
+ <div class="modal-box wide" id="viewBox" role="dialog" aria-modal="true" aria-label="Report details"></div>
+</div>
 
-      <div id="phoneMessage" class="message"></div>
+<script>
+"use strict";
 
-      <form id="phoneForm">
-        <div class="form-group">
-          <label for="profilePhone">Phone number</label>
-          <input id="profilePhone" type="tel" placeholder="+91 9876543210">
-        </div>
+const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
+  ? "http://localhost:5000"
+  : "https://campus-find-hmyj.onrender.com";
 
-        <div class="form-actions">
-          <button type="button" class="secondary-btn" data-close="phoneModal">Cancel</button>
-          <button id="phoneSubmit" type="submit" class="primary-btn">Save phone</button>
-        </div>
-      </form>
-    </div>
-  </div>
+const $ = id => document.getElementById(id);
+let token = localStorage.getItem("campusFindAdminToken") || "";
+let adminUser = null;
+let users = [];
+let items = [];
+let pwTarget = { id: "", noticeId: "usersNotice" };
 
-  <!-- REPORT -->
-  <div class="modal-overlay" id="reportModal">
-    <div class="modal">
-      <h2 id="reportTitle">Report an Item</h2>
-      <p class="modal-subtitle">New reports are checked by an admin before others can see them.</p>
+try {
+  adminUser = JSON.parse(localStorage.getItem("campusFindAdminUser") || "null");
+} catch (_) {}
 
-      <div id="reportMessage" class="message"></div>
+const palette = ["#3987ff", "#9b55f5", "#11b981", "#ffab2e", "#27add6", "#9da9c2"];
+$("backendUrl").value = API_BASE;
 
-      <form id="reportForm">
-        <input id="itemStatus" type="hidden">
+/* ================= SMALL HELPERS ================= */
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+function dateText(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+function statusBadge(status) {
+  const s = status || "Unknown";
+  return `<span class="badge ${escapeHTML(s)}">${escapeHTML(s)}</span>`;
+}
+function showNotice(id, message, type = "error") {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = message;
+  el.className = "notice show " + type;
+}
+function clearNotice(id) {
+  if ($(id)) $(id).className = "notice";
+}
+function normalizeArray(data, keys) {
+  if (Array.isArray(data)) return data;
+  for (const key of keys) {
+    if (Array.isArray(data?.[key])) return data[key];
+  }
+  return [];
+}
+const accountType = user => user.accountType || "Student";
+const accountStatus = user => user.accountStatus || "Approved";
+const userId = user => user._id || user.id || "";
+const itemId = item => item._id || item.id || "";
+const itemType = item => String(item.type || "").toLowerCase();
+const itemTitle = item => item.itemName || item.title || "Untitled report";
+const reviewStatus = item => item.reviewStatus || "Pending";
+const isReturned = item => item.resolutionStatus === "Returned";
+function safeImage(src) {
+  return typeof src === "string" && /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(src) ? src : "";
+}
+function thumbHTML(item) {
+  const src = safeImage(item.thumbnail || item.image);
+  return src
+    ? `<img class="thumb" src="${escapeHTML(src)}" alt="" loading="lazy">`
+    : `<span class="thumb">📦</span>`;
+}
 
-        <label class="report-type-label">What are you reporting?</label>
-        <div class="report-type-switch" role="group" aria-label="Choose Lost or Found">
-          <button class="type-option active" type="button" data-item-type="Lost" aria-pressed="true">🔴 I lost an item</button>
-          <button class="type-option" type="button" data-item-type="Found" aria-pressed="false">🟢 I found an item</button>
-        </div>
+async function api(path, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (token) headers.Authorization = "Bearer " + token;
+  if (options.body) headers["Content-Type"] = "application/json";
+  const response = await fetch(API_BASE + path, { ...options, headers });
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; }
+  catch (_) { data = { message: raw }; }
 
-        <div class="form-group">
-          <label for="itemTitle">Item name *</label>
-          <input id="itemTitle" type="text" placeholder="e.g. Blue notebook" maxlength="120" required>
-        </div>
+  if (!response.ok) {
+    // Login expired: go back to the sign-in screen instead of staying stuck.
+    if (response.status === 401 && token) {
+      logout();
+      showNotice("loginNotice", "Your session expired. Please sign in again.");
+    }
+    throw Error(data.message || data.error || `Request failed (${response.status})`);
+  }
+  return data;
+}
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="studentName" id="reporterNameLabel">Student name *</label>
-            <input id="studentName" type="text" readonly required>
-          </div>
-          <div class="form-group" id="courseGroup">
-            <label for="studentCourse">Course *</label>
-            <input id="studentCourse" type="text" placeholder="e.g. BCA" maxlength="100" required>
-          </div>
-        </div>
+/* ================= NAVIGATION ================= */
+const sectionText = {
+  dashboard: ["👋 Dashboard", "Welcome back, Admin! Here's what's happening on CampusFind."],
+  users: ["Users", "Manage, approve and reset accounts."],
+  create: ["Create Account", "Create Student or Faculty accounts."],
+  items: ["Lost & Found", "Review and manage campus item reports."],
+  approvals: ["Approvals", "Pending Student and Faculty accounts, plus reports awaiting review."],
+  reports: ["Reports", "Summary of existing Lost & Found submissions."],
+  settings: ["Settings", "Admin workspace and backend connection."]
+};
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="studentDepartment">Department *</label>
-            <input id="studentDepartment" type="text" placeholder="e.g. Computer Applications" maxlength="100" required>
-          </div>
-          <div class="form-group" id="batchGroup">
-            <label for="studentBatch">Batch *</label>
-            <input id="studentBatch" type="text" placeholder="e.g. 2024-2027" maxlength="30" required>
-          </div>
-        </div>
+function goTo(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.toggle("active", s.id === id));
+  document.querySelectorAll("[data-section]").forEach(b => b.classList.toggle("active", b.dataset.section === id));
+  const section = $(id);
+  section.querySelector(".page-head h1").textContent = sectionText[id][0];
+  section.querySelector(".page-head p").textContent = sectionText[id][1];
+  closeDropdowns();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+document.querySelectorAll("[data-section]").forEach(button => {
+  button.addEventListener("click", () => goTo(button.dataset.section));
+});
+document.querySelectorAll("[data-go]").forEach(button => {
+  button.addEventListener("click", () => {
+    if (button.dataset.account) $("accountType").value = button.dataset.account;
+    goTo(button.dataset.go);
+  });
+});
+document.querySelectorAll("[data-refresh]").forEach(button => button.addEventListener("click", refreshAll));
 
-        <div class="form-group" id="designationGroup" style="display:none">
-          <label for="facultyDesignation">Designation / Post *</label>
-          <select id="facultyDesignation">
-            <option value="">Select designation</option>
-            <option>HOD</option>
-            <option>Assistant Professor</option>
-            <option>Associate Professor</option>
-            <option>Professor</option>
-            <option>Lecturer</option>
-            <option>Dean</option>
-            <option>Other Faculty</option>
-          </select>
-        </div>
+function closeDropdowns() {
+  $("adminDropdown").classList.add("hidden");
+  $("notificationDropdown").classList.add("hidden");
+  $("searchResults").classList.add("hidden");
+  $("adminMenuBtn").setAttribute("aria-expanded", "false");
+  $("notificationBtn").setAttribute("aria-expanded", "false");
+}
+function toggleDropdown(menuId, buttonId) {
+  const menu = $(menuId);
+  const open = menu.classList.contains("hidden");
+  closeDropdowns();
+  menu.classList.toggle("hidden", !open);
+  $(buttonId).setAttribute("aria-expanded", String(open));
+}
+$("adminMenuBtn").addEventListener("click", event => {
+  event.stopPropagation();
+  $("dropdownEmail").textContent = adminUser?.email || "Administrator";
+  toggleDropdown("adminDropdown", "adminMenuBtn");
+});
+$("notificationBtn").addEventListener("click", event => {
+  event.stopPropagation();
+  updateNotificationUI();
+  toggleDropdown("notificationDropdown", "notificationBtn");
+});
+document.addEventListener("click", event => {
+  if (!event.target.closest(".admin-menu-wrap") && !event.target.closest(".notification-wrap") && !event.target.closest(".search")) closeDropdowns();
+});
+$("notificationRefresh").addEventListener("click", async () => {
+  closeDropdowns();
+  await refreshAll();
+});
+document.querySelectorAll("[data-admin-action]").forEach(button => {
+  button.addEventListener("click", async () => {
+    const action = button.dataset.adminAction;
+    closeDropdowns();
+    if (action === "settings") goTo("settings");
+    if (action === "refresh") await refreshAll();
+    if (action === "logout") logout();
+  });
+});
+$("logoutBtn").addEventListener("click", logout);
 
-        <div class="form-group" id="semesterGroup">
-          <label for="studentSemester">Semester *</label>
-          <select id="studentSemester" required>
-            <option value="">Select semester</option>
-            <option>Semester 1</option>
-            <option>Semester 2</option>
-            <option>Semester 3</option>
-            <option>Semester 4</option>
-            <option>Semester 5</option>
-            <option>Semester 6</option>
-            <option>Semester 7</option>
-            <option>Semester 8</option>
-          </select>
-        </div>
+// Sidebar: on phones show/hide it, on desktop shrink it to icons only.
+$("menuBtn").addEventListener("click", () => {
+  if (window.innerWidth <= 850) document.querySelector(".sidebar").classList.toggle("hidden");
+  else $("adminApp").classList.toggle("collapsed");
+});
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="itemCategory">Category *</label>
-            <select id="itemCategory" required>
-              <option value="">Select category</option>
-              <option value="Bags">Bags</option>
-              <option value="Books">Books</option>
-              <option value="Electronics">Electronics</option>
-              <option value="ID Card">ID Card</option>
-              <option value="Keys">Keys</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="itemDate">Date *</label>
-            <input id="itemDate" type="date" required>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="itemLocation">Campus location *</label>
-          <input id="itemLocation" type="text" placeholder="Library, 3rd floor" maxlength="200" required>
-        </div>
-
-        <div class="form-group">
-          <label for="itemDescription">Description *</label>
-          <textarea id="itemDescription" placeholder="Colour, brand, or unique marks..." maxlength="3000" required></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="itemImage">Photos (optional, up to 5, 10 MB each)</label>
-          <input id="itemImage" type="file" accept="image/*" multiple>
-          <div id="photoGrid" class="photo-grid"></div>
-          <p id="photoHelp" class="photo-help">No photos added. The first photo is the cover photo.</p>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="secondary-btn" data-close="reportModal">Cancel</button>
-          <button id="reportSubmit" type="submit" class="primary-btn">Submit report</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MORE INFORMATION (details box) -->
-  <div class="modal-overlay" id="detailModal">
-    <div class="modal wide" id="detailBox" role="dialog" aria-modal="true" aria-label="Report details"></div>
-  </div>
-
-  <!-- PHOTO VIEWER (1 big photo + small photos below) -->
-  <div class="modal-overlay" id="photoModal">
-    <div class="modal wide" role="dialog" aria-modal="true" aria-label="Photos">
-      <div class="detail-head">
-        <div><h2 id="photoTitle">Photos</h2><p id="photoSub"></p></div>
-        <button type="button" class="detail-close" data-close="photoModal" aria-label="Close photos">✕</button>
-      </div>
-      <div class="detail-body-pad" id="photoBody"></div>
-    </div>
-  </div>
-
-  <script>
-  const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
-    ? "http://localhost:5000"
-    : "https://campus-find-hmyj.onrender.com";
-
-  const $ = id => document.getElementById(id);
-  const MAX_PHOTOS = 5;
-  const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
-
-  let allItems = [];
-  let myReportsMode = false;
-  let myReportStatus = "";
-  let photos = [];          // photos chosen in the report form: { full, thumb }
-  let photoBusy = false;
-  const fullItemCache = new Map();
-
-  /* ================= THEME ================= */
-  (function initThemePicker() {
-    const allowed = ["aurora", "sunset", "emerald"];
-    const saved = localStorage.getItem("campusFindTheme") || "aurora";
-    const active = allowed.includes(saved) ? saved : "aurora";
-    document.documentElement.setAttribute("data-theme", active);
-
-    document.querySelectorAll("[data-theme-choice]").forEach(button => {
-      button.classList.toggle("active", button.dataset.themeChoice === active);
-      button.addEventListener("click", () => {
-        const theme = button.dataset.themeChoice;
-        if (!allowed.includes(theme)) return;
-        document.documentElement.setAttribute("data-theme", theme);
-        localStorage.setItem("campusFindTheme", theme);
-        document.querySelectorAll("[data-theme-choice]").forEach(option => {
-          option.classList.toggle("active", option === button);
-        });
-      });
+/* ================= LOGIN ================= */
+function showApp() {
+  $("loginScreen").classList.add("hidden");
+  $("adminApp").classList.remove("hidden");
+}
+function showLogin() {
+  $("adminApp").classList.add("hidden");
+  $("loginScreen").classList.remove("hidden");
+}
+function logout() {
+  token = "";
+  adminUser = null;
+  users = [];
+  items = [];
+  localStorage.removeItem("campusFindAdminToken");
+  localStorage.removeItem("campusFindAdminUser");
+  closeDropdowns();
+  closeViewModal();
+  closePasswordModal();
+  showLogin();
+}
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  clearNotice("loginNotice");
+  $("loginBtn").disabled = true;
+  $("loginBtn").textContent = "Signing in...";
+  try {
+    const data = await api("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email: $("loginEmail").value.trim(), password: $("loginPassword").value })
     });
-  })();
-
-  /* ================= SESSION + API ================= */
-  const getToken = () => localStorage.getItem("campusFindToken");
-  const isLoggedIn = () => Boolean(getToken());
-
-  function getCurrentUser() {
-    try { return JSON.parse(localStorage.getItem("campusFindUser") || "null"); }
-    catch { return null; }
+    if (!data.token || !data.user?.isAdmin) throw Error("This account does not have administrator access.");
+    token = data.token;
+    adminUser = data.user;
+    localStorage.setItem("campusFindAdminToken", token);
+    localStorage.setItem("campusFindAdminUser", JSON.stringify(adminUser));
+    $("loginPassword").value = "";
+    showApp();
+    await refreshAll();
+  } catch (error) {
+    // The server asks normal users to pick Student/Faculty - for this page that means "not an admin".
+    const message = /^Choose Student or Faculty/.test(error.message)
+      ? "This account does not have administrator access."
+      : error.message;
+    showNotice("loginNotice", message);
+  } finally {
+    $("loginBtn").disabled = false;
+    $("loginBtn").textContent = "Sign in to dashboard";
   }
+});
 
-  function getRole() {
-    return getCurrentUser()?.accountType === "Faculty" ? "Faculty" : "Student";
+/* ================= LOAD DATA ================= */
+async function fetchUsers() {
+  users = normalizeArray(await api("/api/auth/admin/users"), ["users", "data", "accounts", "results"]);
+}
+async function fetchItems() {
+  items = normalizeArray(await api("/api/items/admin/all"), ["items", "data", "reports", "results"]);
+}
+
+async function refreshAll() {
+  clearNotice("globalNotice");
+  try {
+    await Promise.all([fetchUsers(), fetchItems()]);
+    renderAll();
+    $("systemStatus").textContent = "● Backend connected • Data refreshed";
+    $("systemStatus").style.color = "#0aa36d";
+  } catch (error) {
+    $("systemStatus").textContent = "● API connection error";
+    $("systemStatus").style.color = "#c52d44";
+    showNotice("globalNotice", "Could not load live data: " + error.message);
   }
+}
+$("reloadApprovals").addEventListener("click", refreshAll);
 
-  function clearSession() {
-    localStorage.removeItem("campusFindToken");
-    localStorage.removeItem("campusFindUser");
-    allItems = [];
-    fullItemCache.clear();
+$("reloadUsers").addEventListener("click", async () => {
+  try {
+    await fetchUsers();
+    renderAll();
+    showNotice("usersNotice", `Loaded ${users.length} accounts.`, "success");
+  } catch (error) {
+    showNotice("usersNotice", "Could not load users: " + error.message);
   }
-
-  async function apiRequest(path, options = {}) {
-    const headers = { ...(options.headers || {}) };
-    if (getToken()) headers.Authorization = `Bearer ${getToken()}`;
-
-    const response = await fetch(API_BASE + path, { ...options, headers });
-    const text = await response.text();
-    let data = {};
-
-    try { data = text ? JSON.parse(text) : {}; }
-    catch { data = { message: text || "Unexpected server response." }; }
-
-    if (!response.ok) {
-      if (response.status === 401 && isLoggedIn()) {
-        clearSession();
-        updateLoginUI();
-      }
-      throw new Error(data.message || data.error || `Request failed (${response.status})`);
-    }
-
-    return data;
+});
+$("reloadItems").addEventListener("click", async () => {
+  try {
+    await fetchItems();
+    renderAll();
+    showNotice("itemsNotice", `Loaded ${items.length} reports.`, "success");
+  } catch (error) {
+    showNotice("itemsNotice", "Could not load reports: " + error.message);
   }
+});
 
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    })[c]);
-  }
+function renderAll() {
+  renderStats();
+  renderUsers();
+  renderItems();
+  renderRecent();
+  renderCategories();
+  drawActivityChart();
+  renderApprovals();
+  renderReports();
+  updateNotificationUI();
+}
 
-  function showMessage(id, message, type = "error") {
-    const el = $(id);
-    if (!el) return;
-    el.textContent = message;
-    el.className = `message ${type}`;
-  }
+/* ================= DASHBOARD ================= */
+function rangeDays() {
+  return $("dateRange").value === "all" ? Infinity : Number($("dateRange").value || 7);
+}
+$("dateRange").addEventListener("change", () => {
+  renderStats();
+  renderCategories();
+  drawActivityChart();
+});
+function inSelectedRange(item) {
+  if (rangeDays() === Infinity) return true;
+  const value = item.createdAt || item.date;
+  if (!value) return false;
+  const time = new Date(value).getTime();
+  return Number.isFinite(time) && time >= Date.now() - rangeDays() * 86400000 && time <= Date.now() + 86400000;
+}
+// Dashboard numbers count approved reports only (pending / rejected are not "real" reports yet).
+const approvedInRange = () => items.filter(i => reviewStatus(i) === "Approved" && inSelectedRange(i));
 
-  function clearMessage(id) {
-    const el = $(id);
-    if (!el) return;
-    el.textContent = "";
-    el.className = "message";
-  }
+function renderStats() {
+  const students = users.filter(u => accountType(u).toLowerCase() === "student");
+  const faculty = users.filter(u => accountType(u).toLowerCase() === "faculty");
+  const shown = approvedInRange();
+  $("totalUsers").textContent = users.length;
+  $("userSplit").textContent = `Students: ${students.length} | Faculty: ${faculty.length}`;
+  $("lostCount").textContent = shown.filter(i => itemType(i) === "lost").length;
+  $("foundCount").textContent = shown.filter(i => itemType(i) === "found").length;
+  $("pendingFaculty").textContent = faculty.filter(u => accountStatus(u) === "Pending").length;
+  $("allReportsCount").textContent = items.length;
+  $("approvedReportsCount").textContent = items.filter(i => reviewStatus(i) === "Approved").length;
+  $("pendingReportsCount").textContent = items.filter(i => reviewStatus(i) === "Pending").length;
+  $("returnedReportsCount").textContent = items.filter(isReturned).length;
+}
 
-  // Only real photos are allowed to be shown.
-  function safeImage(src) {
-    return typeof src === "string" &&
-      /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(src) ? src : "";
-  }
-
-  /* ================= LOGIN UI ================= */
-  function updateLoginUI() {
-    const loggedIn = isLoggedIn();
-    const user = getCurrentUser();
-
-    document.body.classList.toggle("logged-out", !loggedIn);
-    $("loginButton").textContent = loggedIn ? "＋ Report Item" : "Login";
-    $("profileWrap").style.display = loggedIn ? "block" : "none";
-    $("profileMenuName").textContent = user?.name || "Student";
-    $("profileMenuEmail").textContent = user?.email || "";
-
-    const initials = String(user?.name || "").trim().split(/\s+/)
-      .filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
-    $("profileAvatar").textContent = initials || "U";
-
-    $("authModal").classList.toggle("active", !loggedIn);
-
-    if (!loggedIn) {
-      $("itemsContainer").innerHTML = '<div class="empty-state">Login to view campus reports.</div>';
-    }
-  }
-
-  function toggleProfileMenu() {
-    const open = $("profileMenu").classList.toggle("open");
-    $("profileAvatar").setAttribute("aria-expanded", String(open));
-  }
-
-  function closeProfileMenu() {
-    $("profileMenu").classList.remove("open");
-    $("profileAvatar").setAttribute("aria-expanded", "false");
-  }
-
-  $("profileAvatar").addEventListener("click", toggleProfileMenu);
-  document.addEventListener("click", event => {
-    if (!event.target.closest("#profileWrap")) closeProfileMenu();
-  });
-  $("profileSettingsBtn").addEventListener("click", () => { closeProfileMenu(); openPhoneModal(); });
-  $("profileLogoutBtn").addEventListener("click", logout);
-  $("loginButton").addEventListener("click", () => (isLoggedIn() ? openReport("Lost") : openAuth()));
-  $("urgentBanner").addEventListener("click", () => (isLoggedIn() ? openReport("Lost") : openAuth()));
-
-  function openAuth() {
-    clearMessage("authMessage");
-    $("authModal").classList.add("active");
-  }
-
-  function logout() {
-    closeProfileMenu();
-    clearSession();
-    showAllReports();
-    updateLoginUI();
-    openAuth();
-  }
-
-  /* ================= MODALS ================= */
-  function openModal(id) { $(id).classList.add("active"); }
-
-  function closeModal(id) {
-    if (id === "authModal" && !isLoggedIn()) return;
-    $(id).classList.remove("active");
-    if (id === "detailModal") $("detailBox").innerHTML = "";
-    if (id === "photoModal") $("photoBody").innerHTML = "";
-  }
-
-  document.querySelectorAll(".modal-overlay").forEach(modal => {
-    modal.addEventListener("click", event => {
-      if (event.target === modal) closeModal(modal.id);
-    });
-  });
-
-  // Any button with data-close="modalId" closes that modal (also works for buttons added later).
-  document.addEventListener("click", event => {
-    const closer = event.target.closest("[data-close]");
-    if (closer) closeModal(closer.dataset.close);
-  });
-
-  document.addEventListener("keydown", event => {
-    const order = ["photoModal", "detailModal", "reportModal", "phoneModal"];
-    const open = order.find(id => $(id).classList.contains("active"));
-
-    if (event.key === "Escape" && open) {
-      closeModal(open);
-    } else if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && (open === "photoModal" || open === "detailModal")) {
-      const gallery = $(open).querySelector(".gallery");
-      if (gallery) gallery.step(event.key === "ArrowLeft" ? -1 : 1);
-    }
-  });
-
-  /* ================= LOGIN FORM ================= */
-  $("authForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    clearMessage("authMessage");
-
-    const button = $("authSubmit");
-    button.disabled = true;
-
-    try {
-      const data = await apiRequest("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: $("authEmail").value.trim(),
-          password: $("authPassword").value,
-          accountType: $("authRole").value
-        })
-      });
-
-      if (!data.token || !data.user) {
-        throw new Error("Login response was incomplete. Please try again.");
-      }
-
-      localStorage.setItem("campusFindToken", data.token);
-      localStorage.setItem("campusFindUser", JSON.stringify(data.user));
-      $("authPassword").value = "";
-      updateLoginUI();
-      closeModal("authModal");
-      await loadItemsFromDatabase();
-    } catch (error) {
-      showMessage("authMessage", error.message || "Something went wrong.");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  /* ================= PHONE ================= */
-  function openPhoneModal() {
-    $("profilePhone").value = getCurrentUser()?.phone || "";
-    clearMessage("phoneMessage");
-    openModal("phoneModal");
-  }
-
-  $("phoneForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const button = $("phoneSubmit");
-    button.disabled = true;
-
-    try {
-      const result = await apiRequest("/api/auth/phone", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: $("profilePhone").value.trim() })
-      });
-
-      const user = getCurrentUser() || {};
-      user.phone = result.phone || "";
-      localStorage.setItem("campusFindUser", JSON.stringify(user));
-      showMessage("phoneMessage", result.message || "Phone number saved.", "success");
-    } catch (error) {
-      showMessage("phoneMessage", error.message || "Could not save phone number.");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  /* ================= REPORT FIELD HELPERS ================= */
-  const getItemId = item => item?._id || item?.id || "";
-  const getItemName = item => item?.itemName || item?.title || "Untitled item";
-  const getItemType = item => (item?.type || item?.status) === "Found" ? "Found" : "Lost";
-  const orNotProvided = value => value || "Not provided";
-
-  function normalizeItems(data) {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.items)) return data.items;
-    if (Array.isArray(data?.data)) return data.data;
-    return [];
-  }
-
-  function formatDisplayDate(value) {
-    if (!value) return "Not specified";
-    const raw = String(value).trim();
-    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    // Treat YYYY-MM-DD as a local calendar date to avoid timezone shifts.
-    const date = match
-      ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
-      : new Date(raw);
-
-    if (Number.isNaN(date.getTime())) return raw;
-    return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(date);
-  }
-
-  /* ================= LOAD + STATS ================= */
-  async function loadItemsFromDatabase() {
-    if (!isLoggedIn()) return;
-
-    $("itemsContainer").innerHTML = '<div class="empty-state">Loading reports...</div>';
-    fullItemCache.clear();
-
-    try {
-      allItems = normalizeItems(await apiRequest("/api/items"));
-      renderItems();
-    } catch (error) {
-      $("itemsContainer").innerHTML = `<div class="empty-state">${escapeHTML(error.message)}</div>`;
-    }
-  }
-
-  function updateDashboardStats() {
-    const isReturned = item => item.resolutionStatus === "Returned";
-    const total = allItems.length;
-    const lostAll = allItems.filter(item => getItemType(item) === "Lost").length;
-    const foundAll = allItems.filter(item => getItemType(item) === "Found").length;
-
-    $("statTotal").textContent = total;
-    $("statLost").textContent = allItems.filter(item => getItemType(item) === "Lost" && !isReturned(item)).length;
-    $("statFound").textContent = allItems.filter(item => getItemType(item) === "Found" && !isReturned(item)).length;
-    $("statReturned").textContent = allItems.filter(isReturned).length;
-
-    $("navTotal").textContent = total;
-    $("navLost").textContent = lostAll;
-    $("navFound").textContent = foundAll;
-
-    const places = {};
-    allItems.forEach(item => {
-      const place = (item.location || "Other campus areas").split(",")[0].trim();
-      places[place] = (places[place] || 0) + 1;
-    });
-
-    const top = Object.entries(places).sort((a, b) => b[1] - a[1]).slice(0, 3);
-
-    $("hotspotList").innerHTML = top.length
-      ? top.map(([place, count]) => {
-          const percent = total ? Math.round((count / total) * 100) : 0;
-          return `
-            <div class="hotspot-row">
-              ${escapeHTML(place)}
-              <span style="float:right;color:var(--purple-light)">${percent}%</span>
-              <div class="hotspot-track"><span class="hotspot-fill" style="width:${percent}%"></span></div>
-            </div>`;
-        }).join("")
-      : '<div class="hotspot-row">No reports yet.</div>';
-  }
-
-  /* ================= LISTING ================= */
-  const CATEGORY_EMOJI = {
-    "bags": "🎒", "books": "📚", "electronics": "🎧",
-    "id card": "🪪", "keys": "🔑", "clothing": "👕"
+function drawActivityChart() {
+  const allTime = $("dateRange").value === "all";
+  const span = allTime ? 30 : rangeDays();
+  const totalDays = Math.max(1, Math.min(span, 30));
+  const end = new Date();
+  end.setHours(0, 0, 0, 0);
+  const start = new Date(end);
+  start.setDate(start.getDate() - totalDays + 1);
+  const approved = items.filter(i => reviewStatus(i) === "Approved");
+  const sameDay = (value, day) => {
+    const d = new Date(value);
+    return Number.isFinite(d.getTime()) && d.toDateString() === day.toDateString();
   };
-
-  function workflowNoteHTML(item) {
-    const review = item.reviewStatus || "Approved";
-    if (item.isOwner && review === "Pending") {
-      return '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
-    }
-    if (item.isOwner && review === "Rejected") {
-      return '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
-    }
-    if (item.resolutionStatus === "Returned") {
-      return '<p class="workflow-note returned">Returned — this report is closed.</p>';
-    }
-    return "";
+  const labels = [];
+  const series = { lost: [], found: [], returned: [] };
+  for (let n = 0; n < totalDays; n++) {
+    const day = new Date(start);
+    day.setDate(start.getDate() + n);
+    labels.push(day.toLocaleDateString("en-US", { month: "short", day: "numeric" }));
+    series.lost.push(approved.filter(i => itemType(i) === "lost" && sameDay(i.createdAt || i.date, day)).length);
+    series.found.push(approved.filter(i => itemType(i) === "found" && sameDay(i.createdAt || i.date, day)).length);
+    series.returned.push(approved.filter(i => isReturned(i) && sameDay(i.returnedAt || i.createdAt || i.date, day)).length);
   }
+  const left = 42, right = 635, top = 20, bottom = 160;
+  const highest = Math.max(5, ...Object.values(series).flat());
+  const step = Math.max(1, Math.ceil(highest / 4));
+  const max = step * 4;
+  $("chartGrid").innerHTML = [0, 1, 2, 3, 4].map(n => {
+    const y = bottom - (bottom - top) * n / 4;
+    const x = left + (right - left) * n / 4;
+    return `<path d="M${left} ${y}H${right} M${x} ${top}V${bottom}" fill="none"/>`;
+  }).join("");
+  $("chartYLabels").innerHTML = [0, 1, 2, 3, 4].map(n => {
+    const y = bottom - (bottom - top) * n / 4 + 3;
+    return `<text x="10" y="${y}">${Math.round(max * n / 4)}</text>`;
+  }).join("");
+  const points = values => values.map((value, index) => [
+    left + index * (right - left) / Math.max(1, values.length - 1),
+    bottom - value / max * (bottom - top)
+  ]);
+  const line = values => points(values).map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ");
+  const area = values => {
+    const pts = points(values);
+    return line(values) + ` L ${pts[pts.length - 1][0]} ${bottom} L ${pts[0][0]} ${bottom} Z`;
+  };
+  Object.keys(series).forEach(key => {
+    $(key + "Line").setAttribute("d", line(series[key]));
+    $(key + "Area").setAttribute("d", area(series[key]));
+  });
+  const last = labels.length - 1;
+  const labelIndexes = labels.length <= 7
+    ? labels.map((_, i) => i)
+    : [0, Math.round(last / 5), Math.round(last * 2 / 5), Math.round(last * 3 / 5), Math.round(last * 4 / 5), last];
+  $("chartLabels").innerHTML = [...new Set(labelIndexes)].map(index =>
+    `<text x="${left + index * (right - left) / Math.max(1, last)}" y="184" text-anchor="middle">${escapeHTML(labels[index])}</text>`).join("");
+  const dots = [];
+  Object.keys(series).forEach(key => {
+    const color = key === "lost" ? "#3987ff" : key === "found" ? "#11b981" : "#8b55ff";
+    points(series[key]).forEach(p => dots.push(`<circle cx="${p[0]}" cy="${p[1]}" r="2.7" fill="${color}"/>`));
+  });
+  $("chartDots").innerHTML = dots.join("");
+  $("chartCaption").textContent = allTime
+    ? "The chart shows the last 30 days (all-time totals are in the cards above)."
+    : "Counts are grouped by report date (returned items by the day they were marked returned).";
+}
 
-  function cardHTML(item) {
-    const id = escapeHTML(getItemId(item));
-    const title = escapeHTML(getItemName(item));
-    const type = getItemType(item);
-    const thumb = safeImage(item.thumbnail || item.image);
-    const count = Number(item.imageCount) || (thumb ? 1 : 0);
-    const emoji = CATEGORY_EMOJI[String(item.category || "").toLowerCase().trim()] || "📦";
+function renderCategories() {
+  const selected = approvedInRange();
+  const map = {};
+  selected.forEach(item => {
+    const category = String(item.category || "Others").trim() || "Others";
+    map[category] = (map[category] || 0) + 1;
+  });
+  let entries = Object.entries(map).sort((a, b) => b[1] - a[1]);
+  if (entries.length > 6) {
+    const remaining = entries.slice(5).reduce((sum, entry) => sum + entry[1], 0);
+    entries = entries.slice(0, 5);
+    entries.push(["Others", remaining]);
+  }
+  $("categoryTotal").textContent = selected.length;
+  const sum = entries.reduce((value, entry) => value + entry[1], 0) || 1;
+  let degree = 0;
+  const segments = entries.map((entry, index) => {
+    const next = degree + entry[1] / sum * 100;
+    const part = `${palette[index % palette.length]} ${degree}% ${next}%`;
+    degree = next;
+    return part;
+  });
+  $("categoryDonut").style.background = segments.length ? `conic-gradient(${segments.join(",")})` : "conic-gradient(#dfe6f2 0 100%)";
+  $("categoryLegend").innerHTML = entries.length ? entries.map((entry, index) => `
+    <div class="category-line"><i class="dot" style="background:${palette[index % palette.length]}"></i><span>${escapeHTML(entry[0])}</span><span class="value">${entry[1]} <small>(${Math.round(entry[1] / sum * 100)}%)</small></span></div>
+  `).join("") : `<span class="muted">No category data available.</span>`;
+}
 
-    const media = thumb
-      ? `<button type="button" class="item-media" data-action="photos" data-id="${id}" aria-label="View photos of ${title}">
-           <img src="${escapeHTML(thumb)}" alt="${title}" loading="lazy">
-           ${count > 1 ? `<span class="photo-count">📷 ${count}</span>` : ""}
-         </button>`
-      : `<div class="item-media no-photo" aria-label="No photo">${emoji}</div>`;
+function renderRecent() {
+  const recentUsers = [...users].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).slice(0, 5);
+  $("recentUsers").innerHTML = recentUsers.length ? recentUsers.map((user, index) => `
+    <tr><td><div class="user-cell"><span class="mini-avatar" style="background:${palette[index % palette.length]}">${escapeHTML((user.name || "?").slice(0, 1).toUpperCase())}</span>${escapeHTML(user.name || "Unnamed")}</div></td><td>${escapeHTML(user.email || "—")}</td><td>${escapeHTML(accountType(user))}</td><td>${statusBadge(accountStatus(user))}</td><td>${dateText(user.createdAt)}</td></tr>
+  `).join("") : `<tr><td colspan="5" class="empty">No users found.</td></tr>`;
 
-    return `
-      <article class="item-card">
-        ${media}
-        <div class="item-body">
-          <div class="item-heading">
-            <span class="status ${type}">${type}</span>
-            <h3>${title}</h3>
+  const recentItems = [...items].sort((a, b) => new Date(b.createdAt || b.date || 0) - new Date(a.createdAt || a.date || 0)).slice(0, 5);
+  $("recentActivity").innerHTML = recentItems.length ? recentItems.map((item, index) => {
+    const type = itemType(item);
+    const heading = isReturned(item) ? "Item marked as returned" : type === "lost" ? "New lost item reported" : type === "found" ? "New found item reported" : "New report created";
+    const icon = isReturned(item) ? "▣" : type === "lost" ? "⌕" : type === "found" ? "✓" : "●";
+    return `<div class="activity"><div class="activity-icon ${index % 4 === 1 ? "blue" : index % 4 === 2 ? "purple" : index % 4 === 3 ? "orange" : ""}">${icon}</div><div class="activity-text"><strong>${heading}</strong><small>${escapeHTML(itemTitle(item))}</small></div><time>${dateText(item.createdAt || item.date)}</time></div>`;
+  }).join("") : `<div class="muted">No report activity yet.</div>`;
+}
+
+/* ================= USERS ================= */
+function renderUsers() {
+  const query = $("userSearch").value.trim().toLowerCase();
+  const statusFilter = $("userStatusFilter").value;
+  const typeFilter = $("userTypeFilter").value;
+  const filtered = users.filter(user => {
+    const search = [user.name, user.email, user.phone].join(" ").toLowerCase();
+    return search.includes(query) && (!statusFilter || accountStatus(user) === statusFilter) && (!typeFilter || accountType(user) === typeFilter);
+  });
+  $("usersList").innerHTML = filtered.length ? filtered.map(user => {
+    const id = escapeHTML(userId(user));
+    const status = accountStatus(user);
+    return `<tr>
+      <td><b>${escapeHTML(user.name || "Unnamed")}</b></td>
+      <td>${escapeHTML(user.email || "—")}<br>${escapeHTML(user.phone || "")}</td>
+      <td>${escapeHTML(accountType(user))}</td>
+      <td>${dateText(user.createdAt)}</td>
+      <td>${statusBadge(status)}</td>
+      <td>
+        <details class="user-actions-details">
+          <summary class="btn secondary small">Manage actions <span aria-hidden="true">⌄</span></summary>
+          <div class="user-actions-list">
+            ${status !== "Approved" ? `<button type="button" class="btn good small" data-user-action="status" data-status="Approved" data-id="${id}">Approve</button>` : ""}
+            ${status !== "Pending" ? `<button type="button" class="btn secondary small" data-user-action="status" data-status="Pending" data-id="${id}">Set Pending</button>` : ""}
+            ${status !== "Rejected" ? `<button type="button" class="btn bad small" data-user-action="status" data-status="Rejected" data-id="${id}">Reject</button>` : ""}
+            ${status !== "Disabled" ? `<button type="button" class="btn secondary small" data-user-action="status" data-status="Disabled" data-id="${id}">Disable</button>` : ""}
+            <button type="button" class="btn small reset-action" data-user-action="reset" data-id="${id}">Reset Password</button>
           </div>
-          <p>📍 ${escapeHTML(item.location || "Not specified")}</p>
-          <p>📅 ${escapeHTML(formatDisplayDate(item.date))}</p>
-          ${workflowNoteHTML(item)}
-          <div class="card-btn-wrap">
-            <button class="primary-btn card-btn" type="button" data-action="details" data-id="${id}">More information</button>
-          </div>
-        </div>
-      </article>`;
+        </details>
+      </td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="6" class="empty">${users.length ? "No accounts match your filters." : "No users loaded."}</td></tr>`;
+}
+["userSearch", "userStatusFilter", "userTypeFilter"].forEach(id => $(id).addEventListener("input", renderUsers));
+
+// Messages go to the notice box of the page the admin is currently on.
+const noticeFor = button => (button.closest("#approvals") ? "approvalsNotice" : "usersNotice");
+
+async function runUserAction(button) {
+  const id = button.dataset.id;
+  const noticeId = noticeFor(button);
+  if (!id) { showNotice(noticeId, "This account has no ID in the backend response."); return; }
+
+  if (button.dataset.userAction === "reset") {
+    openPasswordModal(id, noticeId);
+    return;
   }
 
-  function renderItems() {
-    updateDashboardStats();
-
-    const query = $("searchInput").value.trim().toLowerCase();
-    const category = $("categoryFilter").value;
-    const status = $("statusFilter").value;
-
-    const filtered = allItems.filter(item => {
-      if (myReportsMode) {
-        if (!item.isOwner) return false;
-        if (myReportStatus && getItemType(item) !== myReportStatus) return false;
-      }
-
-      const searchable = [
-        getItemName(item), item.category, item.description, item.location,
-        item.course, item.department, item.batch, item.semester,
-        item.designation, item.studentName
-      ].join(" ").toLowerCase();
-
-      return (!query || searchable.includes(query)) &&
-        (!category || item.category === category) &&
-        (!status || getItemType(item) === status);
+  const status = button.dataset.status;
+  if (!confirm(`Set this account status to "${status}"?`)) return;
+  const original = button.textContent;
+  button.disabled = true;
+  button.textContent = "Working...";
+  clearNotice(noticeId);
+  try {
+    const result = await api(`/api/auth/admin/users/${encodeURIComponent(id)}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ accountStatus: status })
     });
-
-    $("itemsContainer").innerHTML = filtered.length
-      ? filtered.map(cardHTML).join("")
-      : `<div class="empty-state">${myReportsMode ? "You have not posted any reports yet." : "No reports found."}</div>`;
+    await fetchUsers();
+    renderAll();
+    showNotice(noticeId, result.message || `Account status changed to ${status}.`, "success");
+  } catch (error) {
+    showNotice(noticeId, `Action failed: ${error.message}`);
+    button.disabled = false;
+    button.textContent = original;
   }
-
-  /* ---------- filters / tabs ---------- */
-  function setListingsTitle(text) {
-    $("listingsTitle").innerHTML = `${text} <span aria-hidden="true" class="title-switch-icon">↔</span>`;
-  }
-
-  function openMyReports() {
-    closeProfileMenu();
-    myReportsMode = true;
-    myReportStatus = "";
-    setListingsTitle("My reports");
-    $("publicFeedTabs").style.display = "none";
-    $("myReportTabs").style.display = "flex";
-    document.querySelectorAll("[data-my-report-filter]").forEach(button => {
-      button.classList.toggle("active", button.dataset.myReportFilter === "");
-    });
-    renderItems();
-    $("itemsContainer").scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function showAllReports() {
-    myReportsMode = false;
-    myReportStatus = "";
-    setListingsTitle("Campus item listings");
-    $("publicFeedTabs").style.display = "flex";
-    $("myReportTabs").style.display = "none";
-    renderItems();
-  }
-
-  function toggleReportsView() {
-    if (myReportsMode) showAllReports();
-    else if (!isLoggedIn()) openAuth();
-    else openMyReports();
-  }
-
-  $("listingsTitle").addEventListener("click", toggleReportsView);
-  $("listingsTitle").addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      toggleReportsView();
-    }
+}
+// One handler for the Users table and both pending-account tables on the Approvals page.
+["usersList", "pendingStudentsList", "pendingFacultyList"].forEach(id => {
+  $(id).addEventListener("click", async event => {
+    const button = event.target.closest("[data-user-action]");
+    if (!button) return;
+    const panel = button.closest(".user-actions-details");
+    if (panel) panel.open = false;
+    await runUserAction(button);
   });
+});
 
-  document.querySelectorAll("[data-my-report-filter]").forEach(button => {
-    button.addEventListener("click", () => {
-      myReportStatus = button.dataset.myReportFilter;
-      document.querySelectorAll("[data-my-report-filter]").forEach(option => {
-        option.classList.toggle("active", option === button);
-      });
-      renderItems();
-    });
-  });
-
-  function syncStatusFilter(selected) {
-    $("statusFilter").value = selected;
-    document.querySelectorAll("[data-status-filter]").forEach(option => {
-      option.classList.toggle("active", option.dataset.statusFilter === selected);
-    });
+/* ---------- reset password popup ---------- */
+function openPasswordModal(id, noticeId) {
+  pwTarget = { id, noticeId };
+  $("pwInput").value = "";
+  clearNotice("pwNotice");
+  $("pwModal").classList.remove("hidden");
+  $("pwInput").focus();
+}
+function closePasswordModal() {
+  $("pwModal").classList.add("hidden");
+  $("pwInput").value = "";
+}
+$("pwCancel").addEventListener("click", closePasswordModal);
+$("pwModal").addEventListener("click", event => { if (event.target === $("pwModal")) closePasswordModal(); });
+$("pwForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const newPassword = $("pwInput").value;
+  if (newPassword.length < 8 || newPassword.length > 128) {
+    showNotice("pwNotice", "Password must be 8–128 characters long.");
+    return;
   }
-
-  document.querySelectorAll("[data-status-filter]").forEach(button => {
-    button.addEventListener("click", () => {
-      syncStatusFilter(button.dataset.statusFilter);
-      showAllReports();
+  $("pwSubmit").disabled = true;
+  try {
+    const result = await api(`/api/auth/admin/users/${encodeURIComponent(pwTarget.id)}/password`, {
+      method: "PATCH",
+      body: JSON.stringify({ newPassword })
     });
+    closePasswordModal();
+    showNotice(pwTarget.noticeId, result.message || "Password reset completed. Share it privately.", "success");
+  } catch (error) {
+    showNotice("pwNotice", error.message);
+  } finally {
+    $("pwSubmit").disabled = false;
+  }
+});
+
+/* ================= CREATE ACCOUNT ================= */
+$("createForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  clearNotice("createNotice");
+  const payload = Object.fromEntries(new FormData(form).entries());
+  $("createBtn").disabled = true;
+  try {
+    const result = await api("/api/auth/admin/users", { method: "POST", body: JSON.stringify(payload) });
+    form.reset();
+    await refreshAll();
+    showNotice("createNotice", result.message || "Account created successfully.", "success");
+  } catch (error) {
+    showNotice("createNotice", "Could not create account: " + error.message);
+  } finally {
+    $("createBtn").disabled = false;
+  }
+});
+
+/* ================= REPORTS (items) ================= */
+function reportCell(item) {
+  return `<div class="report-cell">${thumbHTML(item)}<div><b>${escapeHTML(itemTitle(item))}</b><br><span class="muted clamp">${escapeHTML(item.description || "")}</span></div></div>`;
+}
+function itemStatusBadges(item) {
+  return statusBadge(reviewStatus(item)) + (isReturned(item) ? statusBadge("Returned") : "");
+}
+
+function renderItems() {
+  const query = $("itemSearch").value.trim().toLowerCase();
+  const typeFilter = $("itemTypeFilter").value;
+  const statusFilter = $("itemStatusFilter").value;
+  const filtered = items.filter(item => {
+    const searchable = [itemTitle(item), item.category, item.location, item.description, item.studentName].join(" ").toLowerCase();
+    const typeOk = !typeFilter || (typeFilter === "returned" ? isReturned(item) : itemType(item) === typeFilter);
+    return searchable.includes(query) && typeOk && (!statusFilter || reviewStatus(item) === statusFilter);
   });
+  $("itemsList").innerHTML = filtered.map(item => {
+    const id = escapeHTML(itemId(item));
+    const status = reviewStatus(item);
+    return `<tr>
+      <td>${reportCell(item)}</td>
+      <td>${escapeHTML(item.type || "—")}</td>
+      <td>${escapeHTML(item.category || "—")}<br>${escapeHTML(item.location || "—")}</td>
+      <td>${dateText(item.createdAt)}<br><span class="muted">Item date: ${escapeHTML(item.date || "—")}</span></td>
+      <td>${itemStatusBadges(item)}</td>
+      <td><div class="actions">
+        <button class="btn small" data-view-item="${id}">View</button>
+        ${status !== "Approved" ? `<button class="btn good small" data-item-action="Approved" data-id="${id}">Approve</button>` : ""}
+        ${status !== "Rejected" ? `<button class="btn bad small" data-item-action="Rejected" data-id="${id}">Reject</button>` : ""}
+        <button class="btn secondary small" data-item-action="delete" data-id="${id}">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6" class="empty">No matching reports.</td></tr>`;
+}
+["itemSearch", "itemTypeFilter", "itemStatusFilter"].forEach(id => $(id).addEventListener("input", renderItems));
 
-  $("statusFilter").addEventListener("change", event => {
-    syncStatusFilter(event.target.value);
-    renderItems();
+// Approve / reject / delete a report (used by the tables and by the report popup).
+async function reviewOrDeleteItem(id, action, noticeId) {
+  if (!id) { showNotice(noticeId, "This report has no ID in the backend response."); return false; }
+  const isDelete = action === "delete";
+  const question = isDelete ? "Delete this report permanently? This cannot be undone." : `Set report review status to ${action}?`;
+  if (!confirm(question)) return false;
+  try {
+    const path = `/api/items/admin/${encodeURIComponent(id)}`;
+    const result = await api(isDelete ? path : `${path}/review`, isDelete
+      ? { method: "DELETE" }
+      : { method: "PATCH", body: JSON.stringify({ reviewStatus: action }) });
+    await refreshAll();
+    showNotice(noticeId, result.message || "Report updated successfully.", "success");
+    return true;
+  } catch (error) {
+    showNotice(noticeId, "Report action failed: " + error.message);
+    return false;
+  }
+}
+
+function attachItemHandlers(containerId, noticeId) {
+  $(containerId).addEventListener("click", async event => {
+    const viewButton = event.target.closest("[data-view-item]");
+    if (viewButton) { openAdminView(viewButton.dataset.viewItem); return; }
+    const button = event.target.closest("[data-item-action]");
+    if (!button) return;
+    button.disabled = true;
+    await reviewOrDeleteItem(button.dataset.id, button.dataset.itemAction, noticeId);
+    button.disabled = false;
   });
+}
+attachItemHandlers("itemsList", "itemsNotice");
+attachItemHandlers("pendingItemsList", "approvalsNotice");
 
-  $("searchInput").addEventListener("input", renderItems);
-  $("categoryFilter").addEventListener("change", renderItems);
+/* ================= APPROVALS ================= */
+function approvalUserRows(list) {
+  if (!list.length) return `<tr><td colspan="5" class="empty">No pending accounts.</td></tr>`;
+  return list.map(user => {
+    const id = escapeHTML(userId(user));
+    return `<tr>
+      <td><b>${escapeHTML(user.name || "Unnamed")}</b></td>
+      <td>${escapeHTML(user.email || "—")}</td>
+      <td>${escapeHTML(user.phone || "—")}</td>
+      <td>${dateText(user.createdAt)}</td>
+      <td><div class="actions">
+        <button class="btn good small" data-user-action="status" data-status="Approved" data-id="${id}">Approve</button>
+        <button class="btn bad small" data-user-action="status" data-status="Rejected" data-id="${id}">Reject</button>
+      </div></td>
+    </tr>`;
+  }).join("");
+}
+function renderApprovals() {
+  const pendingOf = type => users.filter(user => accountType(user).toLowerCase() === type && accountStatus(user) === "Pending");
+  const pendingStudents = pendingOf("student");
+  const pendingFaculty = pendingOf("faculty");
+  const pendingItems = items.filter(item => reviewStatus(item) === "Pending");
+  $("pendingStudentCount").textContent = `${pendingStudents.length} pending`;
+  $("pendingFacultyCount").textContent = `${pendingFaculty.length} pending`;
+  $("pendingItemCount").textContent = `${pendingItems.length} pending`;
+  $("pendingStudentsList").innerHTML = approvalUserRows(pendingStudents);
+  $("pendingFacultyList").innerHTML = approvalUserRows(pendingFaculty);
+  $("pendingItemsList").innerHTML = pendingItems.length ? pendingItems.map(item => {
+    const id = escapeHTML(itemId(item));
+    return `<tr>
+      <td>${reportCell(item)}</td>
+      <td>${escapeHTML(item.type || "—")}</td>
+      <td>${escapeHTML(item.category || "—")}<br>${escapeHTML(item.location || "—")}</td>
+      <td>${escapeHTML(item.studentName || "—")}<br><span class="muted">${escapeHTML(item.reporterEmail || "")}</span></td>
+      <td><div class="actions">
+        <button class="btn small" data-view-item="${id}">View</button>
+        <button class="btn good small" data-item-action="Approved" data-id="${id}">Approve</button>
+        <button class="btn bad small" data-item-action="Rejected" data-id="${id}">Reject</button>
+      </div></td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="5" class="empty">No pending reports.</td></tr>`;
+}
 
-  document.querySelectorAll("[data-zone]").forEach(button => {
-    button.addEventListener("click", () => {
-      $("searchInput").value = button.dataset.zone;
-      renderItems();
-    });
-  });
+function renderReports() {
+  $("allReportsList").innerHTML = items.map(item => `<tr>
+    <td>${escapeHTML(itemTitle(item))}</td>
+    <td>${escapeHTML(item.type || "—")}</td>
+    <td>${escapeHTML(item.category || "—")}</td>
+    <td>${dateText(item.createdAt)}</td>
+    <td>${itemStatusBadges(item)}</td>
+  </tr>`).join("") || `<tr><td colspan="5" class="empty">No reports found.</td></tr>`;
+}
 
-  /* ================= PHOTO GALLERY =================
-     One big photo, small photos below. Click a small photo to switch,
-     click the big photo to zoom in / out (move the mouse or finger to look around). */
-  function createGallery(images, startIndex = 0) {
-    const root = document.createElement("div");
-    const list = (images || []).map(safeImage).filter(Boolean);
+function updateNotificationUI() {
+  const pendingOf = type => users.filter(user => accountType(user).toLowerCase() === type && accountStatus(user) === "Pending").length;
+  const pendingStudents = pendingOf("student");
+  const pendingFaculty = pendingOf("faculty");
+  const pendingItems = items.filter(item => reviewStatus(item) === "Pending").length;
+  const total = pendingStudents + pendingFaculty + pendingItems;
+  $("pendingStudentNotice").textContent = pendingStudents;
+  $("pendingFacultyNotice").textContent = pendingFaculty;
+  $("pendingItemNotice").textContent = pendingItems;
+  $("notificationCount").textContent = total;
+  $("approvalBadge").textContent = total;
+  $("notificationSummary").textContent = total ? `${total} item(s) need review` : "You're all caught up";
+}
 
-    if (!list.length) {
-      root.className = "gallery-empty";
-      root.textContent = "No photos were added to this report.";
-      return root;
-    }
+/* ================= TOP SEARCH ================= */
+function renderSearchResults() {
+  const q = $("globalSearch").value.trim().toLowerCase();
+  const box = $("searchResults");
+  if (q.length < 2) { box.classList.add("hidden"); box.innerHTML = ""; return; }
+  const foundUsers = users.filter(u => [u.name, u.email, u.phone].join(" ").toLowerCase().includes(q)).slice(0, 5);
+  const foundItems = items.filter(i => [itemTitle(i), i.category, i.location, i.studentName, i.reporterEmail].join(" ").toLowerCase().includes(q)).slice(0, 5);
+  let html = "";
+  if (foundUsers.length) {
+    html += "<h4>Users</h4>" + foundUsers.map(u =>
+      `<button type="button" data-search-user="${escapeHTML(u.email || "")}">${escapeHTML(u.name || "Unnamed")}<small>${escapeHTML(u.email || "")} · ${escapeHTML(accountType(u))}</small></button>`).join("");
+  }
+  if (foundItems.length) {
+    html += "<h4>Reports</h4>" + foundItems.map(i =>
+      `<button type="button" data-search-item="${escapeHTML(itemId(i))}">${escapeHTML(itemTitle(i))}<small>${escapeHTML(i.type || "")} · ${escapeHTML(i.category || "")} · ${escapeHTML(i.location || "")}</small></button>`).join("");
+  }
+  box.innerHTML = html || `<div class="none">No users or reports match "${escapeHTML($("globalSearch").value.trim())}".</div>`;
+  box.classList.remove("hidden");
+}
+$("globalSearch").addEventListener("input", renderSearchResults);
+$("globalSearch").addEventListener("focus", renderSearchResults);
+$("searchResults").addEventListener("click", event => {
+  const userButton = event.target.closest("[data-search-user]");
+  const itemButton = event.target.closest("[data-search-item]");
+  if (userButton) {
+    goTo("users");
+    $("userSearch").value = userButton.dataset.searchUser;
+    renderUsers();
+  } else if (itemButton) {
+    openAdminView(itemButton.dataset.searchItem);
+  } else {
+    return;
+  }
+  $("globalSearch").value = "";
+  $("searchResults").classList.add("hidden");
+});
 
-    root.className = "gallery";
-    root.innerHTML = `
-      <div class="gallery-stage">
-        <button type="button" class="gallery-nav prev" aria-label="Previous photo">‹</button>
-        <img class="gallery-main" alt="Item photo">
-        <button type="button" class="gallery-nav next" aria-label="Next photo">›</button>
-        <span class="gallery-counter"></span>
-      </div>
-      <p class="gallery-hint">Click the photo to zoom in / out</p>
-      <div class="gallery-thumbs"></div>`;
-
-    const stage = root.querySelector(".gallery-stage");
-    const main = root.querySelector(".gallery-main");
-    const counter = root.querySelector(".gallery-counter");
-    const thumbsBox = root.querySelector(".gallery-thumbs");
-    let index = 0;
-    let zoomed = false;
-
-    function setOrigin(point) {
-      const rect = stage.getBoundingClientRect();
-      const x = Math.min(100, Math.max(0, ((point.clientX - rect.left) / rect.width) * 100));
-      const y = Math.min(100, Math.max(0, ((point.clientY - rect.top) / rect.height) * 100));
-      main.style.transformOrigin = `${x}% ${y}%`;
-    }
-
-    function setZoom(on, point) {
-      zoomed = on;
-      stage.classList.toggle("zoomed", on);
-      if (on && point) setOrigin(point);
-      main.style.transform = on ? "scale(2.4)" : "scale(1)";
-    }
-
-    const thumbs = list.map((src, i) => {
-      const button = document.createElement("button");
-      const img = document.createElement("img");
-      button.type = "button";
-      button.className = "gallery-thumb";
-      button.setAttribute("aria-label", `Photo ${i + 1}`);
-      img.src = src;
-      img.alt = "";
-      button.appendChild(img);
-      button.addEventListener("click", () => show(i));
-      thumbsBox.appendChild(button);
-      return button;
-    });
-
-    function show(i) {
-      index = (i + list.length) % list.length;
-      setZoom(false);
-      main.src = list[index];
-      counter.textContent = `${index + 1} / ${list.length}`;
-      thumbs.forEach((thumb, n) => thumb.classList.toggle("active", n === index));
-      thumbs[index].scrollIntoView({ block: "nearest", inline: "center" });
-    }
-
-    main.addEventListener("click", event => setZoom(!zoomed, event));
-    stage.addEventListener("mousemove", event => { if (zoomed) setOrigin(event); });
-    stage.addEventListener("touchmove", event => {
-      if (zoomed && event.touches[0]) setOrigin(event.touches[0]);
-    }, { passive: true });
-    root.querySelector(".prev").addEventListener("click", () => show(index - 1));
-    root.querySelector(".next").addEventListener("click", () => show(index + 1));
-
-    if (list.length === 1) {
-      root.querySelectorAll(".gallery-nav").forEach(button => { button.style.display = "none"; });
-      thumbsBox.style.display = "none";
-    }
-
-    root.step = delta => show(index + delta);
-    show(Math.min(startIndex, list.length - 1));
+/* ================= PHOTO GALLERY (1 big photo + small photos below) ================= */
+function createGallery(images, startIndex = 0) {
+  const root = document.createElement("div");
+  const list = (images || []).map(safeImage).filter(Boolean);
+  if (!list.length) {
+    root.className = "gallery-empty";
+    root.textContent = "No photos were added to this report.";
     return root;
   }
+  root.className = "gallery";
+  root.innerHTML = `
+    <div class="gallery-stage">
+      <button type="button" class="gallery-nav prev" aria-label="Previous photo">‹</button>
+      <img class="gallery-main" alt="Report photo">
+      <button type="button" class="gallery-nav next" aria-label="Next photo">›</button>
+      <span class="gallery-counter"></span>
+    </div>
+    <p class="gallery-hint">Click the photo to zoom in / out</p>
+    <div class="gallery-thumbs"></div>`;
+  const stage = root.querySelector(".gallery-stage");
+  const main = root.querySelector(".gallery-main");
+  const counter = root.querySelector(".gallery-counter");
+  const thumbsBox = root.querySelector(".gallery-thumbs");
+  let index = 0;
+  let zoomed = false;
 
-  async function fetchFullItem(id) {
-    if (fullItemCache.has(id)) return fullItemCache.get(id);
-    const item = await apiRequest(`/api/items/${encodeURIComponent(id)}`);
-    fullItemCache.set(id, item);
-    return item;
+  function setOrigin(point) {
+    const rect = stage.getBoundingClientRect();
+    const x = Math.min(100, Math.max(0, ((point.clientX - rect.left) / rect.width) * 100));
+    const y = Math.min(100, Math.max(0, ((point.clientY - rect.top) / rect.height) * 100));
+    main.style.transformOrigin = `${x}% ${y}%`;
   }
-
-  /* ---------- click on a card photo ---------- */
-  async function openPhotoViewer(id) {
-    const card = allItems.find(item => String(getItemId(item)) === String(id));
-    $("photoTitle").textContent = card ? getItemName(card) : "Photos";
-    $("photoSub").textContent = card ? `${getItemType(card)} · ${card.location || ""}` : "";
-    $("photoBody").innerHTML = '<p class="muted" style="text-align:center;padding:30px">Loading photos...</p>';
-    openModal("photoModal");
-
-    try {
-      const full = await fetchFullItem(id);
-      if (!$("photoModal").classList.contains("active")) return;
-      $("photoBody").replaceChildren(createGallery(full.images));
-    } catch (error) {
-      $("photoBody").innerHTML = `<div class="empty-state">${escapeHTML(error.message)}</div>`;
-    }
+  function setZoom(on, point) {
+    zoomed = on;
+    stage.classList.toggle("zoomed", on);
+    if (on && point) setOrigin(point);
+    main.style.transform = on ? "scale(2.4)" : "scale(1)";
   }
-
-  /* ================= MORE INFORMATION (details box) ================= */
-  function infoRows(rows) {
-    return rows
-      .filter(([, value]) => value)
-      .map(([label, value]) => `<div class="info-row"><dt>${escapeHTML(label)}</dt><dd>${escapeHTML(value)}</dd></div>`)
-      .join("");
+  const thumbs = list.map((src, i) => {
+    const button = document.createElement("button");
+    const img = document.createElement("img");
+    button.type = "button";
+    button.className = "gallery-thumb";
+    button.setAttribute("aria-label", `Photo ${i + 1}`);
+    img.src = src;
+    img.alt = "";
+    button.appendChild(img);
+    button.addEventListener("click", () => show(i));
+    thumbsBox.appendChild(button);
+    return button;
+  });
+  function show(i) {
+    index = (i + list.length) % list.length;
+    setZoom(false);
+    main.src = list[index];
+    counter.textContent = `${index + 1} / ${list.length}`;
+    thumbs.forEach((thumb, n) => thumb.classList.toggle("active", n === index));
+    thumbs[index].scrollIntoView({ block: "nearest", inline: "center" });
   }
-
-  function contactHTML(item) {
-    const contact = item.contact;
-
-    if (!contact) {
-      return item.isOwner
-        ? '<p class="muted">This is your own report.</p>'
-        : '<p class="muted">Contact details are not available (the report is closed).</p>';
-    }
-
-    const email = contact.studentContact || "";
-    const phone = contact.studentPhone || "";
-    const phoneDigits = phone.replace(/[^\d+]/g, "");
-
-    const rows = infoRows([["Name", contact.studentName], ["Email", email], ["Phone", phone]]);
-    const buttons = [
-      email ? `<a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}" target="_blank" rel="noopener noreferrer">✉ Email</a>` : "",
-      phoneDigits ? `<a class="alt" href="tel:${escapeHTML(phoneDigits)}">📞 Call</a>` : ""
-    ].join("");
-
-    return `<dl>${rows}</dl>${buttons ? `<div class="contact-actions" style="margin-top:8px">${buttons}</div>` : '<p class="muted">No contact details available.</p>'}`;
+  main.addEventListener("click", event => setZoom(!zoomed, event));
+  stage.addEventListener("mousemove", event => { if (zoomed) setOrigin(event); });
+  stage.addEventListener("touchmove", event => { if (zoomed && event.touches[0]) setOrigin(event.touches[0]); }, { passive: true });
+  root.querySelector(".prev").addEventListener("click", () => show(index - 1));
+  root.querySelector(".next").addEventListener("click", () => show(index + 1));
+  if (list.length === 1) {
+    root.querySelectorAll(".gallery-nav").forEach(button => { button.style.display = "none"; });
+    thumbsBox.style.display = "none";
   }
+  root.step = delta => show(index + delta);
+  show(Math.min(startIndex, list.length - 1));
+  return root;
+}
 
-  function renderDetails(item) {
-    const id = escapeHTML(getItemId(item));
-    const type = getItemType(item);
-    const review = item.reviewStatus || "Approved";
-    const open = (item.resolutionStatus || "Open") === "Open";
-    const faculty = item.reporterRole === "Faculty";
+/* ================= REPORT VIEW POPUP ================= */
+function infoRows(rows) {
+  return rows.filter(([, value]) => value)
+    .map(([label, value]) => `<div class="info-row"><dt>${escapeHTML(label)}</dt><dd>${escapeHTML(value)}</dd></div>`).join("");
+}
+function closeViewModal() {
+  $("viewModal").classList.add("hidden");
+  $("viewBox").innerHTML = "";
+}
+function viewHead(title, extra = "") {
+  return `<div class="view-head"><div>${extra}<h2>${escapeHTML(title)}</h2></div>
+    <button type="button" class="view-close" id="viewCloseBtn" aria-label="Close">✕</button></div>`;
+}
 
-    const reporterRows = faculty
-      ? [["Name", item.studentName], ["Role", "Faculty"], ["Designation", item.designation], ["Department", item.department]]
-      : [["Name", item.studentName], ["Role", "Student"], ["Course", item.course], ["Department", item.department], ["Batch", item.batch], ["Semester", item.semester]];
+async function openAdminView(id) {
+  $("viewBox").innerHTML = viewHead("Loading...") + '<div class="view-pad muted">Loading report details...</div>';
+  $("viewModal").classList.remove("hidden");
+  closeDropdowns();
+  try {
+    const item = await api(`/api/items/admin/${encodeURIComponent(id)}`);
+    if ($("viewModal").classList.contains("hidden")) return;
+    renderAdminView(item);
+  } catch (error) {
+    $("viewBox").innerHTML = viewHead("Could not load") + `<div class="view-pad"><div class="notice show error">${escapeHTML(error.message)}</div></div>`;
+  }
+}
 
-    const ownerButtons = item.isOwner
-      ? `<div class="info-card"><h4>Manage your report</h4><div class="detail-actions">
-           ${review === "Approved" && open ? `<button class="secondary-btn" type="button" data-detail-action="resolve" data-id="${id}">✔ Mark returned</button>` : ""}
-           <button class="danger-btn" type="button" data-detail-action="delete" data-id="${id}">🗑 Delete report</button>
-         </div></div>`
-      : "";
+function renderAdminView(item) {
+  const id = escapeHTML(itemId(item));
+  const review = reviewStatus(item);
+  const reporter = item.reporter || {};
+  const faculty = (reporter.accountType || item.reporterRole) === "Faculty";
+  const reporterRows = faculty
+    ? [["Name", reporter.name || item.studentName], ["Role", "Faculty"], ["Designation", item.designation], ["Department", item.department], ["Email", reporter.email], ["Phone", reporter.phone]]
+    : [["Name", reporter.name || item.studentName], ["Role", "Student"], ["Course", item.course], ["Department", item.department], ["Batch", item.batch], ["Semester", item.semester], ["Email", reporter.email], ["Phone", reporter.phone]];
 
-    $("detailBox").innerHTML = `
-      <div class="detail-head">
-        <div>
-          <span class="status ${type}">${type}</span>
-          <h2>${escapeHTML(getItemName(item))}</h2>
-          <p>📍 ${escapeHTML(item.location || "Not specified")} · 📅 ${escapeHTML(formatDisplayDate(item.date))}</p>
-        </div>
-        <button type="button" class="detail-close" data-close="detailModal" aria-label="Close">✕</button>
+  $("viewBox").innerHTML = `
+    ${viewHead(itemTitle(item), statusBadge(item.type) + itemStatusBadges(item))}
+    <div class="view-grid">
+      <div id="viewGallery"></div>
+      <div>
+        <section class="info-card"><h4>Report details</h4><dl>${infoRows([
+          ["Type", item.type], ["Category", item.category], ["Location", item.location],
+          ["Item date", item.date], ["Posted on", dateText(item.createdAt)],
+          ["Review status", review], ["Reviewed on", item.reviewedAt ? dateText(item.reviewedAt) : ""],
+          ["Returned", isReturned(item) ? `Yes (${dateText(item.returnedAt)})` : "No"]
+        ])}</dl></section>
+        <section class="info-card"><h4>Description</h4><p class="info-desc">${escapeHTML(item.description || "—")}</p></section>
+        <section class="info-card"><h4>Reported by</h4><dl>${infoRows(reporterRows)}</dl></section>
       </div>
-      <div class="detail-grid">
-        <div id="detailGallery"></div>
-        <div>
-          ${workflowNoteHTML(item)}
-          <section class="info-card"><h4>Item details</h4><dl>${infoRows([
-            ["Item", getItemName(item)], ["Status", type], ["Category", item.category],
-            ["Location", item.location], ["Date", formatDisplayDate(item.date)],
-            ["Report", review === "Approved" ? (open ? "Open" : "Returned") : review]
-          ])}</dl></section>
-          <section class="info-card"><h4>Description</h4><p class="info-desc">${escapeHTML(orNotProvided(item.description))}</p></section>
-          <section class="info-card"><h4>Reported by</h4><dl>${infoRows(reporterRows)}</dl></section>
-          <section class="info-card"><h4>Contact</h4>${contactHTML(item)}</section>
-          ${ownerButtons}
-        </div>
-      </div>`;
+    </div>
+    <div class="view-foot">
+      ${review !== "Approved" ? `<button class="btn good" data-item-action="Approved" data-id="${id}">Approve</button>` : ""}
+      ${review !== "Rejected" ? `<button class="btn bad" data-item-action="Rejected" data-id="${id}">Reject</button>` : ""}
+      <button class="btn secondary" data-item-action="delete" data-id="${id}">Delete</button>
+    </div>`;
+  $("viewGallery").replaceChildren(createGallery(item.images));
+}
 
-    $("detailGallery").replaceChildren(createGallery(item.images));
+$("viewBox").addEventListener("click", async event => {
+  if (event.target.closest("#viewCloseBtn")) { closeViewModal(); return; }
+  const button = event.target.closest("[data-item-action]");
+  if (!button) return;
+  button.disabled = true;
+  const done = await reviewOrDeleteItem(button.dataset.id, button.dataset.itemAction, "globalNotice");
+  if (done) closeViewModal();
+  else button.disabled = false;
+});
+$("viewModal").addEventListener("click", event => { if (event.target === $("viewModal")) closeViewModal(); });
+
+document.addEventListener("keydown", event => {
+  const viewOpen = !$("viewModal").classList.contains("hidden");
+  if (event.key === "Escape") {
+    if (!$("pwModal").classList.contains("hidden")) closePasswordModal();
+    else if (viewOpen) closeViewModal();
+    else closeDropdowns();
+  } else if (viewOpen && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+    const gallery = $("viewBox").querySelector(".gallery");
+    if (gallery) gallery.step(event.key === "ArrowLeft" ? -1 : 1);
   }
+});
 
-  async function openDetails(id) {
-    $("detailBox").innerHTML = `
-      <div class="detail-head"><div><h2>Loading...</h2></div>
-        <button type="button" class="detail-close" data-close="detailModal" aria-label="Close">✕</button></div>
-      <div class="detail-body-pad"><p class="muted">Loading full report information...</p></div>`;
-    openModal("detailModal");
-
-    try {
-      const item = await fetchFullItem(id);
-      if (!$("detailModal").classList.contains("active")) return;
-      renderDetails(item);
-    } catch (error) {
-      $("detailBox").innerHTML = `
-        <div class="detail-head"><div><h2>Could not load</h2></div>
-          <button type="button" class="detail-close" data-close="detailModal" aria-label="Close">✕</button></div>
-        <div class="detail-body-pad"><div class="empty-state">${escapeHTML(error.message)}</div></div>`;
-    }
+/* ================= START ================= */
+function start() {
+  if (!token || !adminUser?.isAdmin) {
+    showLogin();
+    return;
   }
-
-  $("itemsContainer").addEventListener("click", event => {
-    const button = event.target.closest("[data-action]");
-    if (!button) return;
-    if (button.dataset.action === "photos") openPhotoViewer(button.dataset.id);
-    if (button.dataset.action === "details") openDetails(button.dataset.id);
-  });
-
-  $("detailBox").addEventListener("click", async event => {
-    const button = event.target.closest("[data-detail-action]");
-    if (!button) return;
-    if (button.dataset.detailAction === "delete") await deleteItem(button.dataset.id);
-    if (button.dataset.detailAction === "resolve") await markReturned(button.dataset.id);
-  });
-
-  async function deleteItem(id) {
-    if (!confirm("Are you sure you want to delete this report?")) return;
-
-    try {
-      await apiRequest(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
-      closeModal("detailModal");
-      await loadItemsFromDatabase();
-      alert("Report deleted.");
-    } catch (error) {
-      alert(error.message || "Could not delete this report.");
-    }
-  }
-
-  async function markReturned(id) {
-    if (!confirm("Has this item been returned to its owner?")) return;
-
-    try {
-      await apiRequest(`/api/items/${encodeURIComponent(id)}/resolve`, { method: "PATCH" });
-      closeModal("detailModal");
-      await loadItemsFromDatabase();
-      alert("Report marked as returned.");
-    } catch (error) {
-      alert(error.message || "Could not update this report.");
-    }
-  }
-
-  /* ================= REPORT FORM ================= */
-  function localDateString() {
-    const now = new Date();
-    return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-  }
-
-  function setReportType(status) {
-    const selected = status === "Found" ? "Found" : "Lost";
-    $("itemStatus").value = selected;
-    $("reportTitle").textContent = selected === "Lost" ? "Report a Lost Item" : "Report a Found Item";
-
-    document.querySelectorAll(".type-option").forEach(button => {
-      const active = button.dataset.itemType === selected;
-      button.classList.toggle("active", active);
-      button.setAttribute("aria-pressed", String(active));
-    });
-  }
-
-  document.querySelectorAll(".type-option").forEach(button => {
-    button.addEventListener("click", () => setReportType(button.dataset.itemType));
-  });
-
-  // Students fill Course / Batch / Semester. Faculty fill Designation.
-  function applyRoleFields() {
-    const faculty = getRole() === "Faculty";
-    $("reporterNameLabel").textContent = faculty ? "Faculty name *" : "Student name *";
-    ["courseGroup", "batchGroup", "semesterGroup"].forEach(id => { $(id).style.display = faculty ? "none" : ""; });
-    $("designationGroup").style.display = faculty ? "" : "none";
-    $("studentCourse").required = !faculty;
-    $("studentBatch").required = !faculty;
-    $("studentSemester").required = !faculty;
-    $("facultyDesignation").required = faculty;
-  }
-
-  function openReport(status) {
-    if (!isLoggedIn()) { openAuth(); return; }
-
-    $("reportForm").reset();
-    photos = [];
-    renderPhotoTiles();
-    setReportType(status);
-
-    const today = localDateString();
-    $("itemDate").max = today;
-    $("itemDate").value = today;
-    $("studentName").value = getCurrentUser()?.name || "";
-    applyRoleFields();
-
-    clearMessage("reportMessage");
-    openModal("reportModal");
-  }
-
-  /* ---------- photo picker (photos are shrunk in the browser before upload) ---------- */
-  function loadImageElement(file) {
-    return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`${file.name} could not be read as a photo.`)); };
-      img.src = url;
-    });
-  }
-
-  function resizeToJpeg(img, maxSide, quality) {
-    const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
-    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", quality);
-  }
-
-  async function processPhoto(file) {
-    const img = await loadImageElement(file);
-    return { full: resizeToJpeg(img, 1600, 0.8), thumb: resizeToJpeg(img, 420, 0.72) };
-  }
-
-  function renderPhotoTiles() {
-    $("photoGrid").innerHTML = photos.map((photo, i) => `
-      <div class="photo-tile">
-        <img src="${photo.thumb}" alt="Photo ${i + 1}">
-        <button type="button" data-remove-photo="${i}" aria-label="Remove photo ${i + 1}">✕</button>
-        ${i === 0 ? "<span>Cover</span>" : ""}
-      </div>`).join("");
-
-    $("photoHelp").textContent = photos.length
-      ? `${photos.length} of ${MAX_PHOTOS} photos added. The first photo is the cover photo.`
-      : "No photos added. The first photo is the cover photo.";
-  }
-
-  $("photoGrid").addEventListener("click", event => {
-    const button = event.target.closest("[data-remove-photo]");
-    if (!button) return;
-    photos.splice(Number(button.dataset.removePhoto), 1);
-    renderPhotoTiles();
-  });
-
-  $("itemImage").addEventListener("change", async event => {
-    const input = event.target;
-    const files = Array.from(input.files || []);
-    input.value = "";
-    clearMessage("reportMessage");
-    if (!files.length) return;
-
-    if (photos.length + files.length > MAX_PHOTOS) {
-      showMessage("reportMessage", `You can add ${MAX_PHOTOS} photos at most (you already have ${photos.length}).`);
-      return;
-    }
-
-    for (const file of files) {
-      if (!file.type.startsWith("image/")) {
-        showMessage("reportMessage", `${file.name} is not a photo. Please select image files only.`);
-        return;
-      }
-      if (file.size > MAX_PHOTO_BYTES) {
-        showMessage("reportMessage", `${file.name} is larger than 10 MB.`);
-        return;
-      }
-    }
-
-    photoBusy = true;
-    $("reportSubmit").disabled = true;
-    $("photoHelp").textContent = "Preparing photos...";
-
-    try {
-      for (const file of files) photos.push(await processPhoto(file));
-    } catch (error) {
-      showMessage("reportMessage", error.message || "Could not prepare the photos.");
-    } finally {
-      photoBusy = false;
-      $("reportSubmit").disabled = false;
-      renderPhotoTiles();
-    }
-  });
-
-  $("reportForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    if (photoBusy) return;
-
-    const button = $("reportSubmit");
-    button.disabled = true;
-    clearMessage("reportMessage");
-
-    try {
-      await apiRequest("/api/items", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: $("itemTitle").value.trim(),
-          designation: $("facultyDesignation").value,
-          course: $("studentCourse").value.trim(),
-          department: $("studentDepartment").value.trim(),
-          batch: $("studentBatch").value.trim(),
-          semester: $("studentSemester").value,
-          category: $("itemCategory").value,
-          status: $("itemStatus").value,
-          location: $("itemLocation").value.trim(),
-          date: $("itemDate").value,
-          description: $("itemDescription").value.trim(),
-          images: photos.map(photo => photo.full),
-          thumbnail: photos[0]?.thumb || ""
-        })
-      });
-
-      closeModal("reportModal");
-      await loadItemsFromDatabase();
-      alert("Report submitted. It will appear to everyone after admin approval.");
-    } catch (error) {
-      showMessage("reportMessage", error.message || "Could not submit report.");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  /* ================= START ================= */
-  updateLoginUI();
-
-  if (isLoggedIn()) loadItemsFromDatabase();
-  else openAuth();
-  </script>
+  showApp();
+  refreshAll();
+}
+start();
+</script>
 </body>
 </html>
