@@ -1940,15 +1940,39 @@
       const reviewStatus = item.reviewStatus || "Approved";
       const resolutionStatus = item.resolutionStatus || "Open";
 
-      const imageSource =
+          const imageSource =
         typeof item.image === "string" &&
         /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(item.image)
           ? item.image
           : "";
 
+      // Exact Categories ke hisab se smart emojis logic
+      let defaultEmoji = "📦"; // Agar category "Other" ho ya match na kare toh dabba
+      const categoryName = (item.category || "").toLowerCase().trim();
+
+      if (categoryName === "bags") {
+        defaultEmoji = "🎒"; // Bags ke liye bag
+      } else if (categoryName === "books") {
+        defaultEmoji = "📚"; // Books ke liye college books
+      } else if (categoryName === "electronics") {
+        defaultEmoji = "🎧"; // Electronics ke liye headphones/gadget
+      } else if (categoryName === "id card") {
+        defaultEmoji = "🆔"; // ID Card ke liye card emoji
+      } else if (categoryName === "keys") {
+        defaultEmoji = "🔑"; // Keys ke liye chabi
+      } else if (categoryName === "clothing") {
+        defaultEmoji = "👕"; // Clothing ke liye t-shirt/kapde
+      }
+
+      // Final Render Layout: Real pic hai toh clickable link, nahi toh bada flat emoji background
       const imageHTML = imageSource
-        ? `<img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}">`
-        : '<div class="item-placeholder" aria-label="No photo">📦</div>';
+        ? `<a href="${escapeHTML(imageSource)}" target="_blank" rel="noopener noreferrer" style="cursor: zoom-in; display: block;">
+             <img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}">
+           </a>`
+        : `<div class="item-placeholder" aria-label="No photo" style="font-size: 55px; display: flex; align-items: center; justify-content: center; background: #1e293b; height: 100%; min-height: 150px; border-radius: 8px;">
+             ${defaultEmoji}
+           </div>`;
+id
 
       let workflowNote = "";
 
