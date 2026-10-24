@@ -4,103 +4,17 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const User = require("../model/User");
-const router = express.Router();
+const {
+  getAdminEmail,
+  authenticateUser,
+  authenticateAdmin
+} = require("../middleware/auth");
+const loginGuard = require("../middleware/loginGuard");
 
-function getAdminEmail() {
-  return String(process.env.ADMIN_EMAIL || "").trim().toLowerCase();
-}
+const router = express.Router();
 
 function isValidPhone(phone) {
   return !phone || /^[+0-9().\-\s]{7,30}$/.test(phone);
-}
-
-// Authenticate a logged-in user.
-async function authenticateUser(req, res, next) {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        message: "Please login first."
-      });
-    }
-
-    const token = authHeader.slice(7).trim();
-
-    if (!token || !process.env.JWT_SECRET) {
-      return res.status(401).json({
-        message: "Invalid login token. Please login again."
-      });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
-      return res.status(401).json({
-        message: "Invalid login token. Please login again."
-      });
-    }
-
-    const user = await User.findById(decoded.id).select(
-      "name email phone accountType accountStatus"
-    );
-
-    if (!user) {
-      return res.status(401).json({
-        message: "Account not found. Please login again."
-      });
-    }
-
-    const adminEmail = getAdminEmail();
-    const isAdmin =
-      Boolean(adminEmail) &&
-      user.email.toLowerCase() === adminEmail;
-
-    if (!isAdmin && user.accountStatus !== "Approved") {
-      return res.status(403).json({
-        message: "Your account is not approved or is disabled."
-      });
-    }
-
-    req.user = {
-      id: String(user._id),
-      name: user.name,
-      email: user.email,
-      phone: user.phone || "",
-      accountType: user.accountType || "Student",
-      isAdmin
-    };
-
-    return next();
-  } catch (error) {
-    if (
-      error.name === "TokenExpiredError" ||
-      error.name === "JsonWebTokenError"
-    ) {
-      return res.status(401).json({
-        message: "Invalid or expired login. Please login again."
-      });
-    }
-
-    console.error("Authentication error:", error.message);
-
-    return res.status(500).json({
-      message: "Could not verify your login."
-    });
-  }
-}
-
-// Admin-only middleware.
-function authenticateAdmin(req, res, next) {
-  return authenticateUser(req, res, () => {
-    if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({
-        message: "Administrator access required."
-      });
-    }
-
-    return next();
-  });
 }
 
 // Public registration remains disabled.
@@ -138,17 +52,26 @@ router.post("/login", async (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const guardKey = `${req.ip}|${cleanEmail}`;
+
+    if (loginGuard.isBlocked(guardKey)) {
+      return res.status(429).json({
+        message: "Too many wrong attempts. Please try again after 15 minutes."
+      });
+    }
+
     const user = await User.findOne({ email: cleanEmail });
 
     if (!user || !(await bcrypt.compare(password, user.password))) {
+      loginGuard.recordFailure(guardKey);
+
       return res.status(401).json({
         message: "Invalid email or password."
       });
     }
 
     const adminEmail = getAdminEmail();
-    const isAdmin =
-      Boolean(adminEmail) && cleanEmail === adminEmail;
+    const isAdmin = Boolean(adminEmail) && cleanEmail === adminEmail;
 
     // Verify the selected role for non-admin accounts.
     if (!isAdmin) {
@@ -174,16 +97,16 @@ router.post("/login", async (req, res) => {
           message =
             "Your account request was rejected. Contact the campus admin.";
         } else if (user.accountStatus === "Disabled") {
-          message =
-            "This account is disabled. Contact the campus admin.";
+          message = "This account is disabled. Contact the campus admin.";
         }
 
         return res.status(403).json({ message });
       }
     }
 
-    const accountType =
-      user.accountType || (isAdmin ? "Admin" : "Student");
+    loginGuard.clear(guardKey);
+
+    const accountType = user.accountType || (isAdmin ? "Admin" : "Student");
 
     const token = jwt.sign(
       {
@@ -276,8 +199,7 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
     }
 
     // Students are approved immediately; Faculty require admin approval.
-    const accountStatus =
-      accountType === "Faculty" ? "Pending" : "Approved";
+    const accountStatus = accountType === "Faculty" ? "Pending" : "Approved";
 
     const user = new User({
       name: cleanName,
@@ -325,19 +247,17 @@ router.get("/admin/users", authenticateAdmin, async (req, res) => {
     const users = await User.find({
       email: { $ne: getAdminEmail() }
     })
-      .select(
-        "name email phone accountType accountStatus createdAt"
-      )
+      .select("name email phone accountType accountStatus createdAt")
       .sort({ createdAt: -1 })
       .lean();
 
     // Older accounts without accountType are treated as Students.
-    const normalizedUsers = users.map((user) => ({
-      ...user,
-      accountType: user.accountType || "Student"
-    }));
-
-    return res.json(normalizedUsers);
+    return res.json(
+      users.map((user) => ({
+        ...user,
+        accountType: user.accountType || "Student"
+      }))
+    );
   } catch (error) {
     console.error("Load users error:", error.message);
 
@@ -354,9 +274,7 @@ router.patch(
   async (req, res) => {
     try {
       if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).json({
-          message: "Invalid account ID."
-        });
+        return res.status(400).json({ message: "Invalid account ID." });
       }
 
       const { accountStatus } = req.body || {};
@@ -377,9 +295,7 @@ router.patch(
       });
 
       if (!user) {
-        return res.status(404).json({
-          message: "Account not found."
-        });
+        return res.status(404).json({ message: "Account not found." });
       }
 
       user.accountStatus = accountStatus;
@@ -406,9 +322,7 @@ router.patch(
   async (req, res) => {
     try {
       if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).json({
-          message: "Invalid account ID."
-        });
+        return res.status(400).json({ message: "Invalid account ID." });
       }
 
       const { newPassword } = req.body || {};
@@ -429,9 +343,7 @@ router.patch(
       });
 
       if (!user) {
-        return res.status(404).json({
-          message: "Account not found."
-        });
+        return res.status(404).json({ message: "Account not found." });
       }
 
       user.password = await bcrypt.hash(newPassword, 12);
@@ -454,9 +366,7 @@ router.patch(
 router.patch("/phone", authenticateUser, async (req, res) => {
   try {
     const phone =
-      typeof req.body?.phone === "string"
-        ? req.body.phone.trim()
-        : "";
+      typeof req.body?.phone === "string" ? req.body.phone.trim() : "";
 
     if (!isValidPhone(phone)) {
       return res.status(400).json({
@@ -467,9 +377,7 @@ router.patch("/phone", authenticateUser, async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({
-        message: "User not found."
-      });
+      return res.status(404).json({ message: "User not found." });
     }
 
     user.phone = phone;
