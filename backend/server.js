@@ -26,14 +26,40 @@ if (missingSettings.length > 0) {
 
 app.disable("x-powered-by");
 
-// CORS is kept compatible with the current frontend.
-// Restrict allowed origins after confirming the exact deployed
-// frontend URL and any local development URLs, for example:
-// app.use(cors({ origin: ["https://campus-find-frontend.onrender.com"] }));
-app.use(cors());
+// Render sits behind a proxy; this makes req.ip the real visitor IP (used by the login guard).
+app.set("trust proxy", 1);
 
-// The frontend sends item images as Base64 JSON data.
-// Keep this limit aligned with the frontend's image-size validation.
+// A few basic security headers (no extra package needed).
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  next();
+});
+
+// CORS:
+// - If ALLOWED_ORIGINS is NOT set, every website can call the API (same as before).
+// - To lock it, set ALLOWED_ORIGINS on Render, comma separated, for example:
+//   https://campus-find-frontend.onrender.com,https://your-admin-site.onrender.com,http://127.0.0.1:5501
+const allowedOrigins = String(process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+
+app.use(
+  cors(
+    allowedOrigins.length
+      ? {
+          origin(origin, callback) {
+            // No origin = server-to-server or direct browser visit.
+            callback(null, !origin || allowedOrigins.includes(origin));
+          }
+        }
+      : undefined
+  )
+);
+
+// Photos are sent as Base64 JSON (up to 5 shrunk photos + 1 preview per report).
 app.use(express.json({ limit: "15mb" }));
 
 // API routes
@@ -44,7 +70,7 @@ app.use("/api/items", itemRoutes);
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "CampusFind Backend is Running",
+    message: "CampusFind Backend is Running"
   });
 });
 
@@ -52,14 +78,14 @@ app.get("/api/health", (req, res) => {
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "CampusFind API is live. Use the CampusFind website to continue.",
+    message: "CampusFind API is live. Use the CampusFind website to continue."
   });
 });
 
 // Unknown API routes return JSON instead of an HTML error page
 app.use("/api", (req, res) => {
   res.status(404).json({
-    message: "API route not found.",
+    message: "API route not found."
   });
 });
 
@@ -67,20 +93,20 @@ app.use("/api", (req, res) => {
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && err.status === 400 && "body" in err) {
     return res.status(400).json({
-      message: "Invalid JSON request body.",
+      message: "Invalid JSON request body."
     });
   }
 
   if (err.type === "entity.too.large" || err.status === 413) {
     return res.status(413).json({
-      message: "Request is too large. Please use a smaller image.",
+      message: "Request is too large. Please use fewer or smaller photos."
     });
   }
 
   console.error("Request error:", err.message);
 
   return res.status(500).json({
-    message: "An unexpected server error occurred.",
+    message: "An unexpected server error occurred."
   });
 });
 
