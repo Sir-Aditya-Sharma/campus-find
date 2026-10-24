@@ -1,123 +1,38 @@
-
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const router = express.Router();
 const Item = require("../model/Item");
 const User = require("../model/User");
+const {
+  authenticateUser,
+  authenticateAdmin
+} = require("../middleware/auth");
 
 const REPORT_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
-const MAX_IMAGE_LENGTH = 14_000_000;
+const MAX_IMAGES = 5;
+// The website shrinks every photo before upload, so real photos are far smaller than this.
+const MAX_IMAGE_LENGTH = 4_000_000;
+const MAX_THUMBNAIL_LENGTH = 300_000;
 
-async function authenticateUser(req, res, next) {
-  try {
-    const authHeader = req.headers.authorization;
+/* ---------------- HELPERS ---------------- */
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        message: "Please login first."
-      });
-    }
-
-    if (!process.env.JWT_SECRET) {
-      return res.status(503).json({
-        message: "Login is not configured on the server."
-      });
-    }
-
-    const token = authHeader.slice(7).trim();
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (!decoded.id || !mongoose.isValidObjectId(decoded.id)) {
-      return res.status(401).json({
-        message: "Invalid login token. Please login again."
-      });
-    }
-
-    const user = await User.findById(decoded.id).select(
-      "email accountStatus"
-    );
-
-    if (!user) {
-      return res.status(401).json({
-        message: "Account not found. Please log in again."
-      });
-    }
-
-    const adminEmail = String(process.env.ADMIN_EMAIL || "")
-      .trim()
-      .toLowerCase();
-
-    const isAdmin =
-      Boolean(adminEmail) &&
-      String(user.email).toLowerCase() === adminEmail;
-
-    if (!isAdmin && user.accountStatus !== "Approved") {
-      return res.status(403).json({
-        message: "Your account is not approved or is disabled."
-      });
-    }
-
-    req.user = {
-      id: String(user._id),
-      email: user.email
-    };
-
-    return next();
-  } catch (error) {
-    if (error.name === "TokenExpiredError" ||
-        error.name === "JsonWebTokenError") {
-      return res.status(401).json({
-        message: "Invalid or expired login. Please login again."
-      });
-    }
-
-    console.error("Authentication error:", error.message);
-
-    return res.status(500).json({
-      message: "Could not authenticate your account."
-    });
-  }
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
 }
 
-function authenticateAdmin(req, res, next) {
-  return authenticateUser(req, res, () => {
-    const adminEmail = String(process.env.ADMIN_EMAIL || "")
-      .trim()
-      .toLowerCase();
-
-    if (!adminEmail) {
-      return res.status(503).json({
-        message: "Admin access has not been configured."
-      });
-    }
-
-    if (String(req.user.email || "").toLowerCase() !== adminEmail) {
-      return res.status(403).json({
-        message: "This account does not have admin access."
-      });
-    }
-
-    return next();
-  });
-}
-
-function isAllowedImage(image) {
-  if (image === undefined || image === null || image === "") {
-    return true;
-  }
-
+function isAllowedImage(image, maxLength) {
   if (
     typeof image !== "string" ||
-    image.length > MAX_IMAGE_LENGTH
+    !image ||
+    image.length > maxLength
   ) {
     return false;
   }
 
   return (
-    /^data:image\/(jpeg|jpg|png|webp|gif);base64,/i.test(image) ||
-    /^https:\/\/res\.cloudinary\.com\/[^\s]+$/i.test(image)
+    /^data:image\/(jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/i.test(image) ||
+    /^https:\/\/res\.cloudinary\.com\/[\w\-./~%:@+?=&]+$/i.test(image)
   );
 }
 
@@ -135,8 +50,7 @@ function isExpired(item) {
 }
 
 function isValidDateString(value) {
-  if (typeof value !== "string" ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return false;
   }
 
@@ -148,118 +62,177 @@ function isValidDateString(value) {
   );
 }
 
-function cleanString(value) {
-  return typeof value === "string" ? value.trim() : "";
+// A date more than ~1.5 days ahead is a mistake (the slack covers time zones).
+function isFarFuture(value) {
+  const time = new Date(`${value}T00:00:00.000Z`).getTime();
+  return time > Date.now() + 36 * 60 * 60 * 1000;
+}
+
+// All photos of a report (new reports use `images`, old ones use `image`).
+function imagesOf(item) {
+  if (Array.isArray(item.images) && item.images.length) {
+    return item.images;
+  }
+
+  return item.image ? [item.image] : [];
+}
+
+// Only these fields are ever sent to the browser (no userId, no contact data).
+function publicFields(item) {
+  return {
+    _id: item._id,
+    itemName: item.itemName,
+    category: item.category,
+    type: item.type,
+    description: item.description,
+    location: item.location,
+    date: item.date,
+    studentName: item.studentName,
+    reporterRole: item.reporterRole || "Student",
+    designation: item.designation || "",
+    course: item.course || "",
+    department: item.department || "",
+    batch: item.batch || "",
+    semester: item.semester || "",
+    reviewStatus: item.reviewStatus || "Approved",
+    resolutionStatus: item.resolutionStatus || "Open",
+    createdAt: item.createdAt
+  };
+}
+
+// Listing view: small preview photo + photo count only (full photos load on click).
+function listFields(item) {
+  const count = item.imageCount || (item.image ? 1 : 0);
+
+  return {
+    ...publicFields(item),
+    thumbnail: item.thumbnail || item.image || "",
+    imageCount: count
+  };
+}
+
+function validObjectId(req, res, message) {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    res.status(400).json({ message });
+    return false;
+  }
+
+  return true;
 }
 
 /* ---------------- ADMIN ROUTES ---------------- */
 
-// Get all reports for the admin panel.
+// All reports for the admin panel (preview photo only, not the full photos).
 router.get("/admin/all", authenticateAdmin, async (req, res) => {
   try {
-    const items = await Item.find().sort({ createdAt: -1 });
+    const items = await Item.find().select("-images").sort({ createdAt: -1 }).lean();
 
     return res.json(
-      items.map((document) => {
-        const item = document.toObject();
-
-        return {
-          ...item,
-          reviewStatus: item.reviewStatus || "Approved",
-          resolutionStatus: item.resolutionStatus || "Open",
-          isExpired: isExpired(item)
-        };
-      })
+      items.map((item) => ({
+        ...listFields(item),
+        reporterEmail: item.studentContact,
+        reviewedAt: item.reviewedAt,
+        returnedAt: item.returnedAt,
+        isExpired: isExpired(item)
+      }))
     );
   } catch (error) {
     console.error("Admin report list error:", error.message);
 
-    return res.status(500).json({
-      message: "Could not load admin reports."
+    return res.status(500).json({ message: "Could not load admin reports." });
+  }
+});
+
+// One report with all photos and full reporter details (admin).
+router.get("/admin/:id", authenticateAdmin, async (req, res) => {
+  try {
+    if (!validObjectId(req, res, "Invalid item ID.")) return;
+
+    const item = await Item.findById(req.params.id).lean();
+
+    if (!item) {
+      return res.status(404).json({ message: "Report not found." });
+    }
+
+    const poster = await User.findById(item.userId)
+      .select("name email phone accountType")
+      .lean();
+
+    return res.json({
+      ...publicFields(item),
+      reviewedAt: item.reviewedAt,
+      returnedAt: item.returnedAt,
+      images: imagesOf(item),
+      reporter: {
+        name: poster?.name || item.studentName,
+        email: poster?.email || item.studentContact,
+        phone: poster?.phone || "",
+        accountType: poster?.accountType || item.reporterRole || "Student"
+      }
     });
+  } catch (error) {
+    console.error("Admin report detail error:", error.message);
+
+    return res.status(500).json({ message: "Could not load this report." });
   }
 });
 
 // Approve or reject a report.
-router.patch(
-  "/admin/:id/review",
-  authenticateAdmin,
-  async (req, res) => {
-    try {
-      if (!mongoose.isValidObjectId(req.params.id)) {
-        return res.status(400).json({
-          message: "Invalid item ID."
-        });
-      }
+router.patch("/admin/:id/review", authenticateAdmin, async (req, res) => {
+  try {
+    if (!validObjectId(req, res, "Invalid item ID.")) return;
 
-      const { reviewStatus } = req.body;
+    const { reviewStatus } = req.body || {};
 
-      if (!["Approved", "Rejected"].includes(reviewStatus)) {
-        return res.status(400).json({
-          message: "Choose Approved or Rejected."
-        });
-      }
-
-      const item = await Item.findById(req.params.id);
-
-      if (!item) {
-        return res.status(404).json({
-          message: "Report not found."
-        });
-      }
-
-      item.reviewStatus = reviewStatus;
-      item.reviewedAt = new Date();
-      item.reviewedBy = req.user.id;
-
-      await item.save();
-
-      return res.json({
-        message: `Report ${reviewStatus.toLowerCase()}.`,
-        reviewStatus: item.reviewStatus
-      });
-    } catch (error) {
-      console.error("Report review error:", error.message);
-
-      return res.status(500).json({
-        message: "Could not update report review."
-      });
+    if (!["Approved", "Rejected"].includes(reviewStatus)) {
+      return res.status(400).json({ message: "Choose Approved or Rejected." });
     }
+
+    const item = await Item.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ message: "Report not found." });
+    }
+
+    item.reviewStatus = reviewStatus;
+    item.reviewedAt = new Date();
+    item.reviewedBy = req.user.id;
+
+    await item.save();
+
+    return res.json({
+      message: `Report ${reviewStatus.toLowerCase()}.`,
+      reviewStatus: item.reviewStatus
+    });
+  } catch (error) {
+    console.error("Report review error:", error.message);
+
+    return res.status(500).json({ message: "Could not update report review." });
   }
-);
+});
 
 // Admin deletes any report.
 router.delete("/admin/:id", authenticateAdmin, async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Invalid item ID."
-      });
-    }
+    if (!validObjectId(req, res, "Invalid item ID.")) return;
 
     const item = await Item.findByIdAndDelete(req.params.id);
 
     if (!item) {
-      return res.status(404).json({
-        message: "Report not found."
-      });
+      return res.status(404).json({ message: "Report not found." });
     }
 
-    return res.json({
-      message: "Report deleted."
-    });
+    return res.json({ message: "Report deleted." });
   } catch (error) {
     console.error("Admin delete error:", error.message);
 
-    return res.status(500).json({
-      message: "Could not delete report."
-    });
+    return res.status(500).json({ message: "Could not delete report." });
   }
 });
 
-/* ---------------- STUDENT ROUTES ---------------- */
+/* ---------------- STUDENT / FACULTY ROUTES ---------------- */
 
-// Get recent approved reports and the current user's own reports.
+// Recent approved reports + the current user's own reports.
 router.get("/", authenticateUser, async (req, res) => {
   try {
     const cutoff = new Date(Date.now() - REPORT_LIFETIME_MS);
@@ -272,120 +245,94 @@ router.get("/", authenticateUser, async (req, res) => {
         { reviewStatus: null },
         { userId: req.user.id }
       ]
-    }).sort({ createdAt: -1 });
+    })
+      .select("-images")
+      .sort({ createdAt: -1 })
+      .lean();
 
-    const safeItems = items.map((document) => {
-      const item = document.toObject();
-      const isOwner = String(item.userId) === String(req.user.id);
-
-      delete item.userId;
-      delete item.studentContact;
-      delete item.reviewedBy;
-
-      return {
-        ...item,
-        reviewStatus: item.reviewStatus || "Approved",
-        resolutionStatus: item.resolutionStatus || "Open",
-        isOwner
-      };
-    });
-
-    return res.json(safeItems);
+    return res.json(
+      items.map((item) => ({
+        ...listFields(item),
+        isOwner: String(item.userId) === req.user.id
+      }))
+    );
   } catch (error) {
     console.error("Student report list error:", error.message);
 
-    return res.status(500).json({
-      message: "Failed to fetch items."
-    });
+    return res.status(500).json({ message: "Failed to fetch items." });
   }
 });
 
-// Get contact details only for an approved, open report.
-router.get("/:id/contact", authenticateUser, async (req, res) => {
+// One report: all photos + full details + poster contact (when allowed).
+router.get("/:id", authenticateUser, async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Invalid item ID."
-      });
-    }
+    if (!validObjectId(req, res, "Invalid item ID.")) return;
 
-    const item = await Item.findById(req.params.id);
+    const item = await Item.findById(req.params.id).lean();
 
     if (!item) {
-      return res.status(404).json({
-        message: "Item not found."
-      });
+      return res.status(404).json({ message: "Item not found." });
     }
 
-    if ((item.reviewStatus || "Approved") !== "Approved") {
-      return res.status(404).json({
-        message: "This report is not approved yet."
-      });
+    const isOwner = String(item.userId) === req.user.id;
+    const reviewStatus = item.reviewStatus || "Approved";
+    const resolutionStatus = item.resolutionStatus || "Open";
+
+    if ((reviewStatus !== "Approved" && !isOwner) || isExpired(item)) {
+      return res.status(404).json({ message: "This report is not available." });
     }
 
-    if ((item.resolutionStatus || "Open") === "Returned") {
-      return res.status(409).json({
-        message: "This report has already been closed."
-      });
-    }
+    // Contact details only for an approved, open report that is not your own.
+    let contact = null;
 
-    if (String(item.userId) === String(req.user.id)) {
-      return res.status(400).json({
-        message: "This is your own report."
-      });
-    }
+    if (!isOwner && reviewStatus === "Approved" && resolutionStatus === "Open") {
+      const poster = await User.findById(item.userId)
+        .select("name email phone")
+        .lean();
 
-    const poster = await User.findById(item.userId)
-      .select("name email phone");
-
-    if (!poster) {
-      return res.status(404).json({
-        message: "Poster account not found."
-      });
+      if (poster) {
+        contact = {
+          studentName: poster.name,
+          studentContact: poster.email,
+          studentPhone: poster.phone || ""
+        };
+      }
     }
 
     return res.json({
-      studentName: poster.name,
-      studentContact: poster.email,
-      studentPhone: poster.phone || ""
+      ...publicFields(item),
+      images: imagesOf(item),
+      isOwner,
+      contact
     });
   } catch (error) {
-    console.error("Contact lookup error:", error.message);
+    console.error("Report detail error:", error.message);
 
-    return res.status(500).json({
-      message: "Could not get poster contact."
-    });
+    return res.status(500).json({ message: "Could not load this report." });
   }
 });
 
 // Create a lost/found report.
 router.post("/", authenticateUser, async (req, res) => {
   try {
-    const {
-      title,
-      itemName,
-      category,
-      status,
-      type,
-      description,
-      location,
-      date,
-      image,
-      course,
-      department,
-      batch,
-      semester
-    } = req.body;
+    const body = req.body || {};
+    const isFaculty = req.user.accountType === "Faculty";
 
-    const finalName = cleanString(itemName ?? title);
-    const finalType = type ?? status;
-    const cleanCategory = cleanString(category);
-    const cleanLocation = cleanString(location);
-    const cleanDescription = cleanString(description);
-    const cleanCourse = cleanString(course);
-    const cleanDepartment = cleanString(department);
-    const cleanBatch = cleanString(batch);
-    const cleanSemester = cleanString(semester);
+    const finalName = cleanString(body.itemName ?? body.title);
+    const finalType = body.type ?? body.status;
+    const cleanCategory = cleanString(body.category);
+    const cleanLocation = cleanString(body.location);
+    const cleanDescription = cleanString(body.description);
+    const cleanCourse = cleanString(body.course);
+    const cleanDepartment = cleanString(body.department);
+    const cleanBatch = cleanString(body.batch);
+    const cleanSemester = cleanString(body.semester);
+    const cleanDesignation = cleanString(body.designation);
+
+    // Students must give course, batch and semester. Faculty must give a designation.
+    const missingRoleFields = isFaculty
+      ? !cleanDesignation
+      : !cleanCourse || !cleanBatch || !cleanSemester;
 
     if (
       !finalName ||
@@ -395,18 +342,23 @@ router.post("/", authenticateUser, async (req, res) => {
       !["Lost", "Found"].includes(finalType) ||
       !cleanLocation ||
       cleanLocation.length > 200 ||
-      !cleanCourse ||
-      cleanCourse.length > 100 ||
       !cleanDepartment ||
       cleanDepartment.length > 100 ||
-      !cleanBatch ||
+      cleanCourse.length > 100 ||
       cleanBatch.length > 30 ||
-      !cleanSemester ||
       cleanSemester.length > 30 ||
-      !isValidDateString(date)
+      cleanDesignation.length > 60 ||
+      missingRoleFields ||
+      !isValidDateString(body.date)
     ) {
       return res.status(400).json({
         message: "Please check all required fields and try again."
+      });
+    }
+
+    if (isFarFuture(body.date)) {
+      return res.status(400).json({
+        message: "The date cannot be in the future."
       });
     }
 
@@ -416,40 +368,59 @@ router.post("/", authenticateUser, async (req, res) => {
       });
     }
 
-    if (!isAllowedImage(image)) {
+    // Photos: new sites send `images` (array); an old single `image` still works.
+    let imageList = [];
+
+    if (Array.isArray(body.images)) {
+      imageList = body.images;
+    } else if (typeof body.image === "string" && body.image) {
+      imageList = [body.image];
+    }
+
+    if (imageList.length > MAX_IMAGES) {
       return res.status(400).json({
-        message: "Use a valid supported image of 10 MB or smaller."
+        message: `You can upload up to ${MAX_IMAGES} photos.`
       });
     }
 
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(401).json({
-        message: "User not found. Please login again."
+    if (!imageList.every((image) => isAllowedImage(image, MAX_IMAGE_LENGTH))) {
+      return res.status(400).json({
+        message: "Use valid supported photos (JPG, PNG, WEBP or GIF)."
       });
     }
 
-    const newItem = new Item({
+    let thumbnail = typeof body.thumbnail === "string" ? body.thumbnail : "";
+
+    if (thumbnail && !isAllowedImage(thumbnail, MAX_THUMBNAIL_LENGTH)) {
+      return res.status(400).json({ message: "Invalid photo preview." });
+    }
+
+    if (!thumbnail && imageList.length) {
+      thumbnail = imageList[0];
+    }
+
+    const savedItem = await new Item({
       itemName: finalName,
       category: cleanCategory,
       type: finalType,
       description: cleanDescription,
       location: cleanLocation,
-      date: date.trim(),
-      image: image || "",
-      studentName: user.name,
+      date: body.date.trim(),
+      images: imageList,
+      imageCount: imageList.length,
+      thumbnail,
+      studentName: req.user.name,
+      reporterRole: isFaculty ? "Faculty" : "Student",
+      designation: cleanDesignation,
       course: cleanCourse,
       department: cleanDepartment,
       batch: cleanBatch,
       semester: cleanSemester,
-      studentContact: user.email,
-      userId: user._id,
+      studentContact: req.user.email,
+      userId: req.user.id,
       reviewStatus: "Pending",
       resolutionStatus: "Open"
-    });
-
-    const savedItem = await newItem.save();
+    }).save();
 
     return res.status(201).json({
       message: "Report sent to an admin for review.",
@@ -461,30 +432,22 @@ router.post("/", authenticateUser, async (req, res) => {
   } catch (error) {
     console.error("Create report error:", error.message);
 
-    return res.status(500).json({
-      message: "Failed to create item."
-    });
+    return res.status(500).json({ message: "Failed to create item." });
   }
 });
 
 // Mark the current user's approved report as returned.
 router.patch("/:id/resolve", authenticateUser, async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Invalid item ID."
-      });
-    }
+    if (!validObjectId(req, res, "Invalid item ID.")) return;
 
     const item = await Item.findById(req.params.id);
 
     if (!item) {
-      return res.status(404).json({
-        message: "Item not found."
-      });
+      return res.status(404).json({ message: "Item not found." });
     }
 
-    if (String(item.userId) !== String(req.user.id)) {
+    if (String(item.userId) !== req.user.id) {
       return res.status(403).json({
         message: "You can only close your own reports."
       });
@@ -503,6 +466,7 @@ router.patch("/:id/resolve", authenticateUser, async (req, res) => {
     }
 
     item.resolutionStatus = "Returned";
+    item.returnedAt = new Date();
     await item.save();
 
     return res.json({
@@ -512,30 +476,22 @@ router.patch("/:id/resolve", authenticateUser, async (req, res) => {
   } catch (error) {
     console.error("Resolve report error:", error.message);
 
-    return res.status(500).json({
-      message: "Could not close report."
-    });
+    return res.status(500).json({ message: "Could not close report." });
   }
 });
 
-// A student can delete only their own report.
+// A user can delete only their own report.
 router.delete("/:id", authenticateUser, async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.id)) {
-      return res.status(400).json({
-        message: "Invalid item ID."
-      });
-    }
+    if (!validObjectId(req, res, "Invalid item ID.")) return;
 
     const item = await Item.findById(req.params.id);
 
     if (!item) {
-      return res.status(404).json({
-        message: "Item not found."
-      });
+      return res.status(404).json({ message: "Item not found." });
     }
 
-    if (String(item.userId) !== String(req.user.id)) {
+    if (String(item.userId) !== req.user.id) {
       return res.status(403).json({
         message: "You can only delete your own reports."
       });
@@ -543,15 +499,11 @@ router.delete("/:id", authenticateUser, async (req, res) => {
 
     await item.deleteOne();
 
-    return res.json({
-      message: "Item deleted."
-    });
+    return res.json({ message: "Item deleted." });
   } catch (error) {
     console.error("Delete report error:", error.message);
 
-    return res.status(500).json({
-      message: "Failed to delete item."
-    });
+    return res.status(500).json({ message: "Failed to delete item." });
   }
 });
 
