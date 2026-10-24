@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const itemSchema = new mongoose.Schema(
@@ -42,9 +41,27 @@ const itemSchema = new mongoose.Schema(
       required: true
     },
 
+    // OLD single photo. Kept only so reports made before the update still show.
     image: {
       type: String,
       default: ""
+    },
+
+    // NEW: up to 5 photos per report.
+    images: {
+      type: [String],
+      default: []
+    },
+
+    // Small preview of the first photo, used in the listing so it loads fast.
+    thumbnail: {
+      type: String,
+      default: ""
+    },
+
+    imageCount: {
+      type: Number,
+      default: 0
     },
 
     studentName: {
@@ -52,6 +69,19 @@ const itemSchema = new mongoose.Schema(
       required: true,
       trim: true,
       maxlength: 100
+    },
+
+    reporterRole: {
+      type: String,
+      enum: ["Student", "Faculty"],
+      default: "Student"
+    },
+
+    designation: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 60
     },
 
     course: {
@@ -115,6 +145,11 @@ const itemSchema = new mongoose.Schema(
       type: String,
       enum: ["Open", "Returned"],
       default: "Open"
+    },
+
+    returnedAt: {
+      type: Date,
+      default: null
     }
   },
   {
