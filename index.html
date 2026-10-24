@@ -24,960 +24,272 @@
     }
 
     :root[data-theme="sunset"] {
-      --bg: #140A12;
-      --surface: #21121f;
-      --surface-2: #30182b;
-      --border: #573044;
-      --text: #fff0f5;
-      --muted: #d1a9bb;
-      --purple: #FF7A59;
-      --purple-light: #ff9bb9;
-      --accent-1: #FF7A59;
-      --accent-2: #FF3D81;
+      --bg: #140A12; --surface: #21121f; --surface-2: #30182b; --border: #573044;
+      --text: #fff0f5; --muted: #d1a9bb; --purple: #FF7A59; --purple-light: #ff9bb9;
+      --accent-1: #FF7A59; --accent-2: #FF3D81;
     }
 
     :root[data-theme="emerald"] {
-      --bg: #06130F;
-      --surface: #0d211b;
-      --surface-2: #143128;
-      --border: #245044;
-      --text: #e8fff5;
-      --muted: #9bc7b7;
-      --purple: #10B981;
-      --purple-light: #6ee7b7;
-      --accent-1: #10B981;
-      --accent-2: #38BDF8;
+      --bg: #06130F; --surface: #0d211b; --surface-2: #143128; --border: #245044;
+      --text: #e8fff5; --muted: #9bc7b7; --purple: #10B981; --purple-light: #6ee7b7;
+      --accent-1: #10B981; --accent-2: #38BDF8;
     }
 
-    :root[data-theme="aurora"] {
-      --accent-1: #8B5CF6;
-      --accent-2: #22D3EE;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100vh;
-      background:
-        radial-gradient(ellipse at 50% -30%, #25204b 0, transparent 55%),
-        var(--bg);
+      background: radial-gradient(ellipse at 50% -30%, #25204b 0, transparent 55%), var(--bg);
       color: var(--text);
       font: 14px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .6; }
+    .muted { color: var(--muted); }
 
-    button {
-      cursor: pointer;
-    }
-
-    button:disabled {
-      cursor: not-allowed;
-      opacity: .6;
-    }
-
+    /* ---------- Navbar ---------- */
     .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      min-height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      position: sticky; top: 0; z-index: 5; min-height: 64px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
       padding: 10px max(20px, calc((100% - 1260px) / 2));
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
+      background: var(--surface); border-bottom: 1px solid var(--border);
     }
+    .logo { color: #fff; font-size: 20px; font-weight: 850; white-space: nowrap; }
+    .logo span { color: var(--purple-light); }
+    .nav-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 
-    .logo {
-      color: #fff;
-      font-size: 20px;
-      font-weight: 850;
-      white-space: nowrap;
-    }
+    .theme-dots { display: flex; align-items: center; gap: 6px; padding: 5px 7px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface-2); }
+    .theme-dots button { display: block; width: 20px; height: 20px; min-width: 20px; padding: 0; border: 2px solid transparent; border-radius: 50%; }
+    .theme-dots button.active { border-color: var(--text); box-shadow: 0 0 0 1px var(--bg); }
 
-    .logo span {
-      color: var(--purple-light);
-    }
-
-    .theme-dots { display:flex; align-items:center; gap:6px; padding:5px 7px; border:1px solid var(--border); border-radius:999px; background:var(--surface-2); }
-    .theme-dots button { width:17px; height:17px; min-width:17px; padding:0; border:2px solid transparent; border-radius:50%; }
-    .theme-dots button.active { border-color:var(--text); box-shadow:0 0 0 1px var(--bg); }
-    .profile-theme-section { padding:9px 10px 10px; border-bottom:1px solid var(--border); margin-bottom:5px; }
-    .profile-theme-label { color:var(--muted); font-size:11px; font-weight:700; margin-bottom:7px; }
-    .profile-theme-section .theme-dots { justify-content:flex-start; width:max-content; max-width:100%; }
-    .profile-theme-section .theme-dots button { display:block; width:20px; height:20px; min-width:20px; padding:0; }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    #welcomeText { color: #c0c9df; font-size: 12px; }
     .profile-wrap { position: relative; display: none; }
-    .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg,var(--accent-1),var(--accent-2)); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
+    .profile-avatar { width: 40px; height: 40px; padding: 0; border-radius: 50%; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; font-size: 14px; font-weight: 850; border: 2px solid #b7adff; box-shadow: 0 4px 14px #6858ff35; }
     .profile-menu { position: absolute; right: 0; top: calc(100% + 9px); z-index: 100; width: max-content; min-width: 250px; max-width: min(360px, calc(100vw - 20px)); padding: 7px; border: 1px solid #303b59; border-radius: 12px; background: var(--surface-2); box-shadow: 0 14px 36px #0008; display: none; }
-    .listings-heading #listingsTitle[role="button"] { cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; transition: color .18s ease, transform .18s ease; }
-  .listings-heading #listingsTitle[role="button"]:hover { color: var(--purple-light); }
-  .title-switch-icon { font-size: .85em; opacity: .7; }
-  .profile-menu.open { display: block; }
-    .profile-menu .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; overflow-wrap: normal; word-break: normal; }
-    .profile-menu .profile-heading strong { display:block; color:#f3f4ff; font-size:13px; }
-    .profile-menu .profile-heading small { display:block; color:#9ca9c7; font-size:11px; white-space:nowrap; }
-    .profile-menu button { display:block; width:100%; text-align:left; padding:10px; border:0; background:transparent; color:#dce3f7; }
-    .profile-menu button:hover { background:#202b45; }
-    .profile-menu button.profile-logout { color:#ff9caf; }
+    .profile-menu.open { display: block; }
+    .profile-heading { padding: 9px 10px; border-bottom: 1px solid #293550; margin-bottom: 5px; }
+    .profile-heading strong { display: block; color: #f3f4ff; font-size: 13px; }
+    .profile-heading small { display: block; color: #9ca9c7; font-size: 11px; white-space: nowrap; }
+    .profile-theme-section { padding: 9px 10px 10px; border-bottom: 1px solid var(--border); margin-bottom: 5px; }
+    .profile-theme-label { color: var(--muted); font-size: 11px; font-weight: 700; margin-bottom: 7px; }
+    .profile-theme-section .theme-dots { width: max-content; max-width: 100%; }
+    .profile-menu > button { display: block; width: 100%; text-align: left; padding: 10px; border: 0; background: transparent; color: #dce3f7; }
+    .profile-menu > button:hover { background: #202b45; }
+    .profile-menu > button.profile-logout { color: #ff9caf; }
 
-    button {
-      padding: 9px 13px;
-      border: 1px solid transparent;
-      border-radius: 9px;
-      font-weight: 700;
-      transition: .16s ease;
-    }
-
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-    }
-
-    .primary-btn {
-      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-      color: #fff;
-      box-shadow: 0 5px 16px #6858ff35;
-    }
-
-    .primary-btn:hover:not(:disabled) {
-      filter: brightness(1.08);
-    }
-
-    .secondary-btn {
-      background: var(--surface-2);
-      border-color: var(--border);
-      color: var(--text);
-    }
-
-    .secondary-btn:hover:not(:disabled) {
-      background: #202d46;
-    }
-
-    .danger-btn {
-      background: #351a2a;
-      border-color: #613047;
-      color: #ff9caf;
-    }
-
-    .danger-btn:hover:not(:disabled) {
-      background: #492034;
-    }
+    /* ---------- Buttons ---------- */
+    button { padding: 9px 13px; border: 1px solid transparent; border-radius: 9px; font-weight: 700; transition: .16s ease; }
+    button:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+    .primary-btn { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; box-shadow: 0 5px 16px #6858ff35; }
+    .secondary-btn { background: var(--surface-2); border-color: var(--border); color: var(--text); }
+    .secondary-btn:hover:not(:disabled) { background: #202d46; }
+    .danger-btn { background: #351a2a; border-color: #613047; color: #ff9caf; }
+    .danger-btn:hover:not(:disabled) { background: #492034; }
 
     .urgent-banner {
-      display: block;
-      width: min(1260px, calc(100% - 36px));
-      margin: 12px auto 0;
-      padding: 9px 13px;
-      border: 1px solid #66304a;
-      border-radius: 10px;
-      background: linear-gradient(90deg, #401431, #281447);
-      color: #ffdce5;
-      text-align: left;
-      font-size: 12px;
+      display: block; width: min(1260px, calc(100% - 36px)); margin: 12px auto 0; padding: 9px 13px;
+      border: 1px solid #66304a; border-radius: 10px; background: linear-gradient(90deg, #401431, #281447);
+      color: #ffdce5; text-align: left; font-size: 12px;
     }
+    .urgent-banner strong { margin-right: 8px; color: #ff7897; }
 
-    .urgent-banner strong {
-      margin-right: 8px;
-      color: #ff7897;
-    }
-
+    /* ---------- Dashboard layout ---------- */
     .dashboard {
-      display: grid;
-      grid-template-columns: minmax(190px, 0.78fr) minmax(0, 2.8fr) minmax(220px, 0.9fr);
-      gap: clamp(12px, 1.2vw, 20px);
-      width: min(1880px, calc(100% - 32px));
-      margin: 14px auto 24px;
-      align-items: stretch;
-    }
-
-    .dashboard > .sidebar,
-    .dashboard > .feed-column,
-    .dashboard > .right-rail {
-      min-width: 0;
-    }
-
-    .dashboard > .sidebar,
-    .dashboard > .right-rail {
-      position: sticky;
-      top: 82px;
-    }
-
-    .feed-column {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .dashboard-heading { margin-bottom: 0; }
-    .stats { margin-bottom: 0; }
-
-    .feed-column,
-    .listings,
-    .items-grid {
-      min-width: 0;
-    }
-
-    @media (min-width: 1400px) {
-      .items-grid {
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-        gap: 14px;
-      }
-    }
-
-    .surface {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--surface);
-      box-shadow: 0 12px 32px #0002;
-    }
-
-    .sidebar {
-      padding: 12px;
-    }
-
-    .side-title {
-      margin: 2px 8px 9px;
-      color: #7f8ba8;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-
-    .side-nav {
-      display: grid;
-      gap: 5px;
-    }
-
-    .side-link {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      padding: 8px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background: transparent;
-      color: #aeb9d2;
-      text-align: left;
-      font-size: 11px;
-    }
-
-    .side-link.active,
-    .side-link:hover {
-      border-color: #4d3db3;
-      background: #271f52;
-      color: #eeeaff;
-    }
-
-    .count {
-      color: #8996b2;
-      font-size: 10px;
-    }
-
-    .zones {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .zone-chip {
-      padding: 5px 7px;
-      border: 1px solid #30405b;
-      border-radius: 7px;
-      background: #172238;
-      color: #bac6df;
-      font-size: 10px;
-    }
-
-    .zone-chip:hover {
-      border-color: var(--purple);
-    }
-
-    .dashboard-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: radial-gradient(ellipse at top left, #25234e, #111827 65%);
-    }
-
-    .dashboard-heading h1 {
-      color: #f2f4ff;
-      font-size: clamp(18px, 2vw, 23px);
-    }
-
-    .dashboard-heading p {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .stat {
-      min-height: 68px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: var(--surface);
-    }
-
-    .stat span {
-      display: block;
-      color: var(--muted);
-      font-size: 10px;
-    }
-
-    .stat strong {
-      color: #fff;
-      font-size: 22px;
-    }
-
-    .stat.lost strong {
-      color: var(--red);
-    }
-
-    .stat.found strong,
-    .stat.returned strong {
-      color: var(--green);
-    }
-
-    .listings {
-      padding: 12px;
-    }
-
-    .listings-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .listings-heading h2 {
-      color: #e8edff;
-      font-size: 13px;
-    }
-
-    .feed-tabs {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .feed-tab {
-      padding: 6px 10px;
-      border: 1px solid transparent;
-      border-radius: 20px;
-      background: transparent;
-      color: #aab6d0;
-      font-size: 10px;
-    }
-
-    .feed-tab.active,
-    .feed-tab:hover {
-      background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
-      color: #fff;
-    }
-
-    .filters {
-      display: grid;
-      grid-template-columns: minmax(140px, 1fr) 130px 120px;
-      gap: 7px;
-      margin: 10px 0 12px;
-      padding-bottom: 11px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 9px 11px;
-      border: 1px solid #303d58;
-      border-radius: 9px;
-      background: #0b1220;
-      color: var(--text);
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      color: #77839e;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: 2px solid #6858ff66;
-      border-color: var(--purple);
-    }
-
-    select option {
-      background: #101727;
-      color: var(--text);
-    }
-
-    textarea {
-      min-height: 68px;
-      resize: vertical;
-    }
-
-    .items-grid {
-      display: grid;
-      /* Responsive grid: fill available width without letting cards overflow. */
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-      gap: 12px;
-      align-items: stretch;
-      min-width: 0;
-      width: 100%;
-    }
-
-    .item-card {
-      display: grid;
-      grid-template-columns: 76px minmax(0, 1fr);
-      gap: 11px;
-      padding: 11px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: linear-gradient(135deg, #121b2d, #0e1523);
-    }
-
-    .item-image,
-    .item-placeholder {
-      width: 76px;
-      height: 76px;
-      border: 1px solid #33415d;
-      border-radius: 10px;
-      background: #0a1020;
-    }
-
-    .item-image {
-      display: block;
-      object-fit: cover;
-    }
-
-    .item-placeholder {
-      display: grid;
-      place-items: center;
-      color: #94a3b8;
-      font-size: 30px;
-    }
-
-    .item-content {
-      min-width: 0;
-    }
-
-    .item-heading {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .item-content h3 {
-      color: #dbe3ff;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 8px;
-      border-radius: 20px;
-      font-size: 9px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .status::before {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      content: "";
-    }
-
-    .status.Lost {
-      background: #3a1b2a;
-      color: #ff8da5;
-    }
-
-    .status.Lost::before {
-      background: var(--red);
-    }
-
-    .status.Found {
-      background: #12352e;
-      color: #62e8bc;
-    }
-
-    .status.Found::before {
-      background: var(--green);
-    }
-
-    .item-content p {
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 11px;
-      overflow-wrap: anywhere;
-    }
-
-    .item-content strong {
-      color: #b9c5df;
-    }
-
-    .item-buttons {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 9px;
-    }
-
-    .item-buttons button {
-      padding: 6px 9px;
-      font-size: 10px;
-    }
-
-    .contact-result {
-      display: none;
-      margin-top: 9px;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      background: #0b1220;
-      color: var(--text);
-      font-size: 12px;
-    }
-
-    .contact-result.visible {
-      display: block;
-    }
-
-    .contact-links {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 7px;
-    }
-
-    .contact-links a {
-      color: var(--purple-light);
-      font-weight: 700;
-    }
-
-    .workflow-note {
-      margin-top: 8px !important;
-      padding: 7px 9px;
-      border-radius: 8px;
-      font-size: 10px !important;
-    }
-
-    .workflow-note.pending {
-      background: #372b15;
-      color: #ffd578;
-    }
-
-    .workflow-note.rejected {
-      background: #3a1b22;
-      color: #ff9ca9;
-    }
-
-    .workflow-note.returned {
-      background: #12352e;
-      color: #6be8bf;
-    }
-
-    .empty-state {
-      padding: 24px;
-      border: 1px dashed #35425d;
-      border-radius: 11px;
-      background: #0b1220;
-      color: var(--muted);
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .right-rail {
-      display: grid;
-      gap: 10px;
-    }
-
-    .rail-panel {
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      background: var(--surface);
-    }
-
-    .rail-panel h2 {
-      margin-bottom: 9px;
-      color: #e2e8ff;
-      font-size: 12px;
-    }
-
-    .hotspot-list {
-      display: grid;
-      gap: 8px;
-    }
-
-    .hotspot-row {
-      color: #adb9d2;
-      font-size: 10px;
-    }
-
-    .hotspot-track {
-      height: 4px;
-      margin-top: 4px;
-      overflow: hidden;
-      border-radius: 9px;
-      background: #27324a;
-    }
-
-    .hotspot-fill {
-      display: block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #6858ff, #24d5a3);
-    }
-
-    .how-list {
-      display: grid;
-      gap: 7px;
-      padding-left: 14px;
-      color: #9eabc6;
-      font-size: 10px;
-    }
-
-    .rail-alert {
-      width: 100%;
-      margin-top: 9px;
-      background: #351a2a;
-      border-color: #613047;
-      color: #ff9caf;
-      font-size: 11px;
-    }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 20;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      background: #030610d0;
-      overflow-y: auto;
-      backdrop-filter: blur(4px);
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal {
-      width: min(100%, 440px);
-      max-height: 88vh;
-      padding: 17px;
-      overflow-y: auto;
-      border: 1px solid #34405a;
-      border-radius: 15px;
-      background: #111a2a;
-      color: var(--text);
-      box-shadow: 0 24px 70px #0009;
-    }
-
-    .modal h2 {
-      margin-bottom: 4px;
-      color: #f2f4ff;
-      font-size: 19px;
-    }
-
-    .modal-subtitle {
-      margin-bottom: 10px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .form-group {
-      margin-bottom: 8px;
-    }
-
-    .form-group label,
-    .report-type-label {
-      display: block;
-      margin-bottom: 4px;
-      color: #c3cde2;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      padding: 8px 10px;
-      font-size: 12px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .report-type-switch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      margin: 5px 0 10px;
-      padding: 4px;
-      border: 1px solid #2c3852;
-      border-radius: 10px;
-      background: #0b1220;
-    }
-
-    .type-option {
-      padding: 8px 5px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background: transparent;
-      color: #9eabc6;
-      font-size: 11px;
-    }
-
-    .type-option.active[data-item-type="Lost"] {
-      background: #3b1b2b;
-      border-color: #7a304b;
-      color: #ff9caf;
-    }
-
-    .type-option.active[data-item-type="Found"] {
-      background: #12392f;
-      border-color: #267b66;
-      color: #76edc8;
-    }
-
-    .form-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-
-    .form-actions button {
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .auth-switch {
-      margin-top: 15px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 12px;
-    }
-
-    .text-button {
-      padding: 0;
-      background: transparent;
-      color: var(--purple-light);
-      text-decoration: underline;
-    }
-
-    .message {
-      display: none;
-      margin: 9px 0;
-      padding: 9px;
-      border-radius: 8px;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-
-    .message.error {
-      display: block;
-      background: #3a1b22;
-      color: #ffabb5;
-    }
-
-    .message.success {
-      display: block;
-      background: #12352e;
-      color: #80edca;
-    }
-
-    #imagePreview {
-      display: none;
-      width: 100%;
-      max-height: 120px;
-      margin-top: 7px;
-      border: 1px solid var(--border);
-      border-radius: 9px;
-      background: #0b1220;
-      object-fit: contain;
-    }
-
-    body.logged-out .urgent-banner,
-    body.logged-out .dashboard,
-    body.logged-out footer {
-      display: none;
-    }
-
-    footer {
-      padding: 18px;
-      color: #71809e;
-      text-align: center;
-      font-size: 10px;
-    }
+      display: grid; grid-template-columns: minmax(190px, 0.78fr) minmax(0, 2.8fr) minmax(220px, 0.9fr);
+      gap: clamp(12px, 1.2vw, 20px); width: min(1880px, calc(100% - 32px));
+      margin: 14px auto 24px; align-items: stretch;
+    }
+    .dashboard > .sidebar, .dashboard > .feed-column, .dashboard > .right-rail { min-width: 0; }
+    .dashboard > .sidebar, .dashboard > .right-rail { position: sticky; top: 82px; }
+    .feed-column { display: flex; flex-direction: column; gap: 10px; }
+
+    .surface { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: 0 12px 32px #0002; }
+    .sidebar { padding: 12px; }
+    .side-title { margin: 2px 8px 9px; color: #7f8ba8; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .side-nav { display: grid; gap: 5px; }
+    .side-link { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 8px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #aeb9d2; text-align: left; font-size: 11px; }
+    .side-link.active, .side-link:hover { border-color: #4d3db3; background: #271f52; color: #eeeaff; }
+    .count { color: #8996b2; font-size: 10px; }
+    .zones { display: flex; flex-wrap: wrap; gap: 5px; }
+    .zone-chip { padding: 5px 7px; border: 1px solid #30405b; border-radius: 7px; background: #172238; color: #bac6df; font-size: 10px; }
+    .zone-chip:hover { border-color: var(--purple); }
+
+    .dashboard-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: radial-gradient(ellipse at top left, #25234e, #111827 65%); }
+    .dashboard-heading h1 { color: #f2f4ff; font-size: clamp(18px, 2vw, 23px); }
+    .dashboard-heading p { margin-top: 3px; color: var(--muted); font-size: 11px; }
+
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+    .stat { min-height: 68px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
+    .stat span { display: block; color: var(--muted); font-size: 10px; }
+    .stat strong { color: #fff; font-size: 22px; }
+    .stat.lost strong { color: var(--red); }
+    .stat.found strong, .stat.returned strong { color: var(--green); }
+
+    .listings { padding: 12px; }
+    .listings-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .listings-heading h2 { color: #e8edff; font-size: 13px; }
+    #listingsTitle { cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; transition: color .18s ease; }
+    #listingsTitle:hover { color: var(--purple-light); }
+    .title-switch-icon { font-size: .85em; opacity: .7; }
+    .feed-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .feed-tab { padding: 6px 10px; border: 1px solid transparent; border-radius: 20px; background: transparent; color: #aab6d0; font-size: 10px; }
+    .feed-tab.active, .feed-tab:hover { background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; }
+
+    .filters { display: grid; grid-template-columns: minmax(140px, 1fr) 130px 120px; gap: 7px; margin: 10px 0 12px; padding-bottom: 11px; border-bottom: 1px solid var(--border); }
+    input, select, textarea { width: 100%; padding: 9px 11px; border: 1px solid #303d58; border-radius: 9px; background: #0b1220; color: var(--text); }
+    input::placeholder, textarea::placeholder { color: #77839e; }
+    input:focus, select:focus, textarea:focus { outline: 2px solid #6858ff66; border-color: var(--purple); }
+    input[readonly] { opacity: .75; cursor: not-allowed; }
+    select option { background: #101727; color: var(--text); }
+    textarea { min-height: 68px; resize: vertical; }
+
+    /* ---------- Item cards ---------- */
+    .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 12px; align-items: stretch; min-width: 0; width: 100%; }
+    .item-card { display: flex; flex-direction: column; overflow: hidden; min-width: 0; border: 1px solid var(--border); border-radius: 13px; background: linear-gradient(135deg, #121b2d, #0e1523); transition: border-color .16s ease, transform .16s ease; }
+    .item-card:hover { border-color: var(--purple); transform: translateY(-2px); }
+    .item-media { position: relative; display: block; width: 100%; height: 160px; padding: 0; border: 0; border-radius: 0; background: #0a1020; cursor: zoom-in; }
+    .item-media:hover:not(:disabled) { transform: none; }
+    .item-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .item-media.no-photo { cursor: default; display: grid; place-items: center; font-size: 52px; color: #94a3b8; }
+    .photo-count { position: absolute; right: 8px; bottom: 8px; padding: 2px 9px; border-radius: 20px; background: #000b; color: #fff; font-size: 10px; font-weight: 700; }
+    .item-body { display: flex; flex-direction: column; flex: 1; gap: 3px; padding: 11px 12px 12px; min-width: 0; }
+    .item-heading { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .item-body h3 { color: #dbe3ff; font-size: 14px; overflow-wrap: anywhere; }
+    .status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
+    .status::before { width: 6px; height: 6px; border-radius: 50%; content: ""; }
+    .status.Lost { background: #3a1b2a; color: #ff8da5; }
+    .status.Lost::before { background: var(--red); }
+    .status.Found { background: #12352e; color: #62e8bc; }
+    .status.Found::before { background: var(--green); }
+    .item-body p { color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+    .item-body .card-btn { width: 100%; }
+    .item-body .card-btn-wrap { margin-top: auto; padding-top: 9px; }
+
+    .workflow-note { margin-top: 6px; padding: 7px 9px; border-radius: 8px; font-size: 10px; }
+    .workflow-note.pending { background: #372b15; color: #ffd578; }
+    .workflow-note.rejected { background: #3a1b22; color: #ff9ca9; }
+    .workflow-note.returned { background: #12352e; color: #6be8bf; }
+    .empty-state { grid-column: 1 / -1; padding: 24px; border: 1px dashed #35425d; border-radius: 11px; background: #0b1220; color: var(--muted); text-align: center; font-size: 12px; }
+
+    /* ---------- Right rail ---------- */
+    .right-rail { display: grid; gap: 10px; align-content: start; }
+    .rail-panel { padding: 12px; border: 1px solid var(--border); border-radius: 13px; background: var(--surface); }
+    .rail-panel h2 { margin-bottom: 9px; color: #e2e8ff; font-size: 12px; }
+    .hotspot-list { display: grid; gap: 8px; }
+    .hotspot-row { color: #adb9d2; font-size: 10px; }
+    .hotspot-track { height: 4px; margin-top: 4px; overflow: hidden; border-radius: 9px; background: #27324a; }
+    .hotspot-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6858ff, #24d5a3); }
+    .how-list { display: grid; gap: 7px; padding-left: 14px; color: #9eabc6; font-size: 10px; }
+
+    /* ---------- Modals ---------- */
+    .modal-overlay { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 12px; background: #030610d0; overflow-y: auto; backdrop-filter: blur(4px); }
+    .modal-overlay.active { display: flex; }
+    #photoModal { z-index: 30; }
+    .modal { width: min(100%, 440px); max-height: 88vh; padding: 17px; overflow-y: auto; border: 1px solid #34405a; border-radius: 15px; background: #111a2a; color: var(--text); box-shadow: 0 24px 70px #0009; }
+    .modal h2 { margin-bottom: 4px; color: #f2f4ff; font-size: 19px; }
+    .modal-subtitle { margin-bottom: 10px; color: var(--muted); font-size: 11px; }
+    .form-group { margin-bottom: 8px; }
+    .form-group label, .report-type-label { display: block; margin-bottom: 4px; color: #c3cde2; font-size: 11px; font-weight: 700; }
+    .form-group input, .form-group select, .form-group textarea { padding: 8px 10px; font-size: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .report-type-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 5px 0 10px; padding: 4px; border: 1px solid #2c3852; border-radius: 10px; background: #0b1220; }
+    .type-option { padding: 8px 5px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #9eabc6; font-size: 11px; }
+    .type-option.active[data-item-type="Lost"] { background: #3b1b2b; border-color: #7a304b; color: #ff9caf; }
+    .type-option.active[data-item-type="Found"] { background: #12392f; border-color: #267b66; color: #76edc8; }
+    .form-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .form-actions button { flex: 1; min-width: 100px; }
+    .message { display: none; margin: 9px 0; padding: 9px; border-radius: 8px; font-size: 12px; overflow-wrap: anywhere; }
+    .message.error { display: block; background: #3a1b22; color: #ffabb5; }
+    .message.success { display: block; background: #12352e; color: #80edca; }
+
+    /* photo picker inside the report form */
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; margin-top: 8px; }
+    .photo-grid:empty { display: none; }
+    .photo-tile { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--border); border-radius: 9px; background: #0a1020; }
+    .photo-tile img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .photo-tile button { position: absolute; top: 3px; right: 3px; width: 20px; height: 20px; padding: 0; border: 0; border-radius: 50%; background: #000c; color: #fff; font-size: 11px; line-height: 1; }
+    .photo-tile span { position: absolute; left: 3px; bottom: 3px; padding: 1px 6px; border-radius: 10px; background: #000c; color: #fff; font-size: 9px; }
+    .photo-help { margin-top: 5px; color: var(--muted); font-size: 11px; }
+
+    /* ---------- Details + photo popups ---------- */
+    .modal.wide { width: min(100%, 900px); max-height: 92vh; padding: 0; }
+    .detail-head { position: sticky; top: 0; z-index: 3; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); background: #111a2a; }
+    .detail-head h2 { margin: 6px 0 2px; font-size: 20px; overflow-wrap: anywhere; }
+    .detail-head p { color: var(--muted); font-size: 12px; }
+    .detail-close { flex-shrink: 0; width: 34px; height: 34px; padding: 0; border-radius: 50%; background: var(--surface-2); border-color: var(--border); color: var(--text); }
+    .detail-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; padding: 16px 18px 18px; align-items: start; }
+    .detail-body-pad { padding: 16px 18px 18px; }
+    .info-card { margin-bottom: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+    .info-card h4 { margin-bottom: 8px; color: var(--purple-light); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .info-row { display: grid; grid-template-columns: 105px minmax(0, 1fr); gap: 8px; padding: 5px 0; border-bottom: 1px dashed #28355055; font-size: 12px; }
+    .info-row:last-child { border-bottom: 0; }
+    .info-row dt { color: var(--muted); }
+    .info-row dd { color: var(--text); overflow-wrap: anywhere; }
+    .info-desc { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+    .contact-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .contact-actions a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 13px; border-radius: 9px; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); color: #fff; font-size: 12px; font-weight: 700; text-decoration: none; }
+    .contact-actions a.alt { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); }
+    .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* gallery: 1 big photo + small photos below */
+    .gallery { display: grid; gap: 10px; }
+    .gallery-stage { position: relative; display: flex; align-items: center; justify-content: center; height: clamp(240px, 46vh, 420px); overflow: hidden; border: 1px solid var(--border); border-radius: 12px; background: #070b14; }
+    .gallery-main { width: 100%; height: 100%; object-fit: contain; cursor: zoom-in; transition: transform .18s ease; user-select: none; -webkit-user-drag: none; }
+    .gallery-stage.zoomed { touch-action: none; }
+    .gallery-stage.zoomed .gallery-main { cursor: zoom-out; }
+    .gallery-nav { position: absolute; top: 50%; z-index: 2; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: #000a; color: #fff; font-size: 22px; line-height: 1; transform: translateY(-50%); }
+    .gallery-nav:hover:not(:disabled) { transform: translateY(-50%) scale(1.08); }
+    .gallery-nav.prev { left: 8px; }
+    .gallery-nav.next { right: 8px; }
+    .gallery-counter { position: absolute; left: 8px; bottom: 8px; padding: 2px 10px; border-radius: 20px; background: #000b; color: #fff; font-size: 11px; }
+    .gallery-hint { color: var(--muted); font-size: 11px; text-align: center; }
+    .gallery-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+    .gallery-thumb { flex: 0 0 64px; width: 64px; height: 64px; padding: 0; overflow: hidden; border: 2px solid transparent; border-radius: 9px; background: #0a1020; opacity: .6; }
+    .gallery-thumb.active { border-color: var(--purple); opacity: 1; }
+    .gallery-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .gallery-empty { display: grid; place-items: center; min-height: 200px; border: 1px dashed var(--border); border-radius: 12px; color: var(--muted); font-size: 12px; }
+
+    body.logged-out .urgent-banner, body.logged-out .dashboard, body.logged-out footer { display: none; }
+    footer { padding: 18px; color: #71809e; text-align: center; font-size: 10px; }
 
     @media (max-width: 1250px) {
-      .dashboard {
-        grid-template-columns: minmax(165px, 0.7fr) minmax(0, 2fr);
-        width: calc(100% - 28px);
-        gap: 12px;
-      }
+      .dashboard { grid-template-columns: minmax(165px, 0.7fr) minmax(0, 2fr); width: calc(100% - 28px); gap: 12px; }
+      .dashboard > .sidebar, .dashboard > .right-rail { position: static; }
+      .right-rail { grid-column: 2; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
 
-      .dashboard > .sidebar,
-      .dashboard > .right-rail { position: static; }
-
-      .right-rail {
-        grid-column: 2;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+    @media (max-width: 760px) {
+      .detail-grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 700px) {
-      .navbar {
-        padding: 9px 12px;
-      }
-
-      .logo {
-        font-size: 17px;
-      }
-
-      .nav-actions {
-        gap: 5px;
-      }
-
-      .nav-actions button {
-        padding: 7px 9px;
-        font-size: 11px;
-      }
-
-      #welcomeText { display: none; }
+      .navbar { padding: 9px 12px; }
+      .logo { font-size: 17px; }
+      .nav-actions { gap: 5px; }
+      .nav-actions > button { padding: 7px 9px; font-size: 11px; }
       .profile-avatar { width: 36px; height: 36px; }
-      .profile-menu { right: 0; }
-
-      .urgent-banner,
-      .dashboard {
-        width: calc(100% - 20px);
-      }
-
-      .dashboard {
-        grid-template-columns: minmax(0, 1fr);
-        gap: 9px;
-        margin-top: 10px;
-      }
-
+      .urgent-banner, .dashboard { width: calc(100% - 20px); }
+      .dashboard { grid-template-columns: minmax(0, 1fr); gap: 9px; margin-top: 10px; }
       .feed-column { gap: 9px; }
-
-      .sidebar {
-        padding: 9px;
-      }
-
-      .side-nav {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .side-link {
-        justify-content: center;
-        padding: 7px 4px;
-        font-size: 10px;
-      }
-
-      .side-link .count,
-      .sidebar-zones {
-        display: none;
-      }
-
-      .right-rail {
-        grid-column: auto;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .stat {
-        min-height: 60px;
-        padding: 8px 10px;
-      }
-
-      .filters {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .filters input {
-        grid-column: 1 / -1;
-      }
-
-      .item-card {
-        grid-template-columns: 62px minmax(0, 1fr);
-        gap: 8px;
-        padding: 9px;
-      }
-
-      .item-image,
-      .item-placeholder {
-        width: 62px;
-        height: 62px;
-      }
-
-      .modal {
-        max-height: 90dvh;
-        padding: 14px;
-      }
+      .sidebar { padding: 9px; }
+      .side-nav { grid-template-columns: repeat(3, 1fr); }
+      .side-link { justify-content: center; padding: 7px 4px; font-size: 10px; }
+      .side-link .count, .sidebar-zones { display: none; }
+      .right-rail { grid-column: auto; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .stat { min-height: 60px; padding: 8px 10px; }
+      .filters { grid-template-columns: 1fr 1fr; }
+      .filters input { grid-column: 1 / -1; }
+      .modal { max-height: 90dvh; padding: 14px; }
+      .modal.wide { padding: 0; max-height: 94dvh; }
+      .detail-head, .detail-grid, .detail-body-pad { padding-left: 13px; padding-right: 13px; }
+      .info-row { grid-template-columns: 92px minmax(0, 1fr); }
     }
 
-
     @media (max-width: 430px) {
-      .right-rail {
-        grid-template-columns: 1fr;
-      }
-
-      .form-row {
-        gap: 5px;
-      }
-
+      .right-rail { grid-template-columns: 1fr; }
+      .form-row { gap: 5px; }
     }
   </style>
 </head>
@@ -987,10 +299,8 @@
     <div class="logo">🔎 Campus<span>Find</span></div>
 
     <div class="nav-actions">
-      <span id="welcomeText"></span>
-
       <div class="profile-wrap" id="profileWrap">
-        <button class="profile-avatar" id="profileAvatar" type="button" aria-label="Open profile menu" aria-expanded="false" onclick="toggleProfileMenu()">AS</button>
+        <button class="profile-avatar" id="profileAvatar" type="button" aria-label="Open profile menu" aria-expanded="false">U</button>
         <div class="profile-menu" id="profileMenu" role="menu">
           <div class="profile-heading"><strong id="profileMenuName">Student</strong><small id="profileMenuEmail"></small></div>
           <div class="profile-theme-section">
@@ -1001,24 +311,16 @@
               <button type="button" data-theme-choice="emerald" style="background:linear-gradient(135deg,#10B981,#38BDF8)" aria-label="Emerald theme" title="Emerald theme"></button>
             </div>
           </div>
-          <button type="button" role="menuitem" onclick="openPhoneFromProfile()">My phone / Profile settings</button>
-          <button type="button" role="menuitem" class="profile-logout" onclick="logout()">Logout</button>
+          <button type="button" role="menuitem" id="profileSettingsBtn">My phone / Profile settings</button>
+          <button type="button" role="menuitem" class="profile-logout" id="profileLogoutBtn">Logout</button>
         </div>
       </div>
 
-      <button
-        id="loginButton"
-        class="primary-btn"
-        type="button"
-        onclick="handlePrimaryAction()"
-      >
-        Login
-      </button>
-
+      <button id="loginButton" class="primary-btn" type="button">Login</button>
     </div>
   </header>
 
-  <button class="urgent-banner" type="button" onclick="handleUrgentAlert()" aria-label="Urgent alert: report a lost item">
+  <button class="urgent-banner" id="urgentBanner" type="button" aria-label="Urgent alert: report a lost item">
     <strong>⚠ URGENT ALERT</strong>
     Lost something valuable? Click here to report it.
   </button>
@@ -1028,15 +330,9 @@
       <p class="side-title">Navigation</p>
 
       <nav class="side-nav" aria-label="Item filters">
-        <button class="side-link active" type="button" data-status-filter="">
-          ◉ All live feeds <span class="count" id="navTotal">0</span>
-        </button>
-        <button class="side-link" type="button" data-status-filter="Lost">
-          ● Lost items only <span class="count" id="navLost">0</span>
-        </button>
-        <button class="side-link" type="button" data-status-filter="Found">
-          ● Found items only <span class="count" id="navFound">0</span>
-        </button>
+        <button class="side-link active" type="button" data-status-filter="">◉ All live feeds <span class="count" id="navTotal">0</span></button>
+        <button class="side-link" type="button" data-status-filter="Lost">● Lost items only <span class="count" id="navLost">0</span></button>
+        <button class="side-link" type="button" data-status-filter="Found">● Found items only <span class="count" id="navFound">0</span></button>
       </nav>
 
       <div class="sidebar-zones">
@@ -1059,38 +355,20 @@
       </div>
 
       <div class="stats">
-        <div class="stat">
-          <span>Total reports</span>
-          <strong id="statTotal">0</strong>
-        </div>
-        <div class="stat lost">
-          <span>Active lost</span>
-          <strong id="statLost">0</strong>
-        </div>
-        <div class="stat found">
-          <span>Found items</span>
-          <strong id="statFound">0</strong>
-        </div>
-        <div class="stat returned">
-          <span>Returned</span>
-          <strong id="statReturned">0</strong>
-        </div>
+        <div class="stat"><span>Total reports</span><strong id="statTotal">0</strong></div>
+        <div class="stat lost"><span>Active lost</span><strong id="statLost">0</strong></div>
+        <div class="stat found"><span>Active found</span><strong id="statFound">0</strong></div>
+        <div class="stat returned"><span>Returned</span><strong id="statReturned">0</strong></div>
       </div>
 
       <section class="listings surface">
         <div class="listings-heading">
-          <h2 id="listingsTitle" role="button" tabindex="0" aria-label="Switch between Campus item listings and My reports" title="Click to switch between Campus item listings and My reports" onclick="toggleReportsView()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReportsView()}">Campus item listings <span aria-hidden="true" class="title-switch-icon">↔</span></h2>
+          <h2 id="listingsTitle" role="button" tabindex="0" aria-label="Switch between Campus item listings and My reports" title="Click to switch between Campus item listings and My reports">Campus item listings <span aria-hidden="true" class="title-switch-icon">↔</span></h2>
 
           <div class="feed-tabs" id="publicFeedTabs" aria-label="Filter listings">
-            <button class="feed-tab active" type="button" data-status-filter="">
-              All
-            </button>
-            <button class="feed-tab" type="button" data-status-filter="Lost">
-              Lost
-            </button>
-            <button class="feed-tab" type="button" data-status-filter="Found">
-              Found
-            </button>
+            <button class="feed-tab active" type="button" data-status-filter="">All</button>
+            <button class="feed-tab" type="button" data-status-filter="Lost">Lost</button>
+            <button class="feed-tab" type="button" data-status-filter="Found">Found</button>
           </div>
           <div class="feed-tabs" id="myReportTabs" aria-label="Filter my reports" style="display:none">
             <button class="feed-tab active" type="button" data-my-report-filter="">All Reports</button>
@@ -1100,11 +378,7 @@
         </div>
 
         <div class="filters">
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search items, locations, descriptions..."
-          >
+          <input id="searchInput" type="search" placeholder="Search items, locations, descriptions...">
 
           <select id="categoryFilter">
             <option value="">All categories</option>
@@ -1141,7 +415,7 @@
       <section class="rail-panel">
         <h2>ⓘ How CampusFind works</h2>
         <ul class="how-list">
-          <li>Post clear item details. A photo is optional.</li>
+          <li>Post clear item details. Photos are optional (up to 5).</li>
           <li>New reports are checked before others can see them.</li>
           <li>Contact the student to arrange a safe return.</li>
         </ul>
@@ -1151,22 +425,15 @@
 
   <footer>© 2026 CampusFind · College Lost &amp; Found Portal</footer>
 
+  <!-- LOGIN -->
   <div class="modal-overlay" id="authModal">
     <div class="modal">
-      <h2 id="authTitle">Welcome to CampusFind</h2>
-
-      <p id="authSubtitle" class="modal-subtitle">
-        Login to access campus Lost &amp; Found reports.
-      </p>
+      <h2>Welcome to CampusFind</h2>
+      <p class="modal-subtitle">Login to access campus Lost &amp; Found reports.</p>
 
       <div id="authMessage" class="message"></div>
 
       <form id="authForm">
-        <div class="form-group" id="nameGroup" style="display:none">
-          <label for="authName">Name *</label>
-          <input id="authName" type="text" placeholder="Your name">
-        </div>
-
         <div class="form-group">
           <label for="authRole">Login as *</label>
           <select id="authRole" required>
@@ -1177,44 +444,26 @@
 
         <div class="form-group">
           <label for="authEmail">Username / Email *</label>
-          <input
-            id="authEmail"
-            type="email"
-            placeholder="you@example.com"
-            required
-          >
-        </div>
-
-        <div class="form-group" id="phoneGroup" style="display:none">
-          <label for="authPhone">Phone number (optional)</label>
-          <input id="authPhone" type="tel" placeholder="+91 9876543210">
+          <input id="authEmail" type="email" placeholder="you@example.com" autocomplete="username" required>
         </div>
 
         <div class="form-group">
           <label for="authPassword">Password *</label>
-          <input
-            id="authPassword"
-            type="password"
-            placeholder="Minimum 6 characters"
-            required
-          >
+          <input id="authPassword" type="password" placeholder="Enter your password" autocomplete="current-password" required>
         </div>
 
         <div class="form-actions">
           <button id="authSubmit" class="primary-btn" type="submit">Login</button>
         </div>
       </form>
-
     </div>
   </div>
 
+  <!-- PHONE -->
   <div class="modal-overlay" id="phoneModal">
     <div class="modal">
       <h2>My phone number</h2>
-
-      <p class="modal-subtitle">
-        Optional. Students can use this number to call you.
-      </p>
+      <p class="modal-subtitle">Optional. Other users can use this number to call you about a report.</p>
 
       <div id="phoneMessage" class="message"></div>
 
@@ -1225,28 +474,18 @@
         </div>
 
         <div class="form-actions">
-          <button
-            type="button"
-            class="secondary-btn"
-            onclick="closeModal('phoneModal')"
-          >
-            Cancel
-          </button>
-          <button id="phoneSubmit" type="submit" class="primary-btn">
-            Save phone
-          </button>
+          <button type="button" class="secondary-btn" data-close="phoneModal">Cancel</button>
+          <button id="phoneSubmit" type="submit" class="primary-btn">Save phone</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- REPORT -->
   <div class="modal-overlay" id="reportModal">
     <div class="modal">
       <h2 id="reportTitle">Report an Item</h2>
-
-      <p class="modal-subtitle">
-        New reports are checked by an admin before other students can see them.
-      </p>
+      <p class="modal-subtitle">New reports are checked by an admin before others can see them.</p>
 
       <div id="reportMessage" class="message"></div>
 
@@ -1255,48 +494,34 @@
 
         <label class="report-type-label">What are you reporting?</label>
         <div class="report-type-switch" role="group" aria-label="Choose Lost or Found">
-          <button
-            class="type-option active"
-            type="button"
-            data-item-type="Lost"
-            aria-pressed="true"
-          >
-            🔴 I lost an item
-          </button>
-          <button
-            class="type-option"
-            type="button"
-            data-item-type="Found"
-            aria-pressed="false"
-          >
-            🟢 I found an item
-          </button>
+          <button class="type-option active" type="button" data-item-type="Lost" aria-pressed="true">🔴 I lost an item</button>
+          <button class="type-option" type="button" data-item-type="Found" aria-pressed="false">🟢 I found an item</button>
         </div>
 
         <div class="form-group">
           <label for="itemTitle">Item name *</label>
-          <input id="itemTitle" type="text" placeholder="e.g. Blue notebook" required>
+          <input id="itemTitle" type="text" placeholder="e.g. Blue notebook" maxlength="120" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="studentName" id="reporterNameLabel">Student name *</label>
-            <input id="studentName" type="text" placeholder="Your full name" required>
+            <input id="studentName" type="text" readonly required>
           </div>
           <div class="form-group" id="courseGroup">
             <label for="studentCourse">Course *</label>
-            <input id="studentCourse" type="text" placeholder="e.g. BCA" required>
+            <input id="studentCourse" type="text" placeholder="e.g. BCA" maxlength="100" required>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="studentDepartment">Department *</label>
-            <input id="studentDepartment" type="text" placeholder="e.g. Computer Applications" required>
+            <input id="studentDepartment" type="text" placeholder="e.g. Computer Applications" maxlength="100" required>
           </div>
           <div class="form-group" id="batchGroup">
             <label for="studentBatch">Batch *</label>
-            <input id="studentBatch" type="text" placeholder="e.g. 2024-2027" required>
+            <input id="studentBatch" type="text" placeholder="e.g. 2024-2027" maxlength="30" required>
           </div>
         </div>
 
@@ -1328,6 +553,7 @@
             <option>Semester 8</option>
           </select>
         </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="itemCategory">Category *</label>
@@ -1351,69 +577,42 @@
 
         <div class="form-group">
           <label for="itemLocation">Campus location *</label>
-          <input
-            id="itemLocation"
-            type="text"
-            placeholder="Library, 3rd floor"
-            required
-          >
+          <input id="itemLocation" type="text" placeholder="Library, 3rd floor" maxlength="200" required>
         </div>
 
         <div class="form-group">
           <label for="itemDescription">Description *</label>
-          <textarea
-            id="itemDescription"
-            placeholder="Colour, brand, or unique marks..."
-            required
-          ></textarea>
+          <textarea id="itemDescription" placeholder="Colour, brand, or unique marks..." maxlength="3000" required></textarea>
         </div>
 
-                <!-- Interactive Multi-Image Upload Console (HTML Section Only) -->
-        <div class="form-group" style="font-family: sans-serif; color: #fff;">
-          <label for="itemImage" style="font-weight: bold; display: block; margin-bottom: 8px;">
-            Photo (optional, max 4-5 photos, up to 10MB each)
-          </label>
-          
-          <input id="itemImage" name="images" type="file" accept="image/*" multiple style="margin-bottom: 12px;" />
-
-          <!-- Slider Dynamic Preview Wrapper Container (Initially Hidden) -->
-          <div id="preview-slider-container" style="display: none; position: relative; background: #1e293b; border-radius: 8px; padding: 12px; margin-top: 10px;">
-            <div style="display: flex; align-items: center; justify-content: center; position: relative; height: 220px; overflow: hidden; border-radius: 6px;">
-              
-              <!-- Left Navigation Arrow Button -->
-              <button type="button" id="prev-btn" style="position: absolute; left: 8px; z-index: 10; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-weight: bold;">&lt;</button>
-              
-              <!-- Core Canvas View Container -->
-              <div id="zoom-wrapper" style="overflow: hidden; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; cursor: zoom-in; transition: transform 0.2s ease;">
-                <img id="imagePreview" src="" alt="Item photo preview" style="max-width: 100%; max-height: 100%; object-fit: contain; transform: scale(1); transition: transform 0.2s ease-out; transform-origin: center center;" />
-              </div>
-              
-              <!-- Right Navigation Arrow Button -->
-              <button type="button" id="next-btn" style="position: absolute; right: 8px; z-index: 10; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-weight: bold;">&gt;</button>
-            </div>
-
-            <!-- Counter tracker statistics panel -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 13px; color: #94a3b8;">
-              <span id="slider-counter">Image 1 of 1</span>
-              <span style="font-size: 11px; background: #334155; padding: 2px 6px; border-radius: 4px;">Click pic to Zoom In/Out</span>
-            </div>
-          </div>
+        <div class="form-group">
+          <label for="itemImage">Photos (optional, up to 5, 10 MB each)</label>
+          <input id="itemImage" type="file" accept="image/*" multiple>
+          <div id="photoGrid" class="photo-grid"></div>
+          <p id="photoHelp" class="photo-help">No photos added. The first photo is the cover photo.</p>
         </div>
-
 
         <div class="form-actions">
-          <button
-            type="button"
-            class="secondary-btn"
-            onclick="closeModal('reportModal')"
-          >
-            Cancel
-          </button>
-          <button id="reportSubmit" type="submit" class="primary-btn">
-            Submit report
-          </button>
+          <button type="button" class="secondary-btn" data-close="reportModal">Cancel</button>
+          <button id="reportSubmit" type="submit" class="primary-btn">Submit report</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MORE INFORMATION (details box) -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal wide" id="detailBox" role="dialog" aria-modal="true" aria-label="Report details"></div>
+  </div>
+
+  <!-- PHOTO VIEWER (1 big photo + small photos below) -->
+  <div class="modal-overlay" id="photoModal">
+    <div class="modal wide" role="dialog" aria-modal="true" aria-label="Photos">
+      <div class="detail-head">
+        <div><h2 id="photoTitle">Photos</h2><p id="photoSub"></p></div>
+        <button type="button" class="detail-close" data-close="photoModal" aria-label="Close photos">✕</button>
+      </div>
+      <div class="detail-body-pad" id="photoBody"></div>
     </div>
   </div>
 
@@ -1422,23 +621,29 @@
     ? "http://localhost:5000"
     : "https://campus-find-hmyj.onrender.com";
 
+  const $ = id => document.getElementById(id);
+  const MAX_PHOTOS = 5;
+  const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+
   let allItems = [];
   let myReportsMode = false;
   let myReportStatus = "";
-  let selectedImage = "";
-  let authMode = "login";
+  let photos = [];          // photos chosen in the report form: { full, thumb }
+  let photoBusy = false;
+  const fullItemCache = new Map();
 
-  // Three original theme choices: Aurora, Sunset, and Emerald.
+  /* ================= THEME ================= */
   (function initThemePicker() {
-    const savedTheme = localStorage.getItem("campusFindTheme") || "aurora";
-    const allowedThemes = ["aurora", "sunset", "emerald"];
-    const activeTheme = allowedThemes.includes(savedTheme) ? savedTheme : "aurora";
-    document.documentElement.setAttribute("data-theme", activeTheme);
+    const allowed = ["aurora", "sunset", "emerald"];
+    const saved = localStorage.getItem("campusFindTheme") || "aurora";
+    const active = allowed.includes(saved) ? saved : "aurora";
+    document.documentElement.setAttribute("data-theme", active);
+
     document.querySelectorAll("[data-theme-choice]").forEach(button => {
-      button.classList.toggle("active", button.dataset.themeChoice === activeTheme);
+      button.classList.toggle("active", button.dataset.themeChoice === active);
       button.addEventListener("click", () => {
         const theme = button.dataset.themeChoice;
-        if (!allowedThemes.includes(theme)) return;
+        if (!allowed.includes(theme)) return;
         document.documentElement.setAttribute("data-theme", theme);
         localStorage.setItem("campusFindTheme", theme);
         document.querySelectorAll("[data-theme-choice]").forEach(option => {
@@ -1448,199 +653,428 @@
     });
   })();
 
-  function isLoggedIn() {
-    return Boolean(localStorage.getItem("campusFindToken"));
-  }
+  /* ================= SESSION + API ================= */
+  const getToken = () => localStorage.getItem("campusFindToken");
+  const isLoggedIn = () => Boolean(getToken());
 
   function getCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem("campusFindUser") || "null");
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem("campusFindUser") || "null"); }
+    catch { return null; }
   }
 
-  function getToken() {
-    return localStorage.getItem("campusFindToken");
-  }
-
-  function authHeaders(extraHeaders = {}) {
-    const headers = { ...extraHeaders };
-
-    if (getToken()) {
-      headers.Authorization = `Bearer ${getToken()}`;
-    }
-
-    return headers;
-  }
-
-  async function apiRequest(path, options = {}) {
-    const response = await fetch(API_BASE + path, {
-      ...options,
-      headers: authHeaders(options.headers || {})
-    });
-
-    const text = await response.text();
-    let data = {};
-
-    try {
-      data = text ? JSON.parse(text) : {};
-    } catch {
-      data = { message: text || "Unexpected server response." };
-    }
-
-    if (!response.ok) {
-      if (response.status === 401 && isLoggedIn()) {
-        clearSession();
-        updateLoginUI();
-      }
-
-      throw new Error(
-        data.message || data.error || `Request failed (${response.status})`
-      );
-    }
-
-    return data;
-  }
-
-  function escapeHTML(value) {
-    return String(value ?? "").replace(/[&<>"']/g, character => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[character]);
-  }
-
-  function showMessage(elementId, message, type = "error") {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    element.textContent = message;
-    element.className = `message ${type}`;
-  }
-
-  function clearMessage(elementId) {
-    const element = document.getElementById(elementId);
-    if (!element) return;
-
-    element.textContent = "";
-    element.className = "message";
+  function getRole() {
+    return getCurrentUser()?.accountType === "Faculty" ? "Faculty" : "Student";
   }
 
   function clearSession() {
     localStorage.removeItem("campusFindToken");
     localStorage.removeItem("campusFindUser");
     allItems = [];
+    fullItemCache.clear();
   }
 
+  async function apiRequest(path, options = {}) {
+    const headers = { ...(options.headers || {}) };
+    if (getToken()) headers.Authorization = `Bearer ${getToken()}`;
+
+    const response = await fetch(API_BASE + path, { ...options, headers });
+    const text = await response.text();
+    let data = {};
+
+    try { data = text ? JSON.parse(text) : {}; }
+    catch { data = { message: text || "Unexpected server response." }; }
+
+    if (!response.ok) {
+      if (response.status === 401 && isLoggedIn()) {
+        clearSession();
+        updateLoginUI();
+      }
+      throw new Error(data.message || data.error || `Request failed (${response.status})`);
+    }
+
+    return data;
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[c]);
+  }
+
+  function showMessage(id, message, type = "error") {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = message;
+    el.className = `message ${type}`;
+  }
+
+  function clearMessage(id) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = "";
+    el.className = "message";
+  }
+
+  // Only real photos are allowed to be shown.
+  function safeImage(src) {
+    return typeof src === "string" &&
+      /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(src) ? src : "";
+  }
+
+  /* ================= LOGIN UI ================= */
   function updateLoginUI() {
     const loggedIn = isLoggedIn();
     const user = getCurrentUser();
 
     document.body.classList.toggle("logged-out", !loggedIn);
+    $("loginButton").textContent = loggedIn ? "＋ Report Item" : "Login";
+    $("profileWrap").style.display = loggedIn ? "block" : "none";
+    $("profileMenuName").textContent = user?.name || "Student";
+    $("profileMenuEmail").textContent = user?.email || "";
 
-    const loginButton = document.getElementById("loginButton");
-    const logoutButton = document.getElementById("logoutButton");
-    const phoneButton = document.getElementById("phoneButton");
-    const welcomeText = document.getElementById("welcomeText");
-    const profileWrap = document.getElementById("profileWrap");
-    const profileMenuName = document.getElementById("profileMenuName");
-    const profileMenuEmail = document.getElementById("profileMenuEmail");
-    const profileAvatar = document.getElementById("profileAvatar");
-    const authModal = document.getElementById("authModal");
+    const initials = String(user?.name || "").trim().split(/\s+/)
+      .filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
+    $("profileAvatar").textContent = initials || "U";
 
-    if (loginButton) {
-      loginButton.textContent = loggedIn ? "＋ Report Item" : "Login";
-    }
-
-    if (logoutButton) {
-      logoutButton.style.display = loggedIn ? "inline-block" : "none";
-    }
-
-    if (phoneButton) {
-      phoneButton.style.display = loggedIn ? "inline-block" : "none";
-    }
-
-    if (welcomeText) welcomeText.textContent = "";
-    if (profileWrap) profileWrap.style.display = loggedIn ? "block" : "none";
-    if (profileMenuName) profileMenuName.textContent = user?.name || "Student";
-    if (profileMenuEmail) profileMenuEmail.textContent = user?.email || "";
-    if (profileAvatar) {
-      const name = String(user?.name || "Aditya Sharma").trim();
-      const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join("").toUpperCase();
-      profileAvatar.textContent = initials || "AS";
-    }
-
-    if (authModal) {
-      authModal.classList.toggle("active", !loggedIn);
-    }
+    $("authModal").classList.toggle("active", !loggedIn);
 
     if (!loggedIn) {
-      const itemsContainer = document.getElementById("itemsContainer");
-      if (itemsContainer) {
-        itemsContainer.innerHTML =
-          '<div class="empty-state">Login to view campus reports.</div>';
-      }
+      $("itemsContainer").innerHTML = '<div class="empty-state">Login to view campus reports.</div>';
     }
   }
 
   function toggleProfileMenu() {
-    const menu = document.getElementById("profileMenu");
-    const avatar = document.getElementById("profileAvatar");
-    const isOpen = menu?.classList.toggle("open");
-    avatar?.setAttribute("aria-expanded", String(Boolean(isOpen)));
+    const open = $("profileMenu").classList.toggle("open");
+    $("profileAvatar").setAttribute("aria-expanded", String(open));
   }
 
   function closeProfileMenu() {
-    document.getElementById("profileMenu")?.classList.remove("open");
-    document.getElementById("profileAvatar")?.setAttribute("aria-expanded", "false");
+    $("profileMenu").classList.remove("open");
+    $("profileAvatar").setAttribute("aria-expanded", "false");
   }
 
+  $("profileAvatar").addEventListener("click", toggleProfileMenu);
   document.addEventListener("click", event => {
     if (!event.target.closest("#profileWrap")) closeProfileMenu();
   });
+  $("profileSettingsBtn").addEventListener("click", () => { closeProfileMenu(); openPhoneModal(); });
+  $("profileLogoutBtn").addEventListener("click", logout);
+  $("loginButton").addEventListener("click", () => (isLoggedIn() ? openReport("Lost") : openAuth()));
+  $("urgentBanner").addEventListener("click", () => (isLoggedIn() ? openReport("Lost") : openAuth()));
 
-  function openPhoneFromProfile() {
-    closeProfileMenu();
-    openPhoneModal();
+  function openAuth() {
+    clearMessage("authMessage");
+    $("authModal").classList.add("active");
   }
 
-  function toggleReportsView() {
-    if (myReportsMode) {
-      showAllReports();
-    } else {
-      if (!isLoggedIn()) {
-        openAuth();
-        return;
-      }
-      openMyReports();
+  function logout() {
+    closeProfileMenu();
+    clearSession();
+    showAllReports();
+    updateLoginUI();
+    openAuth();
+  }
+
+  /* ================= MODALS ================= */
+  function openModal(id) { $(id).classList.add("active"); }
+
+  function closeModal(id) {
+    if (id === "authModal" && !isLoggedIn()) return;
+    $(id).classList.remove("active");
+    if (id === "detailModal") $("detailBox").innerHTML = "";
+    if (id === "photoModal") $("photoBody").innerHTML = "";
+  }
+
+  document.querySelectorAll(".modal-overlay").forEach(modal => {
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closeModal(modal.id);
+    });
+  });
+
+  // Any button with data-close="modalId" closes that modal (also works for buttons added later).
+  document.addEventListener("click", event => {
+    const closer = event.target.closest("[data-close]");
+    if (closer) closeModal(closer.dataset.close);
+  });
+
+  document.addEventListener("keydown", event => {
+    const order = ["photoModal", "detailModal", "reportModal", "phoneModal"];
+    const open = order.find(id => $(id).classList.contains("active"));
+
+    if (event.key === "Escape" && open) {
+      closeModal(open);
+    } else if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && (open === "photoModal" || open === "detailModal")) {
+      const gallery = $(open).querySelector(".gallery");
+      if (gallery) gallery.step(event.key === "ArrowLeft" ? -1 : 1);
     }
+  });
+
+  /* ================= LOGIN FORM ================= */
+  $("authForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    clearMessage("authMessage");
+
+    const button = $("authSubmit");
+    button.disabled = true;
+
+    try {
+      const data = await apiRequest("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: $("authEmail").value.trim(),
+          password: $("authPassword").value,
+          accountType: $("authRole").value
+        })
+      });
+
+      if (!data.token || !data.user) {
+        throw new Error("Login response was incomplete. Please try again.");
+      }
+
+      localStorage.setItem("campusFindToken", data.token);
+      localStorage.setItem("campusFindUser", JSON.stringify(data.user));
+      $("authPassword").value = "";
+      updateLoginUI();
+      closeModal("authModal");
+      await loadItemsFromDatabase();
+    } catch (error) {
+      showMessage("authMessage", error.message || "Something went wrong.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  /* ================= PHONE ================= */
+  function openPhoneModal() {
+    $("profilePhone").value = getCurrentUser()?.phone || "";
+    clearMessage("phoneMessage");
+    openModal("phoneModal");
+  }
+
+  $("phoneForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = $("phoneSubmit");
+    button.disabled = true;
+
+    try {
+      const result = await apiRequest("/api/auth/phone", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: $("profilePhone").value.trim() })
+      });
+
+      const user = getCurrentUser() || {};
+      user.phone = result.phone || "";
+      localStorage.setItem("campusFindUser", JSON.stringify(user));
+      showMessage("phoneMessage", result.message || "Phone number saved.", "success");
+    } catch (error) {
+      showMessage("phoneMessage", error.message || "Could not save phone number.");
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  /* ================= REPORT FIELD HELPERS ================= */
+  const getItemId = item => item?._id || item?.id || "";
+  const getItemName = item => item?.itemName || item?.title || "Untitled item";
+  const getItemType = item => (item?.type || item?.status) === "Found" ? "Found" : "Lost";
+  const orNotProvided = value => value || "Not provided";
+
+  function normalizeItems(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
+    return [];
+  }
+
+  function formatDisplayDate(value) {
+    if (!value) return "Not specified";
+    const raw = String(value).trim();
+    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    // Treat YYYY-MM-DD as a local calendar date to avoid timezone shifts.
+    const date = match
+      ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+      : new Date(raw);
+
+    if (Number.isNaN(date.getTime())) return raw;
+    return new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" }).format(date);
+  }
+
+  /* ================= LOAD + STATS ================= */
+  async function loadItemsFromDatabase() {
+    if (!isLoggedIn()) return;
+
+    $("itemsContainer").innerHTML = '<div class="empty-state">Loading reports...</div>';
+    fullItemCache.clear();
+
+    try {
+      allItems = normalizeItems(await apiRequest("/api/items"));
+      renderItems();
+    } catch (error) {
+      $("itemsContainer").innerHTML = `<div class="empty-state">${escapeHTML(error.message)}</div>`;
+    }
+  }
+
+  function updateDashboardStats() {
+    const isReturned = item => item.resolutionStatus === "Returned";
+    const total = allItems.length;
+    const lostAll = allItems.filter(item => getItemType(item) === "Lost").length;
+    const foundAll = allItems.filter(item => getItemType(item) === "Found").length;
+
+    $("statTotal").textContent = total;
+    $("statLost").textContent = allItems.filter(item => getItemType(item) === "Lost" && !isReturned(item)).length;
+    $("statFound").textContent = allItems.filter(item => getItemType(item) === "Found" && !isReturned(item)).length;
+    $("statReturned").textContent = allItems.filter(isReturned).length;
+
+    $("navTotal").textContent = total;
+    $("navLost").textContent = lostAll;
+    $("navFound").textContent = foundAll;
+
+    const places = {};
+    allItems.forEach(item => {
+      const place = (item.location || "Other campus areas").split(",")[0].trim();
+      places[place] = (places[place] || 0) + 1;
+    });
+
+    const top = Object.entries(places).sort((a, b) => b[1] - a[1]).slice(0, 3);
+
+    $("hotspotList").innerHTML = top.length
+      ? top.map(([place, count]) => {
+          const percent = total ? Math.round((count / total) * 100) : 0;
+          return `
+            <div class="hotspot-row">
+              ${escapeHTML(place)}
+              <span style="float:right;color:var(--purple-light)">${percent}%</span>
+              <div class="hotspot-track"><span class="hotspot-fill" style="width:${percent}%"></span></div>
+            </div>`;
+        }).join("")
+      : '<div class="hotspot-row">No reports yet.</div>';
+  }
+
+  /* ================= LISTING ================= */
+  const CATEGORY_EMOJI = {
+    "bags": "🎒", "books": "📚", "electronics": "🎧",
+    "id card": "🪪", "keys": "🔑", "clothing": "👕"
+  };
+
+  function workflowNoteHTML(item) {
+    const review = item.reviewStatus || "Approved";
+    if (item.isOwner && review === "Pending") {
+      return '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
+    }
+    if (item.isOwner && review === "Rejected") {
+      return '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
+    }
+    if (item.resolutionStatus === "Returned") {
+      return '<p class="workflow-note returned">Returned — this report is closed.</p>';
+    }
+    return "";
+  }
+
+  function cardHTML(item) {
+    const id = escapeHTML(getItemId(item));
+    const title = escapeHTML(getItemName(item));
+    const type = getItemType(item);
+    const thumb = safeImage(item.thumbnail || item.image);
+    const count = Number(item.imageCount) || (thumb ? 1 : 0);
+    const emoji = CATEGORY_EMOJI[String(item.category || "").toLowerCase().trim()] || "📦";
+
+    const media = thumb
+      ? `<button type="button" class="item-media" data-action="photos" data-id="${id}" aria-label="View photos of ${title}">
+           <img src="${escapeHTML(thumb)}" alt="${title}" loading="lazy">
+           ${count > 1 ? `<span class="photo-count">📷 ${count}</span>` : ""}
+         </button>`
+      : `<div class="item-media no-photo" aria-label="No photo">${emoji}</div>`;
+
+    return `
+      <article class="item-card">
+        ${media}
+        <div class="item-body">
+          <div class="item-heading">
+            <span class="status ${type}">${type}</span>
+            <h3>${title}</h3>
+          </div>
+          <p>📍 ${escapeHTML(item.location || "Not specified")}</p>
+          <p>📅 ${escapeHTML(formatDisplayDate(item.date))}</p>
+          ${workflowNoteHTML(item)}
+          <div class="card-btn-wrap">
+            <button class="primary-btn card-btn" type="button" data-action="details" data-id="${id}">More information</button>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function renderItems() {
+    updateDashboardStats();
+
+    const query = $("searchInput").value.trim().toLowerCase();
+    const category = $("categoryFilter").value;
+    const status = $("statusFilter").value;
+
+    const filtered = allItems.filter(item => {
+      if (myReportsMode) {
+        if (!item.isOwner) return false;
+        if (myReportStatus && getItemType(item) !== myReportStatus) return false;
+      }
+
+      const searchable = [
+        getItemName(item), item.category, item.description, item.location,
+        item.course, item.department, item.batch, item.semester,
+        item.designation, item.studentName
+      ].join(" ").toLowerCase();
+
+      return (!query || searchable.includes(query)) &&
+        (!category || item.category === category) &&
+        (!status || getItemType(item) === status);
+    });
+
+    $("itemsContainer").innerHTML = filtered.length
+      ? filtered.map(cardHTML).join("")
+      : `<div class="empty-state">${myReportsMode ? "You have not posted any reports yet." : "No reports found."}</div>`;
+  }
+
+  /* ---------- filters / tabs ---------- */
+  function setListingsTitle(text) {
+    $("listingsTitle").innerHTML = `${text} <span aria-hidden="true" class="title-switch-icon">↔</span>`;
   }
 
   function openMyReports() {
     closeProfileMenu();
     myReportsMode = true;
     myReportStatus = "";
-    document.getElementById("listingsTitle").innerHTML = 'My reports <span aria-hidden="true" class="title-switch-icon">↔</span>';
-    document.getElementById("publicFeedTabs").style.display = "none";
-    document.getElementById("myReportTabs").style.display = "flex";
+    setListingsTitle("My reports");
+    $("publicFeedTabs").style.display = "none";
+    $("myReportTabs").style.display = "flex";
     document.querySelectorAll("[data-my-report-filter]").forEach(button => {
       button.classList.toggle("active", button.dataset.myReportFilter === "");
     });
     renderItems();
-    document.getElementById("itemsContainer")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    $("itemsContainer").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function showAllReports() {
     myReportsMode = false;
     myReportStatus = "";
-    document.getElementById("listingsTitle").innerHTML = 'Campus item listings <span aria-hidden="true" class="title-switch-icon">↔</span>';
-    document.getElementById("publicFeedTabs").style.display = "flex";
-    document.getElementById("myReportTabs").style.display = "none";
+    setListingsTitle("Campus item listings");
+    $("publicFeedTabs").style.display = "flex";
+    $("myReportTabs").style.display = "none";
     renderItems();
   }
+
+  function toggleReportsView() {
+    if (myReportsMode) showAllReports();
+    else if (!isLoggedIn()) openAuth();
+    else openMyReports();
+  }
+
+  $("listingsTitle").addEventListener("click", toggleReportsView);
+  $("listingsTitle").addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleReportsView();
+    }
+  });
 
   document.querySelectorAll("[data-my-report-filter]").forEach(button => {
     button.addEventListener("click", () => {
@@ -1652,571 +1086,260 @@
     });
   });
 
-  function handleUrgentAlert() {
-    if (isLoggedIn()) openReport("Lost");
-    else openAuth();
-  }
-
-  function handlePrimaryAction() {
-    if (isLoggedIn()) {
-      openReport("Lost");
-    } else {
-      openAuth();
-    }
-  }
-
-  function openAuth() {
-    clearMessage("authMessage");
-    document.getElementById("authModal")?.classList.add("active");
-  }
-
-
-  function logout() {
-    clearSession();
-    updateLoginUI();
-    openAuth();
-  }
-
-  function closeModal(modalId) {
-    if (modalId === "authModal" && !isLoggedIn()) {
-      return;
-    }
-
-    document.getElementById(modalId)?.classList.remove("active");
-  }
-
-  document.querySelectorAll(".modal-overlay").forEach(modal => {
-    modal.addEventListener("click", event => {
-      if (event.target !== modal) return;
-
-      if (modal.id === "authModal" && !isLoggedIn()) {
-        return;
-      }
-
-      modal.classList.remove("active");
+  function syncStatusFilter(selected) {
+    $("statusFilter").value = selected;
+    document.querySelectorAll("[data-status-filter]").forEach(option => {
+      option.classList.toggle("active", option.dataset.statusFilter === selected);
     });
-  });
-
-  document.getElementById("authForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    clearMessage("authMessage");
-
-    const button = document.getElementById("authSubmit");
-    button.disabled = true;
-
-    try {
-    const payload = {
-  email: document.getElementById("authEmail").value.trim(),
-  password: document.getElementById("authPassword").value,
-  accountType: document.getElementById("authRole").value
-  };
-
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const text = await response.text();
-      let data = {};
-      try {
-        data = text ? JSON.parse(text) : {};
-      } catch {
-        data = { message: "Unexpected server response." };
-      }
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed.");
-      }
-
-      if (!data.token || !data.user) {
-        throw new Error("Login response was incomplete. Please try again.");
-      }
-
-      localStorage.setItem("campusFindToken", data.token);
-      localStorage.setItem("campusFindUser", JSON.stringify(data.user));
-      updateLoginUI();
-      closeModal("authModal");
-      await loadItemsFromDatabase();
-    } catch (error) {
-      showMessage("authMessage", error.message || "Something went wrong.");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  function openPhoneModal() {
-    const user = getCurrentUser();
-
-    document.getElementById("profilePhone").value = user?.phone || "";
-    clearMessage("phoneMessage");
-    document.getElementById("phoneModal").classList.add("active");
   }
-
-  document.getElementById("phoneForm").addEventListener("submit", async event => {
-    event.preventDefault();
-
-    const button = document.getElementById("phoneSubmit");
-    button.disabled = true;
-
-    try {
-      const result = await apiRequest("/api/auth/phone", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: document.getElementById("profilePhone").value.trim()
-        })
-      });
-
-      const user = getCurrentUser() || {};
-      user.phone = result.phone || "";
-
-      localStorage.setItem("campusFindUser", JSON.stringify(user));
-
-      showMessage(
-        "phoneMessage",
-        result.message || "Phone number saved.",
-        "success"
-      );
-    } catch (error) {
-      showMessage("phoneMessage", error.message || "Could not save phone number.");
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-  function getItemId(item) {
-    return item?._id || item?.id || "";
-  }
-
-  function getItemName(item) {
-    return item?.itemName || item?.title || "Untitled item";
-  }
-
-  function getItemType(item) {
-    return item?.type || item?.status || "Lost";
-  }
-
-  function getCourse(item) {
-    return item?.course || item?.studentCourse || "Not provided";
-  }
-
-  function getDepartment(item) {
-    return item?.department || item?.studentDepartment || "Not provided";
-  }
-
-  function getBatch(item) {
-    return item?.batch || item?.studentBatch || "Not provided";
-  }
-
-  function getSemester(item) {
-    return item?.semester || item?.studentSemester || "Not provided";
-  }
-
-  function normalizeItems(data) {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.items)) return data.items;
-    if (Array.isArray(data?.data)) return data.data;
-    return [];
-  }
-
-  async function loadItemsFromDatabase() {
-    if (!isLoggedIn()) return;
-
-    const container = document.getElementById("itemsContainer");
-    container.innerHTML =
-      '<div class="empty-state">Loading reports...</div>';
-
-    try {
-      const data = await apiRequest("/api/items");
-      allItems = normalizeItems(data);
-      renderItems();
-    } catch (error) {
-      container.innerHTML =
-        `<div class="empty-state">${escapeHTML(error.message)}</div>`;
-    }
-  }
-
-  function updateDashboardStats() {
-    const total = allItems.length;
-    const lost = allItems.filter(item => getItemType(item) !== "Found").length;
-    const found = allItems.filter(item => getItemType(item) === "Found").length;
-    const returned = allItems.filter(
-      item => item.resolutionStatus === "Returned"
-    ).length;
-
-    document.getElementById("statTotal").textContent = total;
-    document.getElementById("statLost").textContent = lost;
-    document.getElementById("statFound").textContent = found;
-    document.getElementById("statReturned").textContent = returned;
-
-    document.getElementById("navTotal").textContent = total;
-    document.getElementById("navLost").textContent = lost;
-    document.getElementById("navFound").textContent = found;
-
-    const locations = {};
-
-    allItems.forEach(item => {
-      const place = (item.location || "Other campus areas")
-        .split(",")[0]
-        .trim();
-
-      locations[place] = (locations[place] || 0) + 1;
-    });
-
-    const topLocations = Object.entries(locations)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-
-    const hotspotList = document.getElementById("hotspotList");
-
-    if (!topLocations.length) {
-      hotspotList.innerHTML =
-        '<div class="hotspot-row">No reports yet.</div>';
-      return;
-    }
-
-    hotspotList.innerHTML = topLocations.map(([place, count]) => {
-      const percent = total ? Math.round((count / total) * 100) : 0;
-
-      return `
-        <div class="hotspot-row">
-          ${escapeHTML(place)}
-          <span style="float:right;color:#a99dff">${percent}%</span>
-          <div class="hotspot-track">
-            <span class="hotspot-fill" style="width:${percent}%"></span>
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  // Format report dates safely; this function is used by item cards.
-  function formatDisplayDate(value) {
-    if (!value) return "Not specified";
-
-    const raw = String(value).trim();
-    // Treat YYYY-MM-DD as a local calendar date to avoid timezone shifts.
-    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    const date = match
-      ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
-      : new Date(raw);
-
-    if (Number.isNaN(date.getTime())) return raw;
-    return new Intl.DateTimeFormat("en-IN", {
-      day: "numeric", month: "short", year: "numeric"
-    }).format(date);
-  }
-
-  function renderItems() {
-    updateDashboardStats();
-
-    const container = document.getElementById("itemsContainer");
-    const query = document
-      .getElementById("searchInput")
-      .value
-      .trim()
-      .toLowerCase();
-
-    const category = document.getElementById("categoryFilter").value;
-    const status = document.getElementById("statusFilter").value;
-
-    const user = getCurrentUser() || {};
-    const currentEmail = String(user.email || "").trim().toLowerCase();
-    const currentId = String(user._id || user.id || user.userId || "");
-    const filtered = allItems.filter(item => {
-      if (myReportsMode) {
-        const ownerEmail = String(item.studentEmail || item.email || item.reporterEmail || item.createdBy?.email || item.user?.email || "").trim().toLowerCase();
-        const ownerId = String(item.studentId || item.userId || item.createdBy?._id || item.createdBy?.id || item.user?._id || item.user?.id || "");
-        const ownerName = String(item.studentName || item.reporterName || "").trim().toLowerCase();
-        const currentName = String(user.name || user.fullName || user.username || "").trim().toLowerCase();
-        const isMine = (currentEmail && ownerEmail === currentEmail) || (currentId && ownerId === currentId) || (currentName && ownerName === currentName);
-        if (!isMine) return false;
-        if (myReportStatus && getItemType(item) !== myReportStatus) return false;
-      }
-      const searchable = [
-        getItemName(item),
-        item.category,
-        item.description,
-        item.location,
-        getCourse(item),
-        getDepartment(item),
-        getBatch(item),
-        getSemester(item),
-        item.studentName
-      ].join(" ").toLowerCase();
-
-      return (
-        (!query || searchable.includes(query)) &&
-        (!category || item.category === category) &&
-        (!status || getItemType(item) === status)
-      );
-    });
-
-    if (!filtered.length) {
-      container.innerHTML =
-        '<div class="empty-state">No reports found.</div>';
-      return;
-    }
-
-    container.innerHTML = filtered.map(item => {
-      const id = escapeHTML(getItemId(item));
-      const title = escapeHTML(getItemName(item));
-      const type = getItemType(item) === "Found" ? "Found" : "Lost";
-      const course = escapeHTML(getCourse(item));
-      const reviewStatus = item.reviewStatus || "Approved";
-      const resolutionStatus = item.resolutionStatus || "Open";
-
-             const imageSource =
-        typeof item.image === "string" &&
-        /^(data:image\/(jpeg|jpg|png|webp|gif);base64,|https:\/\/)/i.test(item.image)
-          ? item.image
-          : "";
-
-      // Exact Categories ke hisab se smart emojis logic
-      let defaultEmoji = "📦"; 
-      const categoryName = (item.category || "").toLowerCase().trim();
-
-      if (categoryName === "bags") defaultEmoji = "🎒"; 
-      else if (categoryName === "books") defaultEmoji = "📚"; 
-      else if (categoryName === "electronics") defaultEmoji = "🎧"; 
-      else if (categoryName === "id card") defaultEmoji = "🪪"; 
-      else if (categoryName === "keys") defaultEmoji = "🔑"; 
-      else if (categoryName === "clothing") defaultEmoji = "👕";
-
-      // 100% Fix Done: href link hatakar onclick trigger function lagaya hai
-      const imageHTML = imageSource
-        ? `<div onclick="openImageModal('${escapeHTML(imageSource)}')" style="cursor: zoom-in; display: block;">
-             <img class="item-image" src="${escapeHTML(imageSource)}" alt="${title}" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px;">
-           </div>`
-        : `<div class="item-placeholder" aria-label="No photo" style="font-size: 55px; display: flex; align-items: center; justify-content: center; background: #1e293b; width: 100%; height: 160px; border-radius: 8px; margin-bottom: 8px;">
-             ${defaultEmoji}
-           </div>`;
-  
-id
-
-      let workflowNote = "";
-
-      if (item.isOwner && reviewStatus === "Pending") {
-        workflowNote =
-          '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>';
-      } else if (item.isOwner && reviewStatus === "Rejected") {
-        workflowNote =
-          '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>';
-      } else if (resolutionStatus === "Returned") {
-        workflowNote =
-          '<p class="workflow-note returned">Returned — this report is closed.</p>';
-      }
-
-      const moreInfoButton =
-        `<button class="primary-btn" type="button" data-action="more-info" data-id="${id}" aria-expanded="false">More information</button>`;
-
-      const returnedButton =
-        item.isOwner &&
-        reviewStatus === "Approved" &&
-        resolutionStatus === "Open"
-          ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${id}">Mark returned</button>`
-          : "";
-
-      const deleteButton = item.isOwner
-        ? `<button class="danger-btn" type="button" data-action="delete" data-id="${id}">Delete report</button>`
-        : "";
-
-      return `
-        <article class="item-card">
-          ${imageHTML}
-
-          <div class="item-content">
-            <div class="item-heading">
-              <span class="status ${type}">${type}</span>
-              <h3>${title}</h3>
-            </div>
-
-            <p>📍 ${escapeHTML(item.location || "Not specified")}</p>
-            <p>📅 Reported: ${escapeHTML(formatDisplayDate(item.date))}</p>
-
-            <div class="item-buttons">
-              ${moreInfoButton}
-            </div>
-
-            <div class="contact-result" aria-live="polite"></div>
-          </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  document.getElementById("searchInput").addEventListener("input", renderItems);
-  document.getElementById("categoryFilter").addEventListener("change", renderItems);
-
-  document.getElementById("statusFilter").addEventListener("change", event => {
-    const selected = event.target.value;
-
-    document.querySelectorAll("[data-status-filter]").forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.statusFilter === selected
-      );
-    });
-
-    renderItems();
-  });
 
   document.querySelectorAll("[data-status-filter]").forEach(button => {
     button.addEventListener("click", () => {
-      const selected = button.dataset.statusFilter;
-      document.getElementById("statusFilter").value = selected;
-
-      document.querySelectorAll("[data-status-filter]").forEach(option => {
-        option.classList.toggle(
-          "active",
-          option.dataset.statusFilter === selected
-        );
-      });
+      syncStatusFilter(button.dataset.statusFilter);
       showAllReports();
-      renderItems();
     });
   });
+
+  $("statusFilter").addEventListener("change", event => {
+    syncStatusFilter(event.target.value);
+    renderItems();
+  });
+
+  $("searchInput").addEventListener("input", renderItems);
+  $("categoryFilter").addEventListener("change", renderItems);
 
   document.querySelectorAll("[data-zone]").forEach(button => {
     button.addEventListener("click", () => {
-      document.getElementById("searchInput").value = button.dataset.zone;
+      $("searchInput").value = button.dataset.zone;
       renderItems();
     });
   });
 
-  document.getElementById("itemsContainer").addEventListener(
-    "click",
-    async event => {
-      const button = event.target.closest("button[data-action]");
-      if (!button) return;
+  /* ================= PHOTO GALLERY =================
+     One big photo, small photos below. Click a small photo to switch,
+     click the big photo to zoom in / out (move the mouse or finger to look around). */
+  function createGallery(images, startIndex = 0) {
+    const root = document.createElement("div");
+    const list = (images || []).map(safeImage).filter(Boolean);
 
-      const { action, id } = button.dataset;
-
-      if (action === "more-info") {
-        await showMoreInfo(id, button);
-      }
-
-      if (action === "delete") {
-        await deleteItem(id);
-      }
-
-      if (action === "resolve") {
-        await markReturned(id);
-      }
+    if (!list.length) {
+      root.className = "gallery-empty";
+      root.textContent = "No photos were added to this report.";
+      return root;
     }
-  );
 
-  function detailLine(label, value) {
-    return `
-      <p>
-        <strong>${escapeHTML(label)}:</strong>
-        ${escapeHTML(value || "Not provided")}
-      </p>
-    `;
+    root.className = "gallery";
+    root.innerHTML = `
+      <div class="gallery-stage">
+        <button type="button" class="gallery-nav prev" aria-label="Previous photo">‹</button>
+        <img class="gallery-main" alt="Item photo">
+        <button type="button" class="gallery-nav next" aria-label="Next photo">›</button>
+        <span class="gallery-counter"></span>
+      </div>
+      <p class="gallery-hint">Click the photo to zoom in / out</p>
+      <div class="gallery-thumbs"></div>`;
+
+    const stage = root.querySelector(".gallery-stage");
+    const main = root.querySelector(".gallery-main");
+    const counter = root.querySelector(".gallery-counter");
+    const thumbsBox = root.querySelector(".gallery-thumbs");
+    let index = 0;
+    let zoomed = false;
+
+    function setOrigin(point) {
+      const rect = stage.getBoundingClientRect();
+      const x = Math.min(100, Math.max(0, ((point.clientX - rect.left) / rect.width) * 100));
+      const y = Math.min(100, Math.max(0, ((point.clientY - rect.top) / rect.height) * 100));
+      main.style.transformOrigin = `${x}% ${y}%`;
+    }
+
+    function setZoom(on, point) {
+      zoomed = on;
+      stage.classList.toggle("zoomed", on);
+      if (on && point) setOrigin(point);
+      main.style.transform = on ? "scale(2.4)" : "scale(1)";
+    }
+
+    const thumbs = list.map((src, i) => {
+      const button = document.createElement("button");
+      const img = document.createElement("img");
+      button.type = "button";
+      button.className = "gallery-thumb";
+      button.setAttribute("aria-label", `Photo ${i + 1}`);
+      img.src = src;
+      img.alt = "";
+      button.appendChild(img);
+      button.addEventListener("click", () => show(i));
+      thumbsBox.appendChild(button);
+      return button;
+    });
+
+    function show(i) {
+      index = (i + list.length) % list.length;
+      setZoom(false);
+      main.src = list[index];
+      counter.textContent = `${index + 1} / ${list.length}`;
+      thumbs.forEach((thumb, n) => thumb.classList.toggle("active", n === index));
+      thumbs[index].scrollIntoView({ block: "nearest", inline: "center" });
+    }
+
+    main.addEventListener("click", event => setZoom(!zoomed, event));
+    stage.addEventListener("mousemove", event => { if (zoomed) setOrigin(event); });
+    stage.addEventListener("touchmove", event => {
+      if (zoomed && event.touches[0]) setOrigin(event.touches[0]);
+    }, { passive: true });
+    root.querySelector(".prev").addEventListener("click", () => show(index - 1));
+    root.querySelector(".next").addEventListener("click", () => show(index + 1));
+
+    if (list.length === 1) {
+      root.querySelectorAll(".gallery-nav").forEach(button => { button.style.display = "none"; });
+      thumbsBox.style.display = "none";
+    }
+
+    root.step = delta => show(index + delta);
+    show(Math.min(startIndex, list.length - 1));
+    return root;
   }
 
-  async function showMoreInfo(id, button) {
-    const card = button.closest(".item-card");
-    const result = card.querySelector(".contact-result");
+  async function fetchFullItem(id) {
+    if (fullItemCache.has(id)) return fullItemCache.get(id);
+    const item = await apiRequest(`/api/items/${encodeURIComponent(id)}`);
+    fullItemCache.set(id, item);
+    return item;
+  }
 
-    if (result.classList.contains("visible")) {
-      result.classList.remove("visible");
-      button.textContent = "More information";
-      button.setAttribute("aria-expanded", "false");
-      return;
-    }
-
-    result.classList.add("visible");
-    result.innerHTML = "<p>Loading full report information...</p>";
-    button.textContent = "Hide information";
-    button.setAttribute("aria-expanded", "true");
-
-    const item = allItems.find(
-      report => String(getItemId(report)) === String(id)
-    );
-
-    if (!item) {
-      result.innerHTML = "<p>Report details could not be found.</p>";
-      return;
-    }
-
-    let contact = {};
+  /* ---------- click on a card photo ---------- */
+  async function openPhotoViewer(id) {
+    const card = allItems.find(item => String(getItemId(item)) === String(id));
+    $("photoTitle").textContent = card ? getItemName(card) : "Photos";
+    $("photoSub").textContent = card ? `${getItemType(card)} · ${card.location || ""}` : "";
+    $("photoBody").innerHTML = '<p class="muted" style="text-align:center;padding:30px">Loading photos...</p>';
+    openModal("photoModal");
 
     try {
-      const response = await apiRequest(
-        `/api/items/${encodeURIComponent(id)}/contact`
-      );
-
-      contact = response.contact || response;
+      const full = await fetchFullItem(id);
+      if (!$("photoModal").classList.contains("active")) return;
+      $("photoBody").replaceChildren(createGallery(full.images));
     } catch (error) {
-      contact = {};
+      $("photoBody").innerHTML = `<div class="empty-state">${escapeHTML(error.message)}</div>`;
+    }
+  }
+
+  /* ================= MORE INFORMATION (details box) ================= */
+  function infoRows(rows) {
+    return rows
+      .filter(([, value]) => value)
+      .map(([label, value]) => `<div class="info-row"><dt>${escapeHTML(label)}</dt><dd>${escapeHTML(value)}</dd></div>`)
+      .join("");
+  }
+
+  function contactHTML(item) {
+    const contact = item.contact;
+
+    if (!contact) {
+      return item.isOwner
+        ? '<p class="muted">This is your own report.</p>'
+        : '<p class="muted">Contact details are not available (the report is closed).</p>';
     }
 
-    const studentName =
-      contact.studentName || item.studentName || "Student";
-    const email =
-      contact.studentContact ||
-      contact.studentEmail ||
-      contact.email ||
-      item.studentContact ||
-      "";
-    const phone =
-      contact.studentPhone ||
-      contact.phone ||
-      item.studentPhone ||
-      "";
+    const email = contact.studentContact || "";
+    const phone = contact.studentPhone || "";
+    const phoneDigits = phone.replace(/[^\d+]/g, "");
 
-    const type = getItemType(item) === "Found" ? "Found" : "Lost";
+    const rows = infoRows([["Name", contact.studentName], ["Email", email], ["Phone", phone]]);
+    const buttons = [
+      email ? `<a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}" target="_blank" rel="noopener noreferrer">✉ Email</a>` : "",
+      phoneDigits ? `<a class="alt" href="tel:${escapeHTML(phoneDigits)}">📞 Call</a>` : ""
+    ].join("");
 
-       result.innerHTML = `
-      <strong>Complete item information</strong>
-      ${detailLine("Item", getItemName(item))}
-      ${detailLine("Status", type)}
-      ${detailLine("Category", item.category)}
-      ${detailLine("Location", item.location)}
-      ${detailLine("Date", item.date)}
-      ${detailLine("Description", item.description)}
-      ${item.isOwner && (item.reviewStatus || "Approved") === "Pending" ? '<p class="workflow-note pending">Waiting for admin approval. Only you can see this report.</p>' : ""}
-      ${item.isOwner && (item.reviewStatus || "Approved") === "Rejected" ? '<p class="workflow-note rejected">This report was not approved. You can delete it.</p>' : ""}
-      ${(item.resolutionStatus || "Open") === "Returned" ? '<p class="workflow-note returned">Returned — this report is closed.</p>' : ""}
-      <div class="item-buttons">
-        ${item.isOwner && (item.reviewStatus || "Approved") === "Approved" && (item.resolutionStatus || "Open") === "Open" ? `<button class="secondary-btn" type="button" data-action="resolve" data-id="${escapeHTML(getItemId(item))}">Mark returned</button>` : ""}
-        ${item.isOwner ? `<button class="danger-btn" type="button" data-action="delete" data-id="${escapeHTML(getItemId(item))}">Delete report</button>` : ""}
-      </div>
-      <hr style="margin:8px 0;border-color:#283550">
-      <strong>Student information</strong>
-      ${detailLine("Name", studentName)}
-      ${detailLine("Course", getCourse(item))}
-      ${detailLine("Department", getDepartment(item))}
-      ${detailLine("Batch", getBatch(item))}
-      ${detailLine("Semester", getSemester(item))}
-      
-      <!-- Privacy Safe Contact Link -->
-      ${email ? `
-        <div style="margin-top: 15px;">
-          <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}" 
-             target="_blank" 
-             rel="noopener noreferrer" 
-             style="color: #38bdf8; text-decoration: underline; font-weight: bold; font-size: 16px;">
-            Contact
-          </a>
-        </div>
-      ` : '<p style="color: #aaa; margin-top: 15px;">Contact: Not available</p>'}
-    `;
+    return `<dl>${rows}</dl>${buttons ? `<div class="contact-actions" style="margin-top:8px">${buttons}</div>` : '<p class="muted">No contact details available.</p>'}`;
   }
+
+  function renderDetails(item) {
+    const id = escapeHTML(getItemId(item));
+    const type = getItemType(item);
+    const review = item.reviewStatus || "Approved";
+    const open = (item.resolutionStatus || "Open") === "Open";
+    const faculty = item.reporterRole === "Faculty";
+
+    const reporterRows = faculty
+      ? [["Name", item.studentName], ["Role", "Faculty"], ["Designation", item.designation], ["Department", item.department]]
+      : [["Name", item.studentName], ["Role", "Student"], ["Course", item.course], ["Department", item.department], ["Batch", item.batch], ["Semester", item.semester]];
+
+    const ownerButtons = item.isOwner
+      ? `<div class="info-card"><h4>Manage your report</h4><div class="detail-actions">
+           ${review === "Approved" && open ? `<button class="secondary-btn" type="button" data-detail-action="resolve" data-id="${id}">✔ Mark returned</button>` : ""}
+           <button class="danger-btn" type="button" data-detail-action="delete" data-id="${id}">🗑 Delete report</button>
+         </div></div>`
+      : "";
+
+    $("detailBox").innerHTML = `
+      <div class="detail-head">
+        <div>
+          <span class="status ${type}">${type}</span>
+          <h2>${escapeHTML(getItemName(item))}</h2>
+          <p>📍 ${escapeHTML(item.location || "Not specified")} · 📅 ${escapeHTML(formatDisplayDate(item.date))}</p>
+        </div>
+        <button type="button" class="detail-close" data-close="detailModal" aria-label="Close">✕</button>
+      </div>
+      <div class="detail-grid">
+        <div id="detailGallery"></div>
+        <div>
+          ${workflowNoteHTML(item)}
+          <section class="info-card"><h4>Item details</h4><dl>${infoRows([
+            ["Item", getItemName(item)], ["Status", type], ["Category", item.category],
+            ["Location", item.location], ["Date", formatDisplayDate(item.date)],
+            ["Report", review === "Approved" ? (open ? "Open" : "Returned") : review]
+          ])}</dl></section>
+          <section class="info-card"><h4>Description</h4><p class="info-desc">${escapeHTML(orNotProvided(item.description))}</p></section>
+          <section class="info-card"><h4>Reported by</h4><dl>${infoRows(reporterRows)}</dl></section>
+          <section class="info-card"><h4>Contact</h4>${contactHTML(item)}</section>
+          ${ownerButtons}
+        </div>
+      </div>`;
+
+    $("detailGallery").replaceChildren(createGallery(item.images));
+  }
+
+  async function openDetails(id) {
+    $("detailBox").innerHTML = `
+      <div class="detail-head"><div><h2>Loading...</h2></div>
+        <button type="button" class="detail-close" data-close="detailModal" aria-label="Close">✕</button></div>
+      <div class="detail-body-pad"><p class="muted">Loading full report information...</p></div>`;
+    openModal("detailModal");
+
+    try {
+      const item = await fetchFullItem(id);
+      if (!$("detailModal").classList.contains("active")) return;
+      renderDetails(item);
+    } catch (error) {
+      $("detailBox").innerHTML = `
+        <div class="detail-head"><div><h2>Could not load</h2></div>
+          <button type="button" class="detail-close" data-close="detailModal" aria-label="Close">✕</button></div>
+        <div class="detail-body-pad"><div class="empty-state">${escapeHTML(error.message)}</div></div>`;
+    }
+  }
+
+  $("itemsContainer").addEventListener("click", event => {
+    const button = event.target.closest("[data-action]");
+    if (!button) return;
+    if (button.dataset.action === "photos") openPhotoViewer(button.dataset.id);
+    if (button.dataset.action === "details") openDetails(button.dataset.id);
+  });
+
+  $("detailBox").addEventListener("click", async event => {
+    const button = event.target.closest("[data-detail-action]");
+    if (!button) return;
+    if (button.dataset.detailAction === "delete") await deleteItem(button.dataset.id);
+    if (button.dataset.detailAction === "resolve") await markReturned(button.dataset.id);
+  });
 
   async function deleteItem(id) {
-    if (!confirm("Are you sure you want to delete this report?")) {
-      return;
-    }
+    if (!confirm("Are you sure you want to delete this report?")) return;
 
     try {
-      await apiRequest(
-        `/api/items/${encodeURIComponent(id)}`,
-        { method: "DELETE" }
-      );
-
+      await apiRequest(`/api/items/${encodeURIComponent(id)}`, { method: "DELETE" });
+      closeModal("detailModal");
       await loadItemsFromDatabase();
       alert("Report deleted.");
     } catch (error) {
@@ -2225,16 +1348,11 @@ id
   }
 
   async function markReturned(id) {
-    if (!confirm("Has this item been returned to its owner?")) {
-      return;
-    }
+    if (!confirm("Has this item been returned to its owner?")) return;
 
     try {
-      await apiRequest(
-        `/api/items/${encodeURIComponent(id)}/resolve`,
-        { method: "PATCH" }
-      );
-
+      await apiRequest(`/api/items/${encodeURIComponent(id)}/resolve`, { method: "PATCH" });
+      closeModal("detailModal");
       await loadItemsFromDatabase();
       alert("Report marked as returned.");
     } catch (error) {
@@ -2242,21 +1360,16 @@ id
     }
   }
 
+  /* ================= REPORT FORM ================= */
   function localDateString() {
     const now = new Date();
-    const localDate = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60000
-    );
-
-    return localDate.toISOString().slice(0, 10);
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   }
 
   function setReportType(status) {
     const selected = status === "Found" ? "Found" : "Lost";
-
-    document.getElementById("itemStatus").value = selected;
-    document.getElementById("reportTitle").textContent =
-      selected === "Lost" ? "Report a Lost Item" : "Report a Found Item";
+    $("itemStatus").value = selected;
+    $("reportTitle").textContent = selected === "Lost" ? "Report a Lost Item" : "Report a Found Item";
 
     document.querySelectorAll(".type-option").forEach(button => {
       const active = button.dataset.itemType === selected;
@@ -2266,260 +1379,169 @@ id
   }
 
   document.querySelectorAll(".type-option").forEach(button => {
-    button.addEventListener("click", () => {
-      setReportType(button.dataset.itemType);
-    });
+    button.addEventListener("click", () => setReportType(button.dataset.itemType));
   });
+
+  // Students fill Course / Batch / Semester. Faculty fill Designation.
+  function applyRoleFields() {
+    const faculty = getRole() === "Faculty";
+    $("reporterNameLabel").textContent = faculty ? "Faculty name *" : "Student name *";
+    ["courseGroup", "batchGroup", "semesterGroup"].forEach(id => { $(id).style.display = faculty ? "none" : ""; });
+    $("designationGroup").style.display = faculty ? "" : "none";
+    $("studentCourse").required = !faculty;
+    $("studentBatch").required = !faculty;
+    $("studentSemester").required = !faculty;
+    $("facultyDesignation").required = faculty;
+  }
 
   function openReport(status) {
-    if (!isLoggedIn()) {
-      openAuth();
-      return;
-    }
+    if (!isLoggedIn()) { openAuth(); return; }
 
-    document.getElementById("reportForm").reset();
+    $("reportForm").reset();
+    photos = [];
+    renderPhotoTiles();
     setReportType(status);
-    document.getElementById("itemDate").value = localDateString();
-    document.getElementById("studentName").value =
-      getCurrentUser()?.name || "";
 
-    selectedImage = "";
-
-    const preview = document.getElementById("imagePreview");
-    preview.removeAttribute("src");
-    preview.style.display = "none";
+    const today = localDateString();
+    $("itemDate").max = today;
+    $("itemDate").value = today;
+    $("studentName").value = getCurrentUser()?.name || "";
+    applyRoleFields();
 
     clearMessage("reportMessage");
-    document.getElementById("reportModal").classList.add("active");
+    openModal("reportModal");
   }
 
-  document.getElementById("itemImage").addEventListener("change", event => {
-    const file = event.target.files[0];
-    const preview = document.getElementById("imagePreview");
+  /* ---------- photo picker (photos are shrunk in the browser before upload) ---------- */
+  function loadImageElement(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`${file.name} could not be read as a photo.`)); };
+      img.src = url;
+    });
+  }
 
-    selectedImage = "";
-    preview.removeAttribute("src");
-    preview.style.display = "none";
-    clearMessage("reportMessage");
+  function resizeToJpeg(img, maxSide, quality) {
+    const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", quality);
+  }
 
-    if (!file) return;
+  async function processPhoto(file) {
+    const img = await loadImageElement(file);
+    return { full: resizeToJpeg(img, 1600, 0.8), thumb: resizeToJpeg(img, 420, 0.72) };
+  }
 
-    if (!file.type.startsWith("image/")) {
-      showMessage("reportMessage", "Please select an image.");
-      event.target.value = "";
-      return;
-    }
+  function renderPhotoTiles() {
+    $("photoGrid").innerHTML = photos.map((photo, i) => `
+      <div class="photo-tile">
+        <img src="${photo.thumb}" alt="Photo ${i + 1}">
+        <button type="button" data-remove-photo="${i}" aria-label="Remove photo ${i + 1}">✕</button>
+        ${i === 0 ? "<span>Cover</span>" : ""}
+      </div>`).join("");
 
-    if (file.size > 10 * 1024 * 1024) {
-      showMessage("reportMessage", "Image must be 10 MB or smaller.");
-      event.target.value = "";
-      return;
-    }
+    $("photoHelp").textContent = photos.length
+      ? `${photos.length} of ${MAX_PHOTOS} photos added. The first photo is the cover photo.`
+      : "No photos added. The first photo is the cover photo.";
+  }
 
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      selectedImage = String(reader.result || "");
-      preview.src = selectedImage;
-      preview.style.display = "block";
-    };
-
-    reader.onerror = () => {
-      showMessage(
-        "reportMessage",
-        "Could not read that image. Please try another one."
-      );
-    };
-
-    reader.readAsDataURL(file);
+  $("photoGrid").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-photo]");
+    if (!button) return;
+    photos.splice(Number(button.dataset.removePhoto), 1);
+    renderPhotoTiles();
   });
 
-  function syncReportRoleFields() {
-    const role = document.getElementById("authRole")?.value || "Student";
-    const faculty = role === "Faculty";
-    document.getElementById("reporterNameLabel").textContent = faculty ? "Faculty name *" : "Student name *";
-    document.getElementById("courseGroup").style.display = faculty ? "none" : "";
-    document.getElementById("studentCourse").required = !faculty;
-    document.getElementById("batchGroup").style.display = faculty ? "none" : "";
-    document.getElementById("studentBatch").required = !faculty;
-    document.getElementById("semesterGroup").style.display = faculty ? "none" : "";
-    document.getElementById("studentSemester").required = !faculty;
-    document.getElementById("designationGroup").style.display = faculty ? "" : "none";
-    document.getElementById("facultyDesignation").required = faculty;
-  }
-  document.getElementById("authRole")?.addEventListener("change", syncReportRoleFields);
-  syncReportRoleFields();
+  $("itemImage").addEventListener("change", async event => {
+    const input = event.target;
+    const files = Array.from(input.files || []);
+    input.value = "";
+    clearMessage("reportMessage");
+    if (!files.length) return;
 
-  document.getElementById("reportForm").addEventListener(
-    "submit",
-    async event => {
-      event.preventDefault();
+    if (photos.length + files.length > MAX_PHOTOS) {
+      showMessage("reportMessage", `You can add ${MAX_PHOTOS} photos at most (you already have ${photos.length}).`);
+      return;
+    }
 
-      const button = document.getElementById("reportSubmit");
-      button.disabled = true;
-      clearMessage("reportMessage");
-
-      try {
-        await apiRequest("/api/items", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            title: document.getElementById("itemTitle").value.trim(),
-            studentName: document.getElementById("studentName").value.trim(),
-            reporterRole: document.getElementById("authRole")?.value || "Student",
-            designation: document.getElementById("facultyDesignation").value,
-            course: document.getElementById("studentCourse").value.trim(),
-            department: document.getElementById("studentDepartment").value.trim(),
-            batch: document.getElementById("studentBatch").value.trim(),
-            semester: document.getElementById("studentSemester").value,
-            category: document.getElementById("itemCategory").value,
-            status: document.getElementById("itemStatus").value,
-            location: document.getElementById("itemLocation").value.trim(),
-            date: document.getElementById("itemDate").value,
-            description: document.getElementById("itemDescription").value.trim(),
-            image: selectedImage
-          })
-        });
-
-        closeModal("reportModal");
-        await loadItemsFromDatabase();
-
-        alert(
-          "Report submitted. It will appear to everyone after admin approval."
-        );
-      } catch (error) {
-        showMessage("reportMessage", error.message || "Could not submit report.");
-      } finally {
-        button.disabled = false;
+    for (const file of files) {
+      if (!file.type.startsWith("image/")) {
+        showMessage("reportMessage", `${file.name} is not a photo. Please select image files only.`);
+        return;
+      }
+      if (file.size > MAX_PHOTO_BYTES) {
+        showMessage("reportMessage", `${file.name} is larger than 10 MB.`);
+        return;
       }
     }
-  );
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    updateLoginUI();
+    photoBusy = true;
+    $("reportSubmit").disabled = true;
+    $("photoHelp").textContent = "Preparing photos...";
 
-    if (isLoggedIn()) {
+    try {
+      for (const file of files) photos.push(await processPhoto(file));
+    } catch (error) {
+      showMessage("reportMessage", error.message || "Could not prepare the photos.");
+    } finally {
+      photoBusy = false;
+      $("reportSubmit").disabled = false;
+      renderPhotoTiles();
+    }
+  });
+
+  $("reportForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    if (photoBusy) return;
+
+    const button = $("reportSubmit");
+    button.disabled = true;
+    clearMessage("reportMessage");
+
+    try {
+      await apiRequest("/api/items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: $("itemTitle").value.trim(),
+          designation: $("facultyDesignation").value,
+          course: $("studentCourse").value.trim(),
+          department: $("studentDepartment").value.trim(),
+          batch: $("studentBatch").value.trim(),
+          semester: $("studentSemester").value,
+          category: $("itemCategory").value,
+          status: $("itemStatus").value,
+          location: $("itemLocation").value.trim(),
+          date: $("itemDate").value,
+          description: $("itemDescription").value.trim(),
+          images: photos.map(photo => photo.full),
+          thumbnail: photos[0]?.thumb || ""
+        })
+      });
+
+      closeModal("reportModal");
       await loadItemsFromDatabase();
-    } else {
-      openAuth();
+      alert("Report submitted. It will appear to everyone after admin approval.");
+    } catch (error) {
+      showMessage("reportMessage", error.message || "Could not submit report.");
+    } finally {
+      button.disabled = false;
     }
   });
-    // --- MULTI-IMAGE SLIDER & ZOOM CODE SHURU ---
-const itemImageInput = document.getElementById('itemImage');
-if (itemImageInput) {
-  itemImageInput.addEventListener('change', function(e) {
-    const files = Array.from(e.target.files);
-    const container = document.getElementById('preview-slider-container');
-    const activeImg = document.getElementById('imagePreview');
-    const counter = document.getElementById('slider-counter');
-    const wrapper = document.getElementById('zoom-wrapper');
-    
-    if (files.length === 0) {
-      if (container) container.style.display = 'none';
-      return;
-    }
 
-    let currentIndex = 0;
-    let isZoomed = false;
-    const fileURLs = files.map(file => URL.createObjectURL(file));
+  /* ================= START ================= */
+  updateLoginUI();
 
-    if (container) container.style.display = 'block';
-
-    function updateSlider() {
-      isZoomed = false;
-      if (activeImg) {
-        activeImg.style.transform = 'scale(1)';
-        activeImg.src = fileURLs[currentIndex];
-      }
-      if (wrapper) wrapper.style.cursor = 'zoom-in';
-      if (counter) counter.textContent = `Image ${currentIndex + 1} of ${fileURLs.length}`;
-    }
-
-    updateSlider();
-
-    const nextBtn = document.getElementById('next-btn');
-    if (nextBtn) {
-      nextBtn.onclick = function(event) {
-        event.preventDefault();
-        if (fileURLs.length > 0) {
-          currentIndex = (currentIndex + 1) % fileURLs.length;
-          updateSlider();
-        }
-      };
-    }
-
-    const prevBtn = document.getElementById('prev-btn');
-    if (prevBtn) {
-      prevBtn.onclick = function(event) {
-        event.preventDefault();
-        if (fileURLs.length > 0) {
-          currentIndex = (currentIndex - 1 + fileURLs.length) % fileURLs.length;
-          updateSlider();
-        }
-      };
-    }
-
-    if (wrapper) {
-      wrapper.onclick = function(event) {
-        event.preventDefault();
-        if (activeImg) {
-          if (!isZoomed) {
-            activeImg.style.transform = 'scale(2.2)';
-            wrapper.style.cursor = 'zoom-out';
-            isZoomed = true;
-          } else {
-            activeImg.style.transform = 'scale(1)';
-            wrapper.style.cursor = 'zoom-in';
-            isZoomed = false;
-          }
-        }
-      };
-    }
-  });
-}
-// --- MULTI-IMAGE SLIDER & ZOOM CODE KHATAM ---
-  // --- FULL SCREEN PREVIEW MODAL LOGIC SHURU ---
-window.openImageModal = function(imgSrc) {
-  // Check memory if modal already exists, else create dynamically
-  let modal = document.getElementById('global-image-modal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'global-image-modal';
-    modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; cursor:zoom-out;';
-    
-    const innerImg = document.createElement('img');
-    innerImg.id = 'global-modal-img';
-    innerImg.style.cssText = 'max-width:95%; max-height:95%; object-fit:contain; border-radius:4px; transition: transform 0.2s ease;';
-    
-    modal.appendChild(innerImg);
-    document.body.appendChild(modal);
-    
-    // Close modal on tap/click anywhere
-    modal.onclick = function() {
-      modal.style.display = 'none';
-    };
-  }
-  
-  const modalImg = document.getElementById('global-modal-img');
-  if (modalImg) {
-    modalImg.src = imgSrc;
-  }
-  modal.style.display = 'flex';
-};
-// --- FULL SCREEN PREVIEW MODAL LOGIC KHATAM ---
-  
-// Manlo tumhare paas ek card ki images ka array hai:
-const itemImages = [
-    "https://example.com",
-    "https://example.com",
-    "https://example.com"
-];
-
-// Jab main cover image par click ho:
-coverImageElement.onclick = () => {
-    window.openImageGallery(itemImages, 0); // 0 matlab pehli image se chalu hoga
-};
-
-</script>
+  if (isLoggedIn()) loadItemsFromDatabase();
+  else openAuth();
+  </script>
 </body>
 </html>
