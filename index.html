@@ -2124,24 +2124,7 @@
 
     const type = getItemType(item) === "Found" ? "Found" : "Lost";
 
-    const emailActions = email
-      ? `
-        <div class="contact-links">
-          <a
-            href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Open Gmail</a>
-          <a href="mailto:${encodeURIComponent(email)}">Open email app</a>
-        </div>
-      `
-      : '<p>Email/Gmail: Not available</p>';
-
-    const phoneAction = phone
-      ? `<div class="contact-links"><a href="tel:${encodeURIComponent(phone)}">Call ${escapeHTML(phone)}</a></div>`
-      : "<p>Phone: Not provided</p>";
-
-    result.innerHTML = `
+       result.innerHTML = `
       <strong>Complete item information</strong>
       ${detailLine("Item", getItemName(item))}
       ${detailLine("Status", type)}
@@ -2163,8 +2146,18 @@
       ${detailLine("Department", getDepartment(item))}
       ${detailLine("Batch", getBatch(item))}
       ${detailLine("Semester", getSemester(item))}
-      ${emailActions}
-      ${phoneAction}
+      
+      <!-- Privacy Safe Contact Link -->
+      ${email ? `
+        <div style="margin-top: 15px;">
+          <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=${encodeURIComponent(email)}" 
+             target="_blank" 
+             rel="noopener noreferrer" 
+             style="color: #38bdf8; text-decoration: underline; font-weight: bold; font-size: 16px;">
+            Contact
+          </a>
+        </div>
+      ` : '<p style="color: #aaa; margin-top: 15px;">Contact: Not available</p>'}
     `;
   }
 
