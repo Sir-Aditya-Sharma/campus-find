@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const { createRateLimit } = require("../middleware/rateLimit");
 
 const router = express.Router();
 router.use(createRateLimit({ maxRequests: 240, windowMs: 15 * 60 * 1000 }));
@@ -9,7 +10,6 @@ const {
   authenticateUser,
   authenticateAdmin
 } = require("../middleware/auth");
-const { createRateLimit } = require("../middleware/rateLimit");
 
 const REPORT_LIFETIME_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_IMAGES = 5;
