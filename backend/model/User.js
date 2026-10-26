@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
+      maxlength: 254
     },
 
     password: {
@@ -41,11 +42,27 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["Pending", "Approved", "Rejected", "Disabled"],
       default: "Approved"
+    },
+
+    // Server-side authorization role (JWT claims are not trusted alone).
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user"
+    },
+
+    // Bump this to revoke old sessions (for password reset / disabling).
+    tokenVersion: {
+      type: Number,
+      default: 0
     }
   },
   {
     timestamps: true
   }
 );
+
+userSchema.index({ accountStatus: 1, accountType: 1, createdAt: -1 });
+userSchema.index({ role: 1 });
 
 module.exports = mongoose.model("User", userSchema);

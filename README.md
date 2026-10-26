@@ -1,57 +1,63 @@
-🎓 Campus Find
-Discover Colleges. Connect with Opportunities.
+# Campus Find
 
-Campus Find is a web application designed to help students explore college information through a simple web interface.
+Campus Find is a beginner-friendly lost-and-found web app with:
+- Student/Faculty login
+- Admin dashboard for account/report review
+- Report posting, approval, and return tracking
 
-Built as a personal web development project with the help of AI-assisted coding, Campus Find represents my hands-on learning journey in web development.
+## Important account access note
 
-🌐 Live Demo: https://campus-find-frontend.onrender.com/
+Public registration is disabled.  
+Only administrator-created accounts can log in.
 
-💻 GitHub Repository: https://github.com/Sir-Aditya-Sharma/campus-find
+## Runtime assumptions
 
-✨ Features
-🔎 College Search — Explore college information through the application.
-🔐 Student Authentication — Student sign-up and login functionality.
-🗄️ Database Integration — Connects with a database to manage and retrieve application data.
-🌐 Live Deployment — Access the deployed web application online.
-🎯 Project Purpose
+- Node.js `>=20.19.0`
+- MongoDB (local or Atlas)
 
-The purpose of Campus Find is to make college discovery more convenient for students through a web-based platform.
+## Setup
 
-This project also helps me gain practical experience in building, deploying, and improving web applications.
+1. Copy environment values:
+   - Use `.env.example` as the template.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the backend:
+   ```bash
+   npm start
+   ```
+4. Open:
+   - `index.html` for user UI
+   - `admin/admin.html` for admin dashboard
 
-🛠️ Technologies
-Frontend: Refer to the project source code.
-Backend: See the backend/ directory.
-Database: Refer to the application configuration.
-Authentication: Student sign-up and login.
-Deployment: Render.
-📂 Project Structure
-admin/ — Admin-related files.
-backend/ — Backend application files.
-index.html — HTML entry point.
-package.json — Project configuration and dependencies.
-📚 What I'm Learning
-Web application development
-Frontend and backend integration
-Database connectivity
-Authentication workflows
-Debugging and troubleshooting
-AI-assisted coding and problem-solving
-🚀 Future Improvements
-Improve college search and filtering.
-Enhance responsive design.
-Improve loading states and error handling.
-Strengthen authentication and data security.
-Add more testing and documentation.
-👨‍💻 About Me
+## Environment variables
 
-Aditya Sharma
+- `MONGO_URI` (required)
+- `JWT_SECRET` (required)
+- `ADMIN_EMAIL` (required for configured admin compatibility)
+- `ALLOWED_ORIGINS` (required in production; comma-separated origins)
+- `NODE_ENV` (`production` or `development`)
 
-Aspiring Web Developer | AI-Assisted Development | Building Practical Projects
+In development, localhost origins are allowed by default.  
+In production, the server exits if `ALLOWED_ORIGINS` is not configured.
 
-🔗 GitHub: https://github.com/Sir-Aditya-Sharma
+## Security notes
 
-⭐ Thanks for checking out Campus Find!
+- Authenticated requests re-check live user status from MongoDB.
+- Password reset and account disabling revoke older JWT sessions.
+- JWT access token lifetime is shorter than before (`12h`).
+- The frontend currently stores JWTs in `localStorage` for compatibility with the existing UI.  
+  This means XSS would still be high impact; moving to HttpOnly cookies is a future hardening step.
 
-Feedback and suggestions are welcome.
+## Validation / checks
+
+Run syntax checks:
+```bash
+npm run check
+```
+
+Backend-only check:
+```bash
+cd backend && npm run check
+```

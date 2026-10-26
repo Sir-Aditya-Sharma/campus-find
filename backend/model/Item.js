@@ -157,4 +157,9 @@ const itemSchema = new mongoose.Schema(
   }
 );
 
+itemSchema.index({ createdAt: -1 });
+itemSchema.index({ reviewStatus: 1, createdAt: -1 });
+itemSchema.index({ userId: 1, createdAt: -1 });
+itemSchema.index({ resolutionStatus: 1, createdAt: -1 });
+
 module.exports = mongoose.model("Item", itemSchema);

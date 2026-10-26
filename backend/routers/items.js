@@ -68,6 +68,19 @@ function isFarFuture(value) {
   return time > Date.now() + 36 * 60 * 60 * 1000;
 }
 
+function parsePagination(query, defaultLimit = 20, maxLimit = 100) {
+  const hasPagination =
+    query?.page !== undefined || query?.limit !== undefined;
+  const page = Math.max(Number.parseInt(query?.page, 10) || 1, 1);
+  const limit = Math.min(
+    Math.max(Number.parseInt(query?.limit, 10) || defaultLimit, 1),
+    maxLimit
+  );
+  const skip = (page - 1) * limit;
+
+  return { hasPagination, page, limit, skip };
+}
+
 // All photos of a report (new reports use `images`, old ones use `image`).
 function imagesOf(item) {
   if (Array.isArray(item.images) && item.images.length) {
@@ -77,8 +90,23 @@ function imagesOf(item) {
   return item.image ? [item.image] : [];
 }
 
-// Only these fields are ever sent to the browser (no userId, no contact data).
-function publicFields(item) {
+function getItemAccess(item, userId) {
+  const isOwner = String(item.userId) === String(userId);
+  const reviewStatus = item.reviewStatus || "Approved";
+  const resolutionStatus = item.resolutionStatus || "Open";
+  const expired = isExpired(item);
+
+  return {
+    isOwner,
+    reviewStatus,
+    resolutionStatus,
+    expired,
+    canView: !expired && (isOwner || reviewStatus === "Approved")
+  };
+}
+
+// Detail fields for one report (no userId, no password/hidden account data).
+function publicDetailFields(item) {
   return {
     _id: item._id,
     itemName: item.itemName,
@@ -100,12 +128,22 @@ function publicFields(item) {
   };
 }
 
-// Listing view: small preview photo + photo count only (full photos load on click).
+// Listing view keeps report details minimal.
 function listFields(item) {
   const count = item.imageCount || (item.image ? 1 : 0);
 
   return {
-    ...publicFields(item),
+    _id: item._id,
+    itemName: item.itemName,
+    category: item.category,
+    type: item.type,
+    description: item.description,
+    location: item.location,
+    date: item.date,
+    reporterRole: item.reporterRole || "Student",
+    reviewStatus: item.reviewStatus || "Approved",
+    resolutionStatus: item.resolutionStatus || "Open",
+    createdAt: item.createdAt,
     thumbnail: item.thumbnail || item.image || "",
     imageCount: count
   };
@@ -125,17 +163,28 @@ function validObjectId(req, res, message) {
 // All reports for the admin panel (preview photo only, not the full photos).
 router.get("/admin/all", authenticateAdmin, async (req, res) => {
   try {
-    const items = await Item.find().select("-images").sort({ createdAt: -1 }).lean();
-
-    return res.json(
-      items.map((item) => ({
-        ...listFields(item),
-        reporterEmail: item.studentContact,
-        reviewedAt: item.reviewedAt,
-        returnedAt: item.returnedAt,
-        isExpired: isExpired(item)
-      }))
+    const { hasPagination, page, limit, skip } = parsePagination(
+      req.query,
+      25,
+      200
     );
+    const query = Item.find().select("-images").sort({ createdAt: -1 });
+    const items = await (hasPagination ? query.skip(skip).limit(limit) : query).lean();
+
+    const payload = items.map((item) => ({
+      ...listFields(item),
+      reporterEmail: item.studentContact,
+      reviewedAt: item.reviewedAt,
+      returnedAt: item.returnedAt,
+      isExpired: isExpired(item)
+    }));
+
+    if (!hasPagination) {
+      return res.json(payload);
+    }
+
+    const total = await Item.countDocuments();
+    return res.json({ items: payload, page, limit, total });
   } catch (error) {
     console.error("Admin report list error:", error.message);
 
@@ -159,7 +208,7 @@ router.get("/admin/:id", authenticateAdmin, async (req, res) => {
       .lean();
 
     return res.json({
-      ...publicFields(item),
+      ...publicDetailFields(item),
       reviewedAt: item.reviewedAt,
       returnedAt: item.returnedAt,
       images: imagesOf(item),
@@ -236,8 +285,13 @@ router.delete("/admin/:id", authenticateAdmin, async (req, res) => {
 router.get("/", authenticateUser, async (req, res) => {
   try {
     const cutoff = new Date(Date.now() - REPORT_LIFETIME_MS);
+    const { hasPagination, page, limit, skip } = parsePagination(
+      req.query,
+      20,
+      100
+    );
 
-    const items = await Item.find({
+    const queryFilter = {
       createdAt: { $gte: cutoff },
       $or: [
         { reviewStatus: "Approved" },
@@ -245,17 +299,32 @@ router.get("/", authenticateUser, async (req, res) => {
         { reviewStatus: null },
         { userId: req.user.id }
       ]
-    })
+    };
+    const baseQuery = Item.find(queryFilter)
       .select("-images")
-      .sort({ createdAt: -1 })
-      .lean();
+      .sort({ createdAt: -1 });
+    const items = await (hasPagination
+      ? baseQuery.skip(skip).limit(limit)
+      : baseQuery
+    ).lean();
 
-    return res.json(
-      items.map((item) => ({
-        ...listFields(item),
-        isOwner: String(item.userId) === req.user.id
-      }))
-    );
+    const payload = items
+      .map((item) => {
+        const access = getItemAccess(item, req.user.id);
+        if (!access.canView) return null;
+        return {
+          ...listFields(item),
+          isOwner: access.isOwner
+        };
+      })
+      .filter(Boolean);
+
+    if (!hasPagination) {
+      return res.json(payload);
+    }
+
+    const total = await Item.countDocuments(queryFilter);
+    return res.json({ items: payload, page, limit, total });
   } catch (error) {
     console.error("Student report list error:", error.message);
 
@@ -274,18 +343,20 @@ router.get("/:id", authenticateUser, async (req, res) => {
       return res.status(404).json({ message: "Item not found." });
     }
 
-    const isOwner = String(item.userId) === req.user.id;
-    const reviewStatus = item.reviewStatus || "Approved";
-    const resolutionStatus = item.resolutionStatus || "Open";
+    const access = getItemAccess(item, req.user.id);
 
-    if ((reviewStatus !== "Approved" && !isOwner) || isExpired(item)) {
+    if (!access.canView) {
       return res.status(404).json({ message: "This report is not available." });
     }
 
     // Contact details only for an approved, open report that is not your own.
     let contact = null;
 
-    if (!isOwner && reviewStatus === "Approved" && resolutionStatus === "Open") {
+    if (
+      !access.isOwner &&
+      access.reviewStatus === "Approved" &&
+      access.resolutionStatus === "Open"
+    ) {
       const poster = await User.findById(item.userId)
         .select("name email phone")
         .lean();
@@ -300,9 +371,9 @@ router.get("/:id", authenticateUser, async (req, res) => {
     }
 
     return res.json({
-      ...publicFields(item),
+      ...publicDetailFields(item),
       images: imagesOf(item),
-      isOwner,
+      isOwner: access.isOwner,
       contact
     });
   } catch (error) {
