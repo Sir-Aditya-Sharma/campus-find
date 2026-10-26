@@ -10,6 +10,7 @@ const itemRoutes = require("./routers/items");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
 
 // Required environment variables
 const missingSettings = ["MONGO_URI", "JWT_SECRET"].filter(
@@ -34,29 +35,74 @@ app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader("X-XSS-Protection", "0");
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.setHeader("Content-Security-Policy", [
+    "default-src 'none'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    "connect-src 'self'",
+    "img-src 'self' data: https:",
+    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline'"
+  ].join("; "));
+
+  if (isProduction) {
+    res.setHeader(
+      "Strict-Transport-Security",
+      "max-age=31536000; includeSubDomains"
+    );
+  }
+
   next();
 });
 
 // CORS:
-// - If ALLOWED_ORIGINS is NOT set, every website can call the API (same as before).
-// - To lock it, set ALLOWED_ORIGINS on Render, comma separated, for example:
+// - In production, ALLOWED_ORIGINS is required.
+// - In development, localhost defaults are allowed.
+// - Set ALLOWED_ORIGINS as comma separated values, for example:
 //   https://campus-find-frontend.onrender.com,https://your-admin-site.onrender.com,http://127.0.0.1:5501
 const allowedOrigins = String(process.env.ALLOWED_ORIGINS || "")
   .split(",")
   .map((origin) => origin.trim().replace(/\/$/, ""))
   .filter(Boolean);
 
+if (isProduction && allowedOrigins.length === 0) {
+  console.error("ALLOWED_ORIGINS is required in production.");
+  process.exit(1);
+}
+
+const developmentOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5000",
+  "http://localhost:5500",
+  "http://localhost:5501",
+  "http://127.0.0.1:3000",
+  "http://127.0.0.1:5000",
+  "http://127.0.0.1:5500",
+  "http://127.0.0.1:5501"
+];
+const corsOrigins =
+  allowedOrigins.length > 0
+    ? allowedOrigins
+    : isProduction
+      ? []
+      : developmentOrigins;
+
 app.use(
-  cors(
-    allowedOrigins.length
-      ? {
-          origin(origin, callback) {
-            // No origin = server-to-server or direct browser visit.
-            callback(null, !origin || allowedOrigins.includes(origin));
-          }
-        }
-      : undefined
-  )
+  cors({
+    origin(origin, callback) {
+      if (!origin || corsOrigins.includes(origin.replace(/\/$/, ""))) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Origin not allowed by CORS policy."));
+    },
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
 );
 
 // Photos are sent as Base64 JSON (up to 5 shrunk photos + 1 preview per report).

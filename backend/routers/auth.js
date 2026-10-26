@@ -10,8 +10,50 @@ const {
   authenticateAdmin
 } = require("../middleware/auth");
 const loginGuard = require("../middleware/loginGuard");
+const { createRateLimit } = require("../middleware/rateLimit");
 
 const router = express.Router();
+router.use(createRateLimit({ maxRequests: 180, windowMs: 15 * 60 * 1000 }));
+const MIN_PASSWORD_LENGTH = 10;
+const MAX_PASSWORD_LENGTH = 128;
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 254;
+
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isValidEmail(email) {
+  return (
+    typeof email === "string" &&
+    email.length <= MAX_EMAIL_LENGTH &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(email)
+  );
+}
+
+function isStrongPassword(password) {
+  return (
+    typeof password === "string" &&
+    password.length >= MIN_PASSWORD_LENGTH &&
+    password.length <= MAX_PASSWORD_LENGTH &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password) &&
+    !/\s/.test(password)
+  );
+}
+
+function parsePagination(query, defaultLimit = 50, maxLimit = 200) {
+  const hasPagination =
+    query?.page !== undefined || query?.limit !== undefined;
+  const page = Math.max(Number.parseInt(query?.page, 10) || 1, 1);
+  const limit = Math.min(
+    Math.max(Number.parseInt(query?.limit, 10) || defaultLimit, 1),
+    maxLimit
+  );
+  const skip = (page - 1) * limit;
+  return { hasPagination, page, limit, skip };
+}
 
 function isValidPhone(phone) {
   return !phone || /^[+0-9().\-\s]{7,30}$/.test(phone);
@@ -35,13 +77,12 @@ router.post("/login", async (req, res) => {
     } = req.body || {};
 
     if (
-      typeof email !== "string" ||
-      !email.trim() ||
+      !isValidEmail(cleanString(email).toLowerCase()) ||
       typeof password !== "string" ||
       !password
     ) {
       return res.status(400).json({
-        message: "Please enter email and password."
+        message: "Please enter a valid email and password."
       });
     }
 
@@ -51,7 +92,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanEmail = cleanString(email).toLowerCase();
     const guardKey = `${req.ip}|${cleanEmail}`;
 
     if (loginGuard.isBlocked(guardKey)) {
@@ -71,7 +112,9 @@ router.post("/login", async (req, res) => {
     }
 
     const adminEmail = getAdminEmail();
-    const isAdmin = Boolean(adminEmail) && cleanEmail === adminEmail;
+    const isAdminByRole = user.role === "admin";
+    const isAdminByEmail = Boolean(adminEmail) && cleanEmail === adminEmail;
+    const isAdmin = isAdminByRole || isAdminByEmail;
 
     // Verify the selected role for non-admin accounts.
     if (!isAdmin) {
@@ -82,6 +125,7 @@ router.post("/login", async (req, res) => {
       }
 
       const savedAccountType = user.accountType || "Student";
+      const currentStatus = user.accountStatus || "Approved";
 
       if (savedAccountType !== requestedAccountType) {
         return res.status(403).json({
@@ -90,13 +134,13 @@ router.post("/login", async (req, res) => {
       }
 
       // Only approved accounts may log in.
-      if (user.accountStatus !== "Approved") {
+      if (currentStatus !== "Approved") {
         let message = "Your account is waiting for admin approval.";
 
-        if (user.accountStatus === "Rejected") {
+        if (currentStatus === "Rejected") {
           message =
             "Your account request was rejected. Contact the campus admin.";
-        } else if (user.accountStatus === "Disabled") {
+        } else if (currentStatus === "Disabled") {
           message = "This account is disabled. Contact the campus admin.";
         }
 
@@ -107,16 +151,17 @@ router.post("/login", async (req, res) => {
     loginGuard.clear(guardKey);
 
     const accountType = user.accountType || (isAdmin ? "Admin" : "Student");
+    const tokenVersion = Number(user.tokenVersion || 0);
 
     const token = jwt.sign(
       {
         id: String(user._id),
         email: user.email,
         accountType,
-        isAdmin
+        tokenVersion
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "12h" }
     );
 
     return res.json({
@@ -152,19 +197,14 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
         : req.body.accountType;
 
     if (
-      typeof name !== "string" ||
-      !name.trim() ||
-      name.trim().length > 100 ||
-      typeof email !== "string" ||
-      !email.trim() ||
-      email.trim().length > 254 ||
-      typeof password !== "string" ||
-      password.length < 8 ||
-      password.length > 128
+      !cleanString(name) ||
+      cleanString(name).length > MAX_NAME_LENGTH ||
+      !isValidEmail(cleanString(email).toLowerCase()) ||
+      !isStrongPassword(password)
     ) {
       return res.status(400).json({
         message:
-          "Enter a name, valid email, and password of 8–128 characters."
+          "Enter a name, valid email, and a strong password (10+ chars with upper, lower, and number)."
       });
     }
 
@@ -174,9 +214,9 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
       });
     }
 
-    const cleanName = name.trim();
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPhone = typeof phone === "string" ? phone.trim() : "";
+    const cleanName = cleanString(name);
+    const cleanEmail = cleanString(email).toLowerCase();
+    const cleanPhone = cleanString(phone);
 
     if (cleanEmail === getAdminEmail()) {
       return res.status(400).json({
@@ -207,7 +247,9 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
       password: await bcrypt.hash(password, 12),
       phone: cleanPhone,
       accountType,
-      accountStatus
+      accountStatus,
+      role: "user",
+      tokenVersion: 0
     });
 
     await user.save();
@@ -244,20 +286,32 @@ router.post("/admin/users", authenticateAdmin, async (req, res) => {
 // Admin: list accounts without exposing password hashes.
 router.get("/admin/users", authenticateAdmin, async (req, res) => {
   try {
-    const users = await User.find({
-      email: { $ne: getAdminEmail() }
-    })
-      .select("name email phone accountType accountStatus createdAt")
-      .sort({ createdAt: -1 })
-      .lean();
-
-    // Older accounts without accountType are treated as Students.
-    return res.json(
-      users.map((user) => ({
-        ...user,
-        accountType: user.accountType || "Student"
-      }))
+    const { hasPagination, page, limit, skip } = parsePagination(
+      req.query,
+      50,
+      200
     );
+    const query = {
+      email: { $ne: getAdminEmail() }
+    };
+    const baseQuery = User.find(query)
+      .select("name email phone accountType accountStatus createdAt")
+      .sort({ createdAt: -1 });
+    const users = await (hasPagination
+      ? baseQuery.skip(skip).limit(limit)
+      : baseQuery
+    ).lean();
+    const payload = users.map((user) => ({
+      ...user,
+      accountType: user.accountType || "Student"
+    }));
+
+    if (!hasPagination) {
+      return res.json(payload);
+    }
+
+    const total = await User.countDocuments(query);
+    return res.json({ users: payload, page, limit, total });
   } catch (error) {
     console.error("Load users error:", error.message);
 
@@ -299,6 +353,9 @@ router.patch(
       }
 
       user.accountStatus = accountStatus;
+      if (accountStatus === "Disabled") {
+        user.tokenVersion = Number(user.tokenVersion || 0) + 1;
+      }
       await user.save();
 
       return res.json({
@@ -328,12 +385,11 @@ router.patch(
       const { newPassword } = req.body || {};
 
       if (
-        typeof newPassword !== "string" ||
-        newPassword.length < 8 ||
-        newPassword.length > 128
+        !isStrongPassword(newPassword)
       ) {
         return res.status(400).json({
-          message: "New password must be 8–128 characters."
+          message:
+            "New password must be strong (10+ chars with upper, lower, and number)."
         });
       }
 
@@ -347,6 +403,7 @@ router.patch(
       }
 
       user.password = await bcrypt.hash(newPassword, 12);
+      user.tokenVersion = Number(user.tokenVersion || 0) + 1;
       await user.save();
 
       return res.json({
