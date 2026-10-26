@@ -10,8 +10,10 @@ const {
   authenticateAdmin
 } = require("../middleware/auth");
 const loginGuard = require("../middleware/loginGuard");
+const { createRateLimit } = require("../middleware/rateLimit");
 
 const router = express.Router();
+router.use(createRateLimit({ maxRequests: 180, windowMs: 15 * 60 * 1000 }));
 const MIN_PASSWORD_LENGTH = 10;
 const MAX_PASSWORD_LENGTH = 128;
 const MAX_NAME_LENGTH = 100;
